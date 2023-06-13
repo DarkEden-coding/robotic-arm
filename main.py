@@ -14,6 +14,7 @@ while True:
     print("Counter-Clockwise Test")
     mymotortest.motor_go(
         False,  # True=Clockwise, False=Counter-Clockwise
+        "Full",  # Step type (Full,Half,1/4,1/8,1/16,1/32)
         50,  # number of steps
         0.05,  # step delay [sec]
         False,  # True = print verbose output
@@ -23,6 +24,7 @@ while True:
     print("Clockwise Test")
     mymotortest.motor_go(
         True,  # True=Clockwise, False=Counter-Clockwise
+        "Full",  # Step type (Full,Half,1/4,1/8,1/16,1/32)
         50,  # number of steps
         0.05,  # step delay [sec]
         False,  # True = print verbose output

@@ -8,7 +8,7 @@ direction = 14  # Direction (DIR) GPIO Pin
 step = 15  # Step GPIO Pin
 
 # Declare a instance of class pass GPIO pins numbers and the motor type
-mymotortest = RpiMotorLib.A4988Nema(direction, step, (21, 21, 21), "DRV8825")
+mymotortest = RpiMotorLib.A4988Nema(direction, step, (-1, -1, -1), "DRV8825")
 
 while True:
     print("Counter-Clockwise Test")

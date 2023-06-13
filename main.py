@@ -11,6 +11,7 @@ step = 15  # Step GPIO Pin
 mymotortest = RpiMotorLib.A4988Nema(direction, step, (21, 21, 21), "DRV8825")
 
 while True:
+    print("Counter-Clockwise Test")
     mymotortest.motor_go(
         False,  # True=Clockwise, False=Counter-Clockwise
         "Full",  # Step type (Full,Half,1/4,1/8,1/16,1/32)
@@ -20,6 +21,7 @@ while True:
         0.05,
     )  # initial delay [sec]
 
+    print("Clockwise Test")
     mymotortest.motor_go(
         True,  # True=Clockwise, False=Counter-Clockwise
         "Full",  # Step type (Full,Half,1/4,1/8,1/16,1/32)

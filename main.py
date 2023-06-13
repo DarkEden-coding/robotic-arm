@@ -1,6 +1,8 @@
-import RPi.GPIO as GPIO
 from RpiMotorLib import RpiMotorLib
 from time import sleep
+import RPi.GPIO as GPIO
+
+GPIO.setmode(GPIO.BCM)
 
 direction = 14  # Direction (DIR) GPIO Pin
 step = 15  # Step GPIO Pin

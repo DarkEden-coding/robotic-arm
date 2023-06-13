@@ -10,10 +10,6 @@ EN_pin = 24  # enable pin (LOW to enable)
 mymotortest = RpiMotorLib.A4988Nema(direction, step, (21, 21, 21), "DRV8825")
 GPIO.setup(EN_pin, GPIO.OUT)  # set enable pin as output
 
-###########################
-# Actual motor control
-###########################
-#
 GPIO.output(EN_pin, GPIO.LOW)  # pull enable to low to enable motor
 mymotortest.motor_go(
     False,  # True=Clockwise, False=Counter-Clockwise

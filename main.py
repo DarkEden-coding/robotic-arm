@@ -1,38 +1,42 @@
-#######################################
-# Copyright (c) 2021 Maker Portal LLC
-# Author: Joshua Hrisko
-#######################################
-#
-# NEMA 17 (17HS4023) Raspberry Pi Tests
-# --- rotating the NEMA 17 clockwise
-# --- and counterclockwise in a loop
-#
-#
-#######################################
-#
 import RPi.GPIO as GPIO
-from RpiMotorLib import RpiMotorLib
-import time
+from time import sleep
 
-################################
-# RPi and Motor Pre-allocations
-################################
-#
-# define GPIO pins
-direction = 22  # Direction (DIR) GPIO Pin
-step = 23  # Step GPIO Pin
+GPIO.setmode(GPIO.BCM)
 
-# Declare a instance of class pass GPIO pins numbers and the motor type
-mymotortest = RpiMotorLib.A4988Nema(direction, step, (-1, -1, -1), "A4988")
+direction_pin = 14  # Direction (DIR) GPIO Pin
+step_pin = 15  # Step GPIO Pin
 
-dir_array = [False, True]
-for ii in range(10):
-    mymotortest.motor_go(
-        dir_array[ii % 2],  # False=Clockwise, True=Counterclockwise
-        "Full",  # Step type (Full,Half,1/4,1/8,1/16,1/32)
-        200,  # number of steps
-        0.0005,  # step delay [sec]
-        False,  # True = print verbose output
-        0.05,
-    )  # initial delay [sec]
-    time.sleep(1)
+# Set up GPIO pins as outputs
+GPIO.setup(direction_pin, GPIO.OUT)
+GPIO.setup(step_pin, GPIO.OUT)
+
+# Define motor rotation constants
+CLOCKWISE = GPIO.HIGH
+COUNTERCLOCKWISE = GPIO.LOW
+
+
+def rotate_stepper_motor(angle, direction, delay):
+    steps_per_revolution = 200  # Number of steps per full revolution
+    total_steps = int(angle / 360 * steps_per_revolution)  # Calculate total steps based on desired angle
+
+    # Set the motor direction
+    GPIO.output(direction_pin, direction)
+
+    # Generate step pulses to rotate the motor
+    for _ in range(total_steps):
+        GPIO.output(step_pin, GPIO.HIGH)
+        sleep(delay)
+        GPIO.output(step_pin, GPIO.LOW)
+        sleep(delay)
+
+
+# Repeat the process 10 times
+for _ in range(10):
+    # Rotate 360 degrees counterclockwise
+    rotate_stepper_motor(360, COUNTERCLOCKWISE, 0.001)
+    sleep(1)  # Wait for 1 second between rotations
+    rotate_stepper_motor(360, CLOCKWISE, 0.001)
+    sleep(1)  # Wait for 1 second between rotations
+
+# Clean up GPIO
+GPIO.cleanup()

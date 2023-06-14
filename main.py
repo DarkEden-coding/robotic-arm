@@ -48,6 +48,7 @@ class StepperMotor:
                 self.position -= 1
             else:
                 self.position += 1
+            print(f"Step: {step + 1} Speed: {self.step_speed} Position: {self.position}")
 
 
 motor = StepperMotor(direction_pin, step_pin)

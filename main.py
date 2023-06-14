@@ -38,10 +38,12 @@ class StepperMotor:
             GPIO.output(self.direction_pin, COUNTERCLOCKWISE)
 
         for step in range(self.steps):
-            if step < (MAX_SPEED / ACCELERATION) - 1 and self.step_speed < MAX_SPEED:
-                self.step_speed += self.acceleration
-            elif step > (self.steps - ((MAX_SPEED - STARTING_SPEED) / ACCELERATION)) - 1 and self.step_speed > STARTING_SPEED:
-                self.step_speed -= self.acceleration
+            if self.steps < self.steps / 2:
+                if step < (MAX_SPEED / ACCELERATION) - 1 and self.step_speed < MAX_SPEED:
+                    self.step_speed += self.acceleration
+            else:
+                if step > (self.steps - ((MAX_SPEED - STARTING_SPEED) / ACCELERATION)) - 1 and self.step_speed > STARTING_SPEED:
+                    self.step_speed -= self.acceleration
             GPIO.output(self.step_pin, GPIO.HIGH)
             sleep(1 / self.step_speed)
             GPIO.output(self.step_pin, GPIO.LOW)

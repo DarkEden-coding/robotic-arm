@@ -13,7 +13,7 @@ GPIO.setup(step_pin, GPIO.OUT)
 # Define motor rotation constants
 CLOCKWISE = GPIO.HIGH
 COUNTERCLOCKWISE = GPIO.LOW
-MAX_SPEED = 0.0005  # 0.5 ms
+MAX_SPEED = 10  # 0.5 ms
 
 
 class StepperMotor:

@@ -17,7 +17,9 @@ COUNTERCLOCKWISE = GPIO.LOW
 
 def rotate_stepper_motor(angle, direction, delay):
     steps_per_revolution = 200  # Number of steps per full revolution
-    total_steps = int(angle / 360 * steps_per_revolution)  # Calculate total steps based on desired angle
+    total_steps = int(
+        angle / 360 * steps_per_revolution
+    )  # Calculate total steps based on desired angle
 
     # Set the motor direction
     GPIO.output(direction_pin, direction)
@@ -33,8 +35,10 @@ def rotate_stepper_motor(angle, direction, delay):
 # Repeat the process 10 times
 for _ in range(10):
     # Rotate 360 degrees counterclockwise
+    print("Rotating 360 degrees counterclockwise")
     rotate_stepper_motor(360, COUNTERCLOCKWISE, 0.001)
     sleep(1)  # Wait for 1 second between rotations
+    print("Rotating 360 degrees clockwise")
     rotate_stepper_motor(360, CLOCKWISE, 0.001)
     sleep(1)  # Wait for 1 second between rotations
 

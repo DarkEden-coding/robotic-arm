@@ -58,7 +58,7 @@ class StepperMotor:
 motor = StepperMotor(direction_pin, step_pin)
 
 # Repeat the process 10 times
-for _ in range(10):
+for _ in range(20):
     # Rotate 360 degrees counterclockwise with acceleration of 1000 steps per second squared
     print("Rotating 640 degrees counterclockwise")
     motor.move(steps=400, clockwise=False, acceleration=ACCELERATION)

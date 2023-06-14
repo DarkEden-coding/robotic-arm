@@ -15,6 +15,7 @@ CLOCKWISE = GPIO.HIGH
 COUNTERCLOCKWISE = GPIO.LOW
 MAX_SPEED = 100  # 0.5 ms
 STARTING_SPEED = 10
+ACCELERATION = 2
 
 
 class StepperMotor:
@@ -37,9 +38,9 @@ class StepperMotor:
         self.acceleration = acceleration
 
         for step in range(self.steps):
-            if step < self.steps / 2 and self.step_speed < MAX_SPEED:
+            if step < MAX_SPEED / ACCELERATION and self.step_speed < MAX_SPEED:
                 self.step_speed += self.acceleration
-            elif step > self.steps / 2 and self.step_speed > STARTING_SPEED:
+            elif step > (self.step_speed - STARTING_SPEED) / ACCELERATION and self.step_speed > STARTING_SPEED:
                 self.step_speed -= self.acceleration
             GPIO.output(self.step_pin, GPIO.HIGH)
             sleep(1 / self.step_speed)
@@ -60,11 +61,11 @@ motor = StepperMotor(direction_pin, step_pin)
 for _ in range(10):
     # Rotate 360 degrees counterclockwise with acceleration of 1000 steps per second squared
     print("Rotating 360 degrees counterclockwise")
-    motor.move(steps=200, clockwise=False, acceleration=2)
+    motor.move(steps=200, clockwise=False, acceleration=ACCELERATION)
     sleep(1)  # Wait for 1 second between rotations
     # Rotate 360 degrees clockwise with acceleration of -1000 steps per second squared (deceleration)
     print("Rotating 360 degrees clockwise")
-    motor.move(steps=200, clockwise=True, acceleration=2)
+    motor.move(steps=200, clockwise=True, acceleration=ACCELERATION)
     sleep(1)  # Wait for 1 second between rotations
 
 # Clean up GPIO

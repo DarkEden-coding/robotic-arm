@@ -55,11 +55,11 @@ motor = StepperMotor(direction_pin, step_pin)
 for _ in range(10):
     # Rotate 360 degrees counterclockwise with acceleration of 1000 steps per second squared
     print("Rotating 360 degrees counterclockwise")
-    motor.move(steps=200, clockwise=False, acceleration=1)
+    motor.move(steps=200, clockwise=False, acceleration=2)
     sleep(1)  # Wait for 1 second between rotations
     # Rotate 360 degrees clockwise with acceleration of -1000 steps per second squared (deceleration)
     print("Rotating 360 degrees clockwise")
-    motor.move(steps=200, clockwise=True, acceleration=1)
+    motor.move(steps=200, clockwise=True, acceleration=2)
     sleep(1)  # Wait for 1 second between rotations
 
 # Clean up GPIO

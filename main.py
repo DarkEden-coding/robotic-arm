@@ -13,9 +13,9 @@ GPIO.setup(step_pin, GPIO.OUT)
 # Define motor rotation constants
 CLOCKWISE = GPIO.HIGH
 COUNTERCLOCKWISE = GPIO.LOW
-MAX_SPEED = 200  # 0.5 ms
+MAX_SPEED = 400  # 0.5 ms
 STARTING_SPEED = 50
-ACCELERATION = 4
+ACCELERATION = 10
 
 
 class StepperMotor:
@@ -38,7 +38,7 @@ class StepperMotor:
         self.acceleration = acceleration
 
         for step in range(self.steps):
-            if step < MAX_SPEED / ACCELERATION and self.step_speed < MAX_SPEED:
+            if step < (MAX_SPEED / ACCELERATION) - 1 and self.step_speed < MAX_SPEED:
                 self.step_speed += self.acceleration
             elif step > (self.steps - ((MAX_SPEED - STARTING_SPEED) / ACCELERATION)) - 1 and self.step_speed > STARTING_SPEED:
                 self.step_speed -= self.acceleration

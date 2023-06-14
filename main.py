@@ -34,7 +34,7 @@ class StepperMotor:
         self.clockwise = clockwise
         self.acceleration = acceleration
 
-        for step in self.steps:
+        for step in range(self.steps):
             if step < 50:
                 self.step_speed -= self.acceleration
             elif step > self.steps - 50:

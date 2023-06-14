@@ -51,7 +51,7 @@ class StepperMotor:
             else:
                 self.position += 1
             print(
-                f"Step: {step + 1} Speed: {self.step_speed} Position: {self.position}"
+                f"Step: {step + 1} Speed: {self.step_speed} Position: {self.position} Clockwise: {self.clockwise}"
             )
 
 

@@ -31,7 +31,7 @@ class StepperMotor:
         else:
             GPIO.output(self.direction_pin, COUNTERCLOCKWISE)
         self.steps = steps
-        self.clockwise = clockwize
+        self.clockwise = clockwise
         self.acceleration = acceleration
 
         for step in self.steps:

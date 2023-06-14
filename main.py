@@ -13,7 +13,8 @@ GPIO.setup(step_pin, GPIO.OUT)
 # Define motor rotation constants
 CLOCKWISE = GPIO.HIGH
 COUNTERCLOCKWISE = GPIO.LOW
-MAX_SPEED = 50  # 0.5 ms
+MAX_SPEED = 100  # 0.5 ms
+STARTING_SPEED = 10
 
 
 class StepperMotor:
@@ -23,7 +24,7 @@ class StepperMotor:
         self.steps = 0
         self.clockwise = True
         self.acceleration = 0
-        self.step_speed = 5
+        self.step_speed = STARTING_SPEED
         self.position = 0
 
     def move(self, steps, clockwise, acceleration):
@@ -38,7 +39,7 @@ class StepperMotor:
         for step in range(self.steps):
             if step < self.steps / 2 and self.step_speed < MAX_SPEED:
                 self.step_speed += self.acceleration
-            elif self.step_speed > MAX_SPEED:
+            elif step > self.steps / 2 and self.step_speed > STARTING_SPEED:
                 self.step_speed -= self.acceleration
             GPIO.output(self.step_pin, GPIO.HIGH)
             sleep(1 / self.step_speed)

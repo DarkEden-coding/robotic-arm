@@ -29,7 +29,7 @@ class StepperMotor:
         self.position = 0
 
     def move(self, steps, clockwise, acceleration):
-        self.steps = round(steps * 101.5)
+        self.steps = round(steps * 1.015)
         self.clockwise = clockwise
         self.acceleration = acceleration
         if self.clockwise:

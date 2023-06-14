@@ -23,6 +23,7 @@ class StepperMotor:
         self.clockwise = True
         self.acceleration = 0
         self.step_speed = 1
+        self.position = 0
 
     def move(self, steps, clockwise, acceleration):
         if clockwise:
@@ -42,17 +43,23 @@ class StepperMotor:
             sleep(self.step_speed)
             GPIO.output(self.step_pin, GPIO.LOW)
             sleep(self.step_speed)
+            if clockwise:
+                self.position -= 1
+            else:
+                self.position += 1
 
+
+motor = StepperMotor(direction_pin, step_pin)
 
 # Repeat the process 10 times
 for _ in range(10):
     # Rotate 360 degrees counterclockwise with acceleration of 1000 steps per second squared
     print("Rotating 360 degrees counterclockwise")
-    rotate_stepper_motor(steps=200, clockwise=False, acceleration=1)
+    motor.move(steps=200, clockwise=False, acceleration=1)
     sleep(1)  # Wait for 1 second between rotations
     # Rotate 360 degrees clockwise with acceleration of -1000 steps per second squared (deceleration)
     print("Rotating 360 degrees clockwise")
-    rotate_stepper_motor(steps=200, clockwise=True, acceleration=1)
+    motor.move(steps=200, clockwise=True, acceleration=1)
     sleep(1)  # Wait for 1 second between rotations
 
 # Clean up GPIO

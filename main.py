@@ -36,10 +36,10 @@ def rotate_stepper_motor(angle, direction, delay):
 for _ in range(10):
     # Rotate 360 degrees counterclockwise
     print("Rotating 360 degrees counterclockwise")
-    rotate_stepper_motor(360, COUNTERCLOCKWISE, 0.2)
+    rotate_stepper_motor(360, COUNTERCLOCKWISE, 0.05)
     sleep(1)  # Wait for 1 second between rotations
     print("Rotating 360 degrees clockwise")
-    rotate_stepper_motor(360, CLOCKWISE, 0.2)
+    rotate_stepper_motor(360, CLOCKWISE, 0.05)
     sleep(1)  # Wait for 1 second between rotations
 
 # Clean up GPIO

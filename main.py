@@ -40,9 +40,9 @@ class StepperMotor:
             elif step > self.steps - 50:
                 self.step_speed += self.acceleration
             GPIO.output(self.step_pin, GPIO.HIGH)
-            sleep(self.step_speed)
+            sleep(1 / self.step_speed)
             GPIO.output(self.step_pin, GPIO.LOW)
-            sleep(self.step_speed)
+            sleep(1 / self.step_speed)
             if clockwise:
                 self.position -= 1
             else:

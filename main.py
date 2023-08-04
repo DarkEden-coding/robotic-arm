@@ -13,12 +13,12 @@ motor = StepperMotor(
     max_speed=400,
     starting_speed=0,
     acceleration=5,
-    microstepping=3,
+    microstepping=5,
     ms_pins=ms_pins,
     enable_pin=enable_pin,
 )
 
-dist = 200
+dist = 800
 
 motor.enable()
 

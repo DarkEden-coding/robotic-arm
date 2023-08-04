@@ -121,10 +121,14 @@ class StepperMotor:
                 and self.step_speed > self.STARTING_SPEED
             ):
                 self.step_speed -= self.acceleration
+            if self.step_speed == 0:
+                self.step_speed = .0001
             GPIO.output(self.step_pin, GPIO.HIGH)
-            sleep(1 / self.step_speed + 0.001)
+            sleep(1 / self.step_speed)
             GPIO.output(self.step_pin, GPIO.LOW)
-            sleep(1 / self.step_speed + 0.001)
+            sleep(1 / self.step_speed)
+            if self.step_speed == .0001:
+                self.step_speed = 0
             if self.clockwise:
                 self.position -= 1
             else:

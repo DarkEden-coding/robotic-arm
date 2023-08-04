@@ -10,10 +10,10 @@ enable_pin = 2  # Enable GPIO Pin
 motor = StepperMotor(
     direction_pin=direction_pin,
     step_pin=step_pin,
-    max_speed=100,
+    max_speed=400,
     starting_speed=0,
     acceleration=5,
-    microstepping=2,
+    microstepping=3,
     ms_pins=ms_pins,
     enable_pin=enable_pin,
 )

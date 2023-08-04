@@ -86,13 +86,13 @@ class StepperMotor:
         """
         Enables the motor
         """
-        GPIO.output(self.enable_pin, GPIO.HIGH)
+        GPIO.output(self.enable_pin, GPIO.LOW)
 
     def disable(self):
         """
         Disables the motor
         """
-        GPIO.output(self.enable_pin, GPIO.LOW)
+        GPIO.output(self.enable_pin, GPIO.HIGH)
 
     def _move_process(self, steps, clockwise, debug):
         """

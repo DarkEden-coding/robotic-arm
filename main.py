@@ -18,7 +18,7 @@ motor = StepperMotor(
     enable_pin=enable_pin,
 )
 
-dist = 400
+dist = 800
 
 motor.enable()
 

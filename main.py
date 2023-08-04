@@ -3,7 +3,7 @@ from motor import StepperMotor
 
 direction_pin = 14  # Direction (DIR) GPIO Pin
 step_pin = 15  # Step GPIO Pin
-ms_pins = (17, 22, 27)
+ms_pins = (17, 27, 22)
 enable_pin = 2  # Enable GPIO Pin
 
 

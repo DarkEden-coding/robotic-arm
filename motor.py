@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 from time import sleep
+
 from multiprocessing import Process
 
 CLOCKWISE = GPIO.HIGH

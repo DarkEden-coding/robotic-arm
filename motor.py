@@ -137,3 +137,4 @@ class StepperMotor:
                 print(
                     f"Step: {step + 1} Speed: {self.step_speed} Position: {self.position} Clockwise: {self.clockwise}"
                 )
+        print(f"Done moving {self.steps} steps")

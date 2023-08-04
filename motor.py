@@ -98,7 +98,7 @@ class StepperMotor:
         """
         !!!UTIL FUNCTION DO NOT CALL!!!
         """
-        self.steps = round(steps * 1.015)
+        self.steps = steps
         self.clockwise = clockwise
         if self.clockwise:
             GPIO.output(self.direction_pin, CLOCKWISE)

@@ -13,14 +13,14 @@ motor = StepperMotor(
     max_speed=600,
     starting_speed=5,
     acceleration=10,
-    microstepping=4,
+    microstepping=5,
     ms_pins=ms_pins,
     enable_pin=enable_pin,
 )
 
 motor.enable()
-motor.move(1000, blocking=True, clockwise=True, debug=True)
+motor.move(1280, blocking=True, clockwise=True, debug=True)
 
-motor.move(1000, blocking=True, clockwise=False, debug=True)
+motor.move(1280, blocking=True, clockwise=False, debug=True)
 
 motor.disable()

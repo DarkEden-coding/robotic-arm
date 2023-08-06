@@ -12,7 +12,7 @@ motor = StepperMotor(
     max_speed=1000,
     starting_speed=0,
     acceleration=10,
-    microstepping=5,
+    microstepping=4,
     ms_pins=ms_pins,
     enable_pin=enable_pin,
 )

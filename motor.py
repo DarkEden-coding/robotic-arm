@@ -75,7 +75,7 @@ class StepperMotor:
         GPIO.output(self.ms_pins[1], microstepping_values[1])
         GPIO.output(self.ms_pins[2], microstepping_values[2])
 
-        steps = int(angle * self.microstepping * 200 / 360)
+        steps = (angle / 1.8) * self.microstepping
 
         if blocking:
             self._move_process(steps, clockwise, debug)

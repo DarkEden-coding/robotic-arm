@@ -18,7 +18,7 @@ motor = StepperMotor(
     enable_pin=enable_pin,
 )
 
-dist = 800
+dist = 180
 
 motor.enable()
 
@@ -26,7 +26,7 @@ motor.move(dist, blocking=True, clockwise=True, debug=True)
 
 motor.move(dist, blocking=True, clockwise=False, debug=True)
 
-motor.move(dist, blocking=True, clockwise=True, debug=True)
+"""motor.move(dist, blocking=True, clockwise=True, debug=True)
 
 motor.move(dist, blocking=True, clockwise=False, debug=True)
 
@@ -36,6 +36,6 @@ motor.move(dist, blocking=True, clockwise=False, debug=True)
 
 motor.move(dist, blocking=True, clockwise=True, debug=True)
 
-motor.move(dist, blocking=True, clockwise=False, debug=True)
+motor.move(dist, blocking=True, clockwise=False, debug=True)"""
 
 motor.disable()

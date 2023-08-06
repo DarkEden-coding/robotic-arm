@@ -61,10 +61,10 @@ class StepperMotor:
         GPIO.setup(self.ms_pins[2], GPIO.OUT)
         GPIO.setup(self.enable_pin, GPIO.OUT)
 
-    def move(self, steps, clockwise, debug=False, blocking=False):
+    def move(self, angle, clockwise, debug=False, blocking=False):
         """
         Moves the motor a certain number of steps
-        :param steps: How many steps to move the motor
+        :param angle: what angle to move the motor, note added or subtracted from current position
         :param clockwise: Whether to move the motor clockwise or counterclockwise
         :param debug: Whether to print debug information
         :param blocking: Whether to block the main thread while the motor is moving
@@ -74,6 +74,8 @@ class StepperMotor:
         GPIO.output(self.ms_pins[0], microstepping_values[0])
         GPIO.output(self.ms_pins[1], microstepping_values[1])
         GPIO.output(self.ms_pins[2], microstepping_values[2])
+
+        steps = int(angle * self.microstepping * 200 / 360)
 
         if blocking:
             self._move_process(steps, clockwise, debug)

@@ -1,4 +1,3 @@
-from time import sleep
 from motor import StepperMotor
 
 direction_pin = 14  # Direction (DIR) GPIO Pin

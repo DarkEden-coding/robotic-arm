@@ -3,6 +3,8 @@ from time import sleep
 
 from multiprocessing import Process
 
+GPIO.setwarnings(False)
+
 CLOCKWISE = GPIO.HIGH
 COUNTERCLOCKWISE = GPIO.LOW
 GPIO.setmode(GPIO.BCM)
@@ -13,6 +15,13 @@ microstepping_dict = {
     3: (GPIO.LOW, GPIO.HIGH, GPIO.LOW),
     4: (GPIO.HIGH, GPIO.HIGH, GPIO.LOW),
     5: (GPIO.HIGH, GPIO.HIGH, GPIO.HIGH),
+}
+mult_dict = {
+    1: 1,
+    2: 2,
+    3: 4,
+    4: 8,
+    5: 16,
 }
 
 
@@ -75,7 +84,7 @@ class StepperMotor:
         GPIO.output(self.ms_pins[1], microstepping_values[1])
         GPIO.output(self.ms_pins[2], microstepping_values[2])
 
-        steps = int((angle / 1.8) * self.microstepping)
+        steps = int((angle / 1.8) * mult_dict[self.microstepping])
 
         if blocking:
             self._move_process(steps, clockwise, debug)

@@ -5,7 +5,7 @@ import time
 GPIO.setmode(GPIO.BCM)
 
 # Define the GPIO pin for PWM control
-motor_pin = 4
+motor_pin = 2
 
 # Set up the GPIO pin for PWM with a frequency of 1000 Hz
 GPIO.setup(motor_pin, GPIO.OUT)
@@ -22,7 +22,6 @@ try:
         time.sleep(0.5)  # Wait for a moment before changing speed"""
     while True:
         pwm.ChangeDutyCycle(int(input("Duty Cycle: ")))
-        time.sleep(5)
 
 except KeyboardInterrupt:
     # Clean up GPIO settings

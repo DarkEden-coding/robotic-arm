@@ -16,11 +16,12 @@ pwm.start(0)
 
 try:
     """while True:
-        for duty_cycle in range(0, 101, 5):  # Vary duty cycle from 0% to 100%
-            pwm.ChangeDutyCycle(duty_cycle)
-            print("Duty Cycle:", duty_cycle)
-            time.sleep(0.5)  # Wait for a moment before changing speed"""
-    pwm.ChangeDutyCycle(5)
+    for duty_cycle in range(0, 101, 5):  # Vary duty cycle from 0% to 100%
+        pwm.ChangeDutyCycle(duty_cycle)
+        print("Duty Cycle:", duty_cycle)
+        time.sleep(0.5)  # Wait for a moment before changing speed"""
+    pwm.ChangeDutyCycle(input("Duty Cycle: "))
+    time.sleep(5)
 
 except KeyboardInterrupt:
     # Clean up GPIO settings

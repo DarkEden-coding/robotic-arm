@@ -20,7 +20,7 @@ try:
         pwm.ChangeDutyCycle(duty_cycle)
         print("Duty Cycle:", duty_cycle)
         time.sleep(0.5)  # Wait for a moment before changing speed"""
-    pwm.ChangeDutyCycle(input("Duty Cycle: "))
+    pwm.ChangeDutyCycle(int(input("Duty Cycle: ")))
     time.sleep(5)
 
 except KeyboardInterrupt:

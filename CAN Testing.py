@@ -2,6 +2,7 @@ import json
 import can
 import struct
 
+print("Starting CAN Testing")
 
 with open("flat_endpoints.json", "r") as f:
     endpoint_data = json.load(f)
@@ -25,6 +26,8 @@ format_lookup = {
 }
 
 node_id = 1  # must match the configured node_id on your ODrive (default 0)
+
+print("Setting up CAN")
 
 bus = can.interface.Bus("can0", bustype="socketcan")
 

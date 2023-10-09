@@ -80,6 +80,8 @@ assert endpoint_data["hw_version"] == f"{hw_product_line}.{hw_version}.{hw_varia
 
 # ----------------------------------------setup-end----------------------------------------
 
+print("Done setting up CAN")
+
 
 def send_bus_message(value, obj_path):
     # Convert path to endpoint ID

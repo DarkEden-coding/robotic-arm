@@ -132,12 +132,10 @@ def get_bus_prop_value(obj_path):
     return return_value
 
 
-def call_function(obj_path, if_return):
+def call_function(obj_path):
     # Convert path to endpoint ID
     endpoint_id = endpoints[obj_path]['id']
-
-    if if_return:
-        endpoint_type = endpoints[obj_path]["type"]
+    endpoint_type = endpoints[obj_path]["type"]
 
     bus.send(can.Message(
         arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
@@ -145,25 +143,17 @@ def call_function(obj_path, if_return):
         is_extended_id=False
     ))
 
-    if if_return:
-        # Await reply
-        for msg in bus:
-            print(f"msg: {msg.arbitration_id}")
-            print(f"node: {node_id << 5 | 0x01}")
-            if msg.arbitration_id == (node_id << 5 | 0x01):  # 0x05: TxSdo
-                break
-
-        # Unpack and print reply
+    for msg in bus:
         _, _, _, return_value = struct.unpack(
             "<BHB" + format_lookup[endpoint_type], msg.data
         )
-        return return_value
+        print(return_value)
 
 
 path = "vbus_voltage"
-print(call_function(path, if_return=True))
+call_function(path)
 
-while call_function(path, if_return=True) < 20:
+while call_function(path) < 20:
     pass
 
 path = "odrv0.axis0.controller.config.input_filter_bandwidth"

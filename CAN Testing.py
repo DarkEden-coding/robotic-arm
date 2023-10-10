@@ -143,7 +143,7 @@ def call_function(obj_path):
     ))
 
 
-path = "odrv0.vbus_voltage"
+path = "vbus_voltage"
 print(get_prop_value(path))
 
 while get_prop_value(path) < 20:

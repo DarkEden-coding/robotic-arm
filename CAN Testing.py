@@ -148,8 +148,7 @@ def call_function(obj_path, if_return):
     if if_return:
         # Await reply
         for msg in bus:
-            if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
-                break
+            break
 
         # Unpack and print reply
         _, _, _, return_value = struct.unpack(
@@ -158,7 +157,7 @@ def call_function(obj_path, if_return):
         return return_value
 
 
-path = "odrv0.vbus_voltage"
+path = "vbus_voltage"
 print(call_function(path, if_return=True))
 
 while call_function(path, if_return=True) < 20:

@@ -25,7 +25,7 @@ format_lookup = {
     "float": "f",
 }
 
-node_id = 1  # must match the configured node_id on your ODrive (default 0)
+node_id = 0  # must match the configured node_id on your ODrive (default 0)
 
 print("Setting up CAN")
 

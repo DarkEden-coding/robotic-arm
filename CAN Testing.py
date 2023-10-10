@@ -134,32 +134,39 @@ def get_prop_value(obj_path):
 
 def call_function(obj_path):
     # Convert path to endpoint ID
-    endpoint_id = endpoints[obj_path]['id']
+    endpoint_id = endpoints[obj_path]["id"]
 
-    bus.send(can.Message(
-        arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
-        data=struct.pack('<BHB', OPCODE_WRITE, endpoint_id, 0),
-        is_extended_id=False
-    ))
+    bus.send(
+        can.Message(
+            arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
+            data=struct.pack("<BHB", OPCODE_WRITE, endpoint_id, 0),
+            is_extended_id=False,
+        )
+    )
 
 
 path = "vbus_voltage"
-print(get_prop_value(path))
+print(f"Current Voltage: {get_prop_value(path)}")
 
 while get_prop_value(path) < 20:
     pass
 
-path = "axis0.controller.config.input_filter_bandwidth"
-value_to_write = 2
+print("--Voltage Is Above Required--")
 
-send_bus_message(value_to_write, path)
 
-path = "axis0.controller.config.input_mode"
-value_to_write = "InputMode.POS_FILTER"
+print("moving to position 12.5")
+send_bus_message(12.5, "axis0.controller.input_pos")
+input("Press Enter to continue...")
 
-send_bus_message(value_to_write, path)
+print("moving to position 0")
+send_bus_message(0, "axis0.controller.input_pos")
 
-path = "axis0.controller.input_pos"
-value_to_write = 25
+input("Press Enter to continue...")
 
-send_bus_message(value_to_write, path)
+print("moving to position -12.5")
+send_bus_message(-12.5, "axis0.controller.input_pos")
+
+input("Press Enter to continue...")
+
+print("moving to position 0")
+send_bus_message(0, "axis0.controller.input_pos")

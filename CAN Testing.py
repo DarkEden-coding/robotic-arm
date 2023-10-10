@@ -34,11 +34,12 @@ bus = can.interface.Bus("can0", bustype="socketcan")
 # Flush CAN RX buffer so there are no more old pending messages
 while not (bus.recv(timeout=0) is None):
     pass
-print(1)
 
 node_id = 0  # must match `<odrv>.axis0.config.can.node_id`. The default is 0.
 cmd_id = 0x01  # heartbeat command ID
 message_id = node_id << 5 | cmd_id
+
+print(1)
 
 for msg in bus:
     if msg.arbitration_id == message_id:
@@ -49,7 +50,6 @@ print(error, state, result, traj_done)
 # Flush CAN RX buffer so there are no more old pending messages
 while not (bus.recv(timeout=0) is None):
     pass
-print(2)
 
 # Send read command
 bus.send(

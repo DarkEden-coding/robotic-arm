@@ -102,7 +102,7 @@ def send_bus_message(value, obj_path):
     )
 
 
-def get_bus_prop_value(obj_path):
+def get_prop_value(obj_path):
     # Convert path to endpoint ID
     endpoint_id = endpoints[obj_path]["id"]
     endpoint_type = endpoints[obj_path]["type"]
@@ -135,7 +135,6 @@ def get_bus_prop_value(obj_path):
 def call_function(obj_path):
     # Convert path to endpoint ID
     endpoint_id = endpoints[obj_path]['id']
-    endpoint_type = endpoints[obj_path]["type"]
 
     bus.send(can.Message(
         arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
@@ -143,17 +142,11 @@ def call_function(obj_path):
         is_extended_id=False
     ))
 
-    for msg in bus:
-        _, _, _, return_value = struct.unpack(
-            "<BHB" + format_lookup[endpoint_type], msg.data
-        )
-        print(return_value)
 
+path = "odrv0.axis0.vbus_voltage"
+print(get_prop_value(path))
 
-path = "vbus_voltage"
-call_function(path)
-
-while call_function(path) < 20:
+while get_prop_value(path) < 20:
     pass
 
 path = "odrv0.axis0.controller.config.input_filter_bandwidth"

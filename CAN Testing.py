@@ -39,9 +39,8 @@ node_id = 0  # must match `<odrv>.axis0.config.can.node_id`. The default is 0.
 cmd_id = 0x01  # heartbeat command ID
 message_id = node_id << 5 | cmd_id
 
-print(1)
-
 for msg in bus:
+    print(msg)
     if msg.arbitration_id == message_id:
         error, state, result, traj_done = struct.unpack("<IBBB", bytes(msg.data[:7]))
         break

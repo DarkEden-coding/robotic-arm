@@ -43,7 +43,7 @@ for msg in bus:
     if msg.arbitration_id == message_id:
         error, state, result, traj_done = struct.unpack("<IBBB", bytes(msg.data[:7]))
         break
-print(error, state, result, traj_done)
+# print(error, state, result, traj_done)
 
 # Flush CAN RX buffer so there are no more old pending messages
 while not (bus.recv(timeout=0) is None):

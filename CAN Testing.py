@@ -40,7 +40,8 @@ cmd_id = 0x01  # heartbeat command ID
 message_id = node_id << 5 | cmd_id
 
 for msg in bus:
-    print(msg)
+    print(f"arb id: {msg.arbitration_id}")
+    print(f"msg id: {message_id}")
     if msg.arbitration_id == message_id:
         error, state, result, traj_done = struct.unpack("<IBBB", bytes(msg.data[:7]))
         break

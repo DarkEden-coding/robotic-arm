@@ -149,8 +149,8 @@ def call_function(obj_path, if_return):
         # Await reply
         for msg in bus:
             print(f"msg: {msg.arbitration_id}")
-            print(f"node: {node_id << 5 | 0x05}")
-            if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
+            print(f"node: {node_id << 5 | 0x01}")
+            if msg.arbitration_id == (node_id << 5 | 0x01):  # 0x05: TxSdo
                 break
 
         # Unpack and print reply

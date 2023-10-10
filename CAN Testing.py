@@ -35,7 +35,7 @@ bus = can.interface.Bus("can0", bustype="socketcan")
 while not (bus.recv(timeout=0) is None):
     pass
 
-node_id = 0  # must match `<odrv>.axis0.config.can.node_id`. The default is 0.
+node_id = 1  # must match `<odrv>.axis0.config.can.node_id`. The default is 0.
 cmd_id = 0x01  # heartbeat command ID
 message_id = node_id << 5 | cmd_id
 

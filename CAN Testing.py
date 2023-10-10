@@ -149,17 +149,17 @@ print(get_prop_value(path))
 while get_prop_value(path) < 20:
     pass
 
-path = "odrv0.axis0.controller.config.input_filter_bandwidth"
+path = "axis0.controller.config.input_filter_bandwidth"
 value_to_write = 2
 
 send_bus_message(value_to_write, path)
 
-path = "odrv0.axis0.controller.config.input_mode"
+path = "axis0.controller.config.input_mode"
 value_to_write = "InputMode.POS_FILTER"
 
 send_bus_message(value_to_write, path)
 
-path = "odrv0.axis0.controller.input_pos"
+path = "axis0.controller.input_pos"
 value_to_write = 25
 
 send_bus_message(value_to_write, path)

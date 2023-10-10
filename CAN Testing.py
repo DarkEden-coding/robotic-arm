@@ -158,7 +158,7 @@ def call_function(obj_path, if_return):
         return return_value
 
 
-path = "vbus_voltage"
+path = "odrv0.vbus_voltage"
 print(call_function(path, if_return=True))
 
 while call_function(path, if_return=True) < 20:

@@ -154,7 +154,7 @@ while get_prop_value(path) < 20:
 print("--Voltage Is Above Required--")
 
 print("Enabling Closed Loop Control")
-send_bus_message("CLOSED_LOOP_CONTROL", "axis0.requested_state")
+send_bus_message(8, "axis0.requested_state")
 
 print("moving to position 12.5")
 send_bus_message(12.5, "axis0.controller.input_pos")

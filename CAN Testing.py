@@ -1,8 +1,16 @@
 import json
 import can
 import struct
+import subprocess
 
 print("Starting CAN Testing")
+
+command = "sudo ip link set can0 up type can bitrate 250000"
+try:
+    subprocess.run(command, shell=True, check=True)
+    print("CAN Connection command executed successfully.")
+except subprocess.CalledProcessError as e:
+    print(f"Error: {e}")
 
 with open("flat_endpoints.json", "r") as f:
     endpoint_data = json.load(f)
@@ -172,3 +180,9 @@ input("Press Enter to continue...")
 
 print("moving to position 0")
 send_bus_message(0, "axis0.controller.input_pos")
+
+print("Disabling Closed Loop Control")
+send_bus_message(1, "axis0.requested_state")
+
+# Shutdown the CAN bus
+bus.shutdown()

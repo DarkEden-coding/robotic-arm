@@ -9,8 +9,11 @@ controller_1.enable_motor()
 print(controller_1.get_encoder_pos())
 # controller_2.enable_motor()
 
+controller_1.move_to_pos(20)
+
 sleep(10)
 
+print(controller_1.get_encoder_pos())
 controller_1.disable_motor()
 # controller_2.disable_motor()
 

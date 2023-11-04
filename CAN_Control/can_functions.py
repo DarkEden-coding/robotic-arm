@@ -103,10 +103,10 @@ def get_property_value(obj_path, node_id):
         if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
             break
 
-    print(msg.data[:5])
+    print(msg.data)
     # Unpack and print reply
     _, _, _, return_value = struct.unpack(
-        "<BHB" + format_lookup[endpoint_type], msg.data[:5]
+        "<BHB" + format_lookup[endpoint_type], msg.data
     )
     return return_value
 

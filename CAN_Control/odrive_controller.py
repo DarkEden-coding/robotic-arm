@@ -18,10 +18,7 @@ def setup(node_id):
 
     for msg in bus:
         if msg.arbitration_id == message_id:
-            error, state, result, traj_done = struct.unpack(
-                "<IBBB", bytes(msg.data[:7])
-            )
-            print(error, state, result, traj_done)
+            print(f"ODrive with id {node_id}: step 1 complete")
             break
 
     # Flush CAN RX buffer so there are no more old pending messages
@@ -40,6 +37,7 @@ def setup(node_id):
     # Await reply
     for msg in bus:
         if msg.arbitration_id == (node_id << 5 | 0x00):  # 0x00: Get_Version
+            print(f"ODrive with id {node_id}: step 2 complete")
             break
 
     (

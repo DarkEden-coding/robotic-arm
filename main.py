@@ -1,40 +1,7 @@
-from motor import StepperMotor
+from CAN_Control.odrive_controller import odrive_controller
 
-direction_pin = 14  # Direction (DIR) GPIO Pin
-step_pin = 15  # Step GPIO Pin
-ms_pins = (17, 27, 22)
-enable_pin = 2  # Enable GPIO Pin
+controller_1 = odrive_controller(1)
+controller_2 = odrive_controller(2)
 
-
-motor = StepperMotor(
-    direction_pin=direction_pin,
-    step_pin=step_pin,
-    max_speed=100,
-    starting_speed=0,
-    acceleration=2,
-    microstepping=3,
-    ms_pins=ms_pins,
-    enable_pin=enable_pin,
-)
-
-dist = 90
-
-motor.enable()
-
-motor.move(dist, blocking=True, clockwise=True, debug=True)
-
-motor.move(dist, blocking=True, clockwise=False, debug=True)
-
-"""motor.move(dist, blocking=True, clockwise=True, debug=True)
-
-motor.move(dist, blocking=True, clockwise=False, debug=True)
-
-motor.move(dist, blocking=True, clockwise=True, debug=True)
-
-motor.move(dist, blocking=True, clockwise=False, debug=True)
-
-motor.move(dist, blocking=True, clockwise=True, debug=True)
-
-motor.move(dist, blocking=True, clockwise=False, debug=True)"""
-
-motor.disable()
+controller_1.enable_motor()
+controller_2.enable_motor()

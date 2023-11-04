@@ -80,9 +80,15 @@ for msg in bus:
     fw_unreleased,
 ) = struct.unpack("<BBBBBBBB", msg.data)
 
-# If one of these asserts fail, you're probably not using the right flat_endpoints.json file
-assert endpoint_data["fw_version"] == f"{fw_major}.{fw_minor}.{fw_revision}"
-assert endpoint_data["hw_version"] == f"{hw_product_line}.{hw_version}.{hw_variant}"
+try:
+    # If one of these asserts fail, you're probably not using the right flat_endpoints.json file
+    assert endpoint_data["fw_version"] == f"{fw_major}.{fw_minor}.{fw_revision}"
+    assert endpoint_data["hw_version"] == f"{hw_product_line}.{hw_version}.{hw_variant}"
+except AssertionError:
+    print(
+        f"Error: Endpoint JSON file is for hardware version {endpoint_data['hw_version']} and firmware version {endpoint_data['fw_version']}, but the connected hardware is version {hw_product_line}.{hw_version}.{hw_variant} and firmware version {fw_major}.{fw_minor}.{fw_revision}"
+    )
+    exit(1)
 
 # ----------------------------------------setup-end----------------------------------------
 
@@ -110,7 +116,7 @@ def send_bus_message(value, obj_path):
     )
 
 
-def get_prop_value(obj_path):
+def get_property_value(obj_path):
     # Convert path to endpoint ID
     endpoint_id = endpoints[obj_path]["id"]
     endpoint_type = endpoints[obj_path]["type"]
@@ -140,23 +146,10 @@ def get_prop_value(obj_path):
     return return_value
 
 
-def call_function(obj_path):
-    # Convert path to endpoint ID
-    endpoint_id = endpoints[obj_path]["id"]
-
-    bus.send(
-        can.Message(
-            arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
-            data=struct.pack("<BHB", OPCODE_WRITE, endpoint_id, 0),
-            is_extended_id=False,
-        )
-    )
-
-
 path = "vbus_voltage"
-print(f"Current Voltage: {get_prop_value(path)}")
+print(f"Current Voltage: {get_property_value(path)}")
 
-while get_prop_value(path) < 20:
+while get_property_value(path) < 20:
     pass
 
 print("--Voltage Is Above Required--")

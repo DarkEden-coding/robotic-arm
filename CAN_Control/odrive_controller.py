@@ -1,4 +1,4 @@
-from can_functions import (
+from CAN_Control.can_functions import (
     bus,
     send_bus_message,
     get_property_value,

@@ -13,6 +13,11 @@ import threading
 def setup(node_id):
     print(f"Setting up CAN for ODrive with id: {node_id}")
 
+    print("Waiting for main power...")
+    while get_property_value("vbus_voltage", node_id) < 40:
+        pass
+    print("Main power detected")
+
     cmd_id = 0x01  # heartbeat command ID
     message_id = node_id << 5 | cmd_id
 
@@ -82,7 +87,7 @@ def wait_for_move_complete(controller):
         get_property_value("axis0.controller.trajectory_done", controller.node_id)
         is False
     ):
-        pass
+        controller.moving = False
 
 
 class odrive_controller:

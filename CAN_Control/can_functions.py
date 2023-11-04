@@ -108,3 +108,11 @@ def get_property_value(obj_path, node_id):
         "<BHB" + format_lookup[endpoint_type], msg.data
     )
     return return_value
+
+
+def shutdown():
+    """
+    Shutdown CAN bus
+    :return:
+    """
+    bus.shutdown()

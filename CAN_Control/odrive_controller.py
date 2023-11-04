@@ -109,6 +109,9 @@ class odrive_controller:
         print(f"Motor position offset by {offset} counts")
         self.position = 0
 
+    def get_encoder_pos(self):
+        return get_property_value("onboard_encoder0.raw", self.node_id)
+
     def set_torque(self, torque):
         """
         Set the torque of the motor

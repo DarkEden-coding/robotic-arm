@@ -140,14 +140,14 @@ class odrive_controller:
         """
         send_bus_message(torque, "axis0.controller.input_torque", self.node_id)
 
-    def wait_for_move(self):
+    def wait_for_move(self, delay=0.05):
         while (
                 abs(self.requested_position - self.get_encoder_pos()) > 0.1
         ):
             print(f"Current position: {self.get_encoder_pos()}")
             print(f"Requested position: {self.requested_position}")
             pass
-        sleep(0.05)
+        sleep(delay)
         print("Move complete")
 
     def move_to_pos(self, pos):

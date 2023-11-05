@@ -50,10 +50,22 @@ def send_bus_message(value, obj_path, node_id):
         bus.send(
             can.Message(
                 arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
-                data=struct.pack("<BHB", OPCODE_WRITE, endpoint_id, 0),
+                data=struct.pack("<BHB", OPCODE_WRITE, endpoint_id, 0, value if value is not None else ""),
                 is_extended_id=False,
             )
         )
+
+        if "outputs" in endpoints[obj_path]:
+            # Await reply
+            for msg in bus:
+                if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
+                    break
+
+            # Unpack and print reply
+            _, _, _, return_value = struct.unpack(
+                "<BHB" + format_lookup[endpoint_type], msg.data
+            )
+            return return_value
         return
 
     # Send write command

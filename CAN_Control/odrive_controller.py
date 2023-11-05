@@ -75,9 +75,11 @@ def setup(node_id):
     send_bus_message(None, "clear_errors", node_id)
     print("ODrive errors cleared")
 
-    send_bus_message(10, "axis0.controller.config.vel_limit", node_id)
+    send_bus_message(10, "axis0.trap_traj.config.vel_limit", node_id)
 
-    send_bus_message(3, "axis0.controller.config.input_mode", node_id)
+    send_bus_message(5, "axis0.controller.config.input_mode", node_id)
+    send_bus_message(0.2, "axis0.trap_traj.config.accel_limit", node_id)
+    send_bus_message(0.2, "axis0.trap_traj.config.decel_limit", node_id)
 
     print(f"------------------ ODrive with id {node_id} setup complete ------------------")
 
@@ -130,7 +132,7 @@ class odrive_controller:
         :return:
         """
         speed = speed / 10
-        send_bus_message(speed, "axis0.controller.config.vel_limit", self.node_id)
+        send_bus_message(speed, "axis0.trap_traj.config.vel_limit", self.node_id)
         print(f"Speed set to {speed} rps")
 
     def set_torque(self, torque):
@@ -170,7 +172,7 @@ class odrive_controller:
         """
         revolutions = (angle / 360)*25
 
-        print(f"Moving to angle {angle} by going {revolutions} revolutions...")
+        print(f"Moving to angle {angle} by going to {revolutions} revolutions...")
         if not self.enabled:
             warning_message("Motor is not enabled, enabling...")
             self.enable_motor()

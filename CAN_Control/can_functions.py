@@ -76,7 +76,7 @@ def send_bus_message(value, obj_path, node_id):
                 )
             )
 
-        if "outputs" in endpoints[obj_path]:
+        if endpoints[obj_path]["outputs"].length() > 0:
             # Await reply
             for msg in bus:
                 if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo

@@ -94,11 +94,13 @@ def wait_for_move_complete(controller):
     while (
         abs(get_property_value("encoder_estimator0.vel_estimate", controller.node_id)) < 0.1
     ):
+        print(abs(get_property_value("encoder_estimator0.vel_estimate", controller.node_id)))
         pass
 
     while (
         abs(get_property_value("encoder_estimator0.vel_estimate", controller.node_id)) > 0.1
     ):
+        print(abs(get_property_value("encoder_estimator0.vel_estimate", controller.node_id)))
         pass
 
     controller.moving = False

@@ -142,7 +142,7 @@ class odrive_controller:
 
     def wait_for_move(self, delay=0.05):
         while (
-                abs(self.requested_position - self.get_encoder_pos()) > 0.1
+                abs(self.requested_position - self.get_encoder_pos()) > 0.2
         ):
             print(f"Current position: {self.get_encoder_pos()}")
             print(f"Requested position: {self.requested_position}")

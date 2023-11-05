@@ -129,11 +129,15 @@ class odrive_controller:
         """
         send_bus_message(torque, "axis0.controller.input_torque", self.node_id)
 
+    def wait_for_move_complete(self):
+        while self.moving:
+            pass
+
     def move_to_pos(self, pos):
         if not self.enabled:
             warning_message("Motor is not enabled, enabling...")
             self.enable_motor()
-        send_bus_message(pos, "axis0.controller.pos_setpoint", self.node_id)
+        send_bus_message(pos, "axis0.controller.input_pos", self.node_id)
         self.moving = True
 
         complete_check_thread = threading.Thread(

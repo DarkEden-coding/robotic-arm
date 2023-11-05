@@ -47,11 +47,13 @@ def send_bus_message(value, obj_path, node_id):
     endpoint_type = endpoints[obj_path]["type"]
 
     if endpoint_type == "function":
-        bus.send(can.Message(
-            arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
-            data=struct.pack('<BHB', OPCODE_WRITE, endpoint_id, 0),
-            is_extended_id=False
-        ))
+        bus.send(
+            can.Message(
+                arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
+                data=struct.pack("<BHB", OPCODE_WRITE, endpoint_id, 0),
+                is_extended_id=False,
+            )
+        )
         return
 
     # Send write command

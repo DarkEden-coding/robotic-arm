@@ -69,6 +69,10 @@ def setup(node_id):
         )
         exit(1)
 
+    # clear errors
+    send_bus_message(0, "clear_errors", node_id)
+    print("ODrive errors cleared")
+
 
 def warning_message(message):
     yellow_text = "\033[93m"

@@ -91,15 +91,16 @@ def error_message(message):
 
 
 def wait_for_move_complete(controller):
-    print(1)
     while (
         abs(get_property_value("encoder_estimator0.vel_estimate", controller.node_id)) < 0.1
     ):
+        print(get_property_value("encoder_estimator0.vel_estimate", controller.node_id))
         pass
 
     while (
         abs(get_property_value("encoder_estimator0.vel_estimate", controller.node_id)) > 0.1
     ):
+        print(get_property_value("encoder_estimator0.vel_estimate", controller.node_id))
         pass
 
     controller.moving = False
@@ -140,7 +141,6 @@ class odrive_controller:
         send_bus_message(torque, "axis0.controller.input_torque", self.node_id)
 
     def wait_for_move_complete(self):
-        print(2)
         while self.moving:
             pass
         print("Move complete")

@@ -89,8 +89,7 @@ def error_message(message):
 
 def wait_for_move_complete(controller):
     while (
-        get_property_value("encoder_estimator0.vel_estimate", controller.node_id)
-        > 0.1
+        get_property_value("encoder_estimator0.vel_estimate", controller.node_id) > 0.1
     ):
         controller.moving = False
 

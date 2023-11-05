@@ -142,7 +142,7 @@ class odrive_controller:
 
     def wait_for_move(self):
         while (
-                abs(self.requested_position - self.get_encoder_pos) < 0.1
+                abs(self.requested_position - self.get_encoder_pos()) < 0.1
         ):
             pass
         print("Move complete")

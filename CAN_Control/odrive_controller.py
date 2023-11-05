@@ -151,9 +151,8 @@ class odrive_controller:
         send_bus_message(pos, "axis0.controller.input_pos", self.node_id)
         self.moving = True
 
-        print("a")
-
         complete_check_thread = threading.Thread(
             target=wait_for_move_complete, args=(self,)
         )
+        print(1)
         complete_check_thread.start()

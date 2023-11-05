@@ -135,6 +135,7 @@ class odrive_controller:
                 abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)) > 0.1
         ):
             print(abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)))
+            print(1)
             pass
         print("Move complete")
 

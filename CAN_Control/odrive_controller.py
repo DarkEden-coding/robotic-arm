@@ -16,6 +16,7 @@ def setup(node_id):
 
     print("Waiting for main power...")
     while get_property_value("vbus_voltage", node_id) < 40:
+        print(get_property_value("vbus_voltage", node_id))
         pass
     print("Main power detected")
 

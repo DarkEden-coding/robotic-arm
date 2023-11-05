@@ -33,6 +33,8 @@ test_move()
 controller_1.set_speed(50)
 controller_2.set_speed(50)
 
+test_move()
+
 controller_1.disable_motor()
 controller_2.disable_motor()
 

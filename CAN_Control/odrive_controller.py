@@ -74,6 +74,9 @@ def setup(node_id):
     print("Clearing errors...")
     send_bus_message(None, "clear_errors", node_id)
     print("ODrive errors cleared")
+
+    send_bus_message(10, "axis0.controller.input_vel", node_id)
+
     print(f"------------------ ODrive with id {node_id} setup complete ------------------")
 
 

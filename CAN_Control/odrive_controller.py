@@ -115,6 +115,19 @@ class odrive_controller:
     def get_encoder_pos(self):
         return get_property_value("encoder_estimator0.pos_estimate", self.node_id)
 
+    def get_encoder_vel(self):
+        return get_property_value("encoder_estimator0.vel_estimate", self.node_id)
+
+    def set_speed(self, speed):
+        """
+        Set the speed of the motor
+        :param speed: speed in a percentage of 10 rps
+        :return:
+        """
+        speed = speed / 10
+        send_bus_message(speed, "axis0.controller.input_vel", self.node_id)
+        print(f"Speed set to {speed} rps")
+
     def set_torque(self, torque):
         """
         Set the torque of the motor
@@ -122,7 +135,7 @@ class odrive_controller:
         """
         send_bus_message(torque, "axis0.controller.input_torque", self.node_id)
 
-    def wait_for_move_complete(self):
+    def wait_for_move(self):
         sleep(0.2)
 
         while (

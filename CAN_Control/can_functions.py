@@ -127,7 +127,6 @@ def get_property_value(obj_path, node_id):
     """
     # Convert path to endpoint ID
     endpoint_id = endpoints[obj_path]["id"]
-    print(endpoint_id)
     endpoint_type = endpoints[obj_path]["type"]
 
     # Flush CAN RX buffer so there are no more old pending messages

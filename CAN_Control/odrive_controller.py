@@ -89,8 +89,8 @@ def error_message(message):
 
 def wait_for_move_complete(controller):
     while (
-        get_property_value("axis0.controller.trajectory_done", controller.node_id)
-        is False
+        get_property_value("encoder_estimator0.vel_estimate", controller.node_id)
+        > 0.1
     ):
         controller.moving = False
 
@@ -120,7 +120,7 @@ class odrive_controller:
         self.position = 0
 
     def get_encoder_pos(self):
-        return get_property_value("onboard_encoder0.raw", self.node_id)
+        return get_property_value("encoder_estimator0.pos_estimate", self.node_id)
 
     def set_torque(self, torque):
         """

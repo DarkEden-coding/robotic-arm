@@ -128,13 +128,13 @@ class odrive_controller:
         while (
                 abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)) < 0.1
         ):
-            print(get_property_value("encoder_estimator0.vel_estimate", self.node_id))
+            print(abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)))
             pass
 
         while (
                 abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)) > 0.1
         ):
-            print(get_property_value("encoder_estimator0.vel_estimate", self.node_id))
+            print(abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)))
             pass
         print("Move complete")
 

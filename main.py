@@ -8,7 +8,7 @@ controller_1 = odrive_controller(0)
 controller_1.enable_motor()
 # controller_2.enable_motor()
 
-controller_1.move_to_pos(20)
+controller_1.move_to_pos(50)
 
 controller_1.wait_for_move_complete()
 

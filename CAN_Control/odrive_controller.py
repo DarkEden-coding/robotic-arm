@@ -77,7 +77,7 @@ def setup(node_id):
 
     send_bus_message(10, "axis0.controller.config.vel_limit", node_id)
 
-    send_bus_message(1, "axis0.controller.config.input_mode", node_id)
+    send_bus_message(3, "axis0.controller.config.input_mode", node_id)
 
     print(f"------------------ ODrive with id {node_id} setup complete ------------------")
 

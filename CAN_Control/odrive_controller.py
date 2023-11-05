@@ -7,7 +7,6 @@ from CAN_Control.can_functions import (
 )
 import can
 import struct
-import threading
 from time import sleep
 
 
@@ -124,18 +123,11 @@ class odrive_controller:
         send_bus_message(torque, "axis0.controller.input_torque", self.node_id)
 
     def wait_for_move_complete(self):
-        print("Waiting for move to complete...")
-        while (
-                abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)) < 0.1
-        ):
-            print(abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)))
-            pass
+        sleep(0.2)
 
         while (
                 abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)) > 0.1
         ):
-            print(abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)))
-            print(1)
             pass
         print("Move complete")
 

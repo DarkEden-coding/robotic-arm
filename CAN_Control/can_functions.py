@@ -50,7 +50,13 @@ def send_bus_message(value, obj_path, node_id):
         bus.send(
             can.Message(
                 arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
-                data=struct.pack("<BHB", OPCODE_WRITE, endpoint_id, 0, value if value is not None else ""),
+                data=struct.pack(
+                    "<BHB",
+                    OPCODE_WRITE,
+                    endpoint_id,
+                    0,
+                    value if value is not None else "",
+                ),
                 is_extended_id=False,
             )
         )

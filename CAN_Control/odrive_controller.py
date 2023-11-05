@@ -103,7 +103,7 @@ class odrive_controller:
         self.torque_setpoint = 0
 
         setup(self.node_id)
-        # self.zero_motor()
+        self.zero_motor()
 
     def enable_motor(self):
         send_bus_message(8, "axis0.requested_state", self.node_id)

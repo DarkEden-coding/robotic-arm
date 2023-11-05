@@ -2,6 +2,9 @@ import can
 import struct
 import json
 import subprocess
+from threading import Lock
+
+can_bus_lock = Lock()
 
 with open("flat_endpoints.json", "r") as f:
     endpoint_data = json.load(f)
@@ -43,41 +46,70 @@ def send_bus_message(value, obj_path, node_id, return_value=False):
     :param node_id: Node id of the ODrive controller
     :return:
     """
-    # Convert path to endpoint ID
-    endpoint_id = endpoints[obj_path]["id"]
-    endpoint_type = endpoints[obj_path]["type"]
+    with can_bus_lock:
+        # Convert path to endpoint ID
+        endpoint_id = endpoints[obj_path]["id"]
+        endpoint_type = endpoints[obj_path]["type"]
 
-    if endpoint_type == "function":
-        if value is None:
-            bus.send(
-                can.Message(
-                    arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
-                    data=struct.pack(
-                        "<BHB",
-                        OPCODE_WRITE,
-                        endpoint_id,
-                        0,
-                    ),
-                    is_extended_id=False,
+        if endpoint_type == "function":
+            if value is None:
+                bus.send(
+                    can.Message(
+                        arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
+                        data=struct.pack(
+                            "<BHB",
+                            OPCODE_WRITE,
+                            endpoint_id,
+                            0,
+                        ),
+                        is_extended_id=False,
+                    )
                 )
-            )
-        else:
-            bus.send(
-                can.Message(
-                    arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
-                    data=struct.pack(
-                        "<BHB"
-                        + format_lookup[endpoints[obj_path]["inputs"][0]["type"]],
-                        OPCODE_WRITE,
-                        endpoint_id,
-                        0,
-                        value,
-                    ),
-                    is_extended_id=False,
+            else:
+                bus.send(
+                    can.Message(
+                        arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
+                        data=struct.pack(
+                            "<BHB"
+                            + format_lookup[endpoints[obj_path]["inputs"][0]["type"]],
+                            OPCODE_WRITE,
+                            endpoint_id,
+                            0,
+                            value,
+                        ),
+                        is_extended_id=False,
+                    )
                 )
-            )
 
-        if return_value and len(endpoints[obj_path]["outputs"]) > 0:
+            if return_value and len(endpoints[obj_path]["outputs"]) > 0:
+                # Await reply
+                for msg in bus:
+                    if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
+                        break
+
+                # Unpack and print reply
+                _, _, _, return_value = struct.unpack(
+                    "<BHB" + format_lookup[endpoint_type], msg.data
+                )
+                return return_value
+            return
+
+        # Send write command
+        bus.send(
+            can.Message(
+                arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
+                data=struct.pack(
+                    "<BHB" + format_lookup[endpoint_type],
+                    OPCODE_WRITE,
+                    endpoint_id,
+                    0,
+                    value,
+                ),
+                is_extended_id=False,
+            )
+        )
+
+        if "outputs" in endpoints[obj_path] and return_value:
             # Await reply
             for msg in bus:
                 if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
@@ -88,24 +120,33 @@ def send_bus_message(value, obj_path, node_id, return_value=False):
                 "<BHB" + format_lookup[endpoint_type], msg.data
             )
             return return_value
-        return
 
-    # Send write command
-    bus.send(
-        can.Message(
-            arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
-            data=struct.pack(
-                "<BHB" + format_lookup[endpoint_type],
-                OPCODE_WRITE,
-                endpoint_id,
-                0,
-                value,
-            ),
-            is_extended_id=False,
+
+def get_property_value(obj_path, node_id):
+    """
+    Get the value of a property from an ODrive
+    :param obj_path: Path of the property to get
+    :param node_id: Node id of odrive controller
+    :return:
+    """
+    with can_bus_lock:
+        # Convert path to endpoint ID
+        endpoint_id = endpoints[obj_path]["id"]
+        endpoint_type = endpoints[obj_path]["type"]
+
+        # Flush CAN RX buffer so there are no more old pending messages
+        while not (bus.recv(timeout=0) is None):
+            pass
+
+        # Send read command
+        bus.send(
+            can.Message(
+                arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
+                data=struct.pack("<BHB", OPCODE_READ, endpoint_id, 0),
+                is_extended_id=False,
+            )
         )
-    )
 
-    if "outputs" in endpoints[obj_path] and return_value:
         # Await reply
         for msg in bus:
             if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
@@ -116,42 +157,6 @@ def send_bus_message(value, obj_path, node_id, return_value=False):
             "<BHB" + format_lookup[endpoint_type], msg.data
         )
         return return_value
-
-
-def get_property_value(obj_path, node_id):
-    """
-    Get the value of a property from an ODrive
-    :param obj_path: Path of the property to get
-    :param node_id: Node id of odrive controller
-    :return:
-    """
-    # Convert path to endpoint ID
-    endpoint_id = endpoints[obj_path]["id"]
-    endpoint_type = endpoints[obj_path]["type"]
-
-    # Flush CAN RX buffer so there are no more old pending messages
-    while not (bus.recv(timeout=0) is None):
-        pass
-
-    # Send read command
-    bus.send(
-        can.Message(
-            arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
-            data=struct.pack("<BHB", OPCODE_READ, endpoint_id, 0),
-            is_extended_id=False,
-        )
-    )
-
-    # Await reply
-    for msg in bus:
-        if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
-            break
-
-    # Unpack and print reply
-    _, _, _, return_value = struct.unpack(
-        "<BHB" + format_lookup[endpoint_type], msg.data
-    )
-    return return_value
 
 
 def shutdown():

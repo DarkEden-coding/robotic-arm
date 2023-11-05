@@ -161,3 +161,19 @@ class odrive_controller:
         send_bus_message(pos, "axis0.controller.input_pos", self.node_id)
 
         self.requested_position = pos
+
+    def move_to_angle(self, angle):
+        """
+        Move to an angle
+        :param angle: angle in degrees
+        :return:
+        """
+        revolutions = (angle / 360)*25
+
+        print(f"Moving to angle {angle} by going {revolutions} revolutions...")
+        if not self.enabled:
+            warning_message("Motor is not enabled, enabling...")
+            self.enable_motor()
+        send_bus_message(revolutions, "axis0.controller.input_pos", self.node_id)
+
+        self.requested_position = revolutions

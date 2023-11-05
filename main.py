@@ -3,17 +3,16 @@ from CAN_Control.can_functions import shutdown
 
 
 def test_move():
-    controller_1.move_to_pos(6.25)
-    controller_2.move_to_pos(25)
+    controller_1.move_to_angle(45)
 
     controller_1.wait_for_move()
-    controller_2.wait_for_move(delay=0)
+    controller_2.wait_for_move(delay=0.1)
 
-    controller_1.move_to_pos(-6.25)
-    controller_2.move_to_pos(-25)
+    controller_1.move_to_pos(0)
+    controller_2.move_to_pos(22.5)
 
     controller_1.wait_for_move()
-    controller_2.wait_for_move(delay=0)
+    controller_2.wait_for_move(delay=0.1)
 
     controller_1.move_to_pos(0)
     controller_2.move_to_pos(0)

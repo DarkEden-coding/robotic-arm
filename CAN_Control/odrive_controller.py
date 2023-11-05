@@ -8,6 +8,7 @@ from CAN_Control.can_functions import (
 import can
 import struct
 import threading
+from time import sleep
 
 
 def setup(node_id):
@@ -92,6 +93,7 @@ def wait_for_move_complete(controller):
         get_property_value("encoder_estimator0.vel_estimate", controller.node_id) > 0.1
     ):
         pass
+    sleep(0.3)
     controller.moving = False
 
 

@@ -99,7 +99,7 @@ class odrive_controller:
         self.node_id = id_number
         self.enabled = False
         self.position = 0
-        self.torque_setpoint = 0
+        self.requested_position = 0
 
         setup(self.node_id)
         self.zero_motor()
@@ -141,10 +141,8 @@ class odrive_controller:
         send_bus_message(torque, "axis0.controller.input_torque", self.node_id)
 
     def wait_for_move(self):
-        sleep(0.2)
-
         while (
-                abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)) > 0.1
+                abs(self.requested_position - self.get_encoder_pos) < 0.1
         ):
             pass
         print("Move complete")
@@ -160,3 +158,5 @@ class odrive_controller:
             warning_message("Motor is not enabled, enabling...")
             self.enable_motor()
         send_bus_message(pos, "axis0.controller.input_pos", self.node_id)
+
+        self.requested_position = pos

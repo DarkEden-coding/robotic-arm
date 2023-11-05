@@ -147,6 +147,7 @@ class odrive_controller:
             print(f"Current position: {self.get_encoder_pos()}")
             print(f"Requested position: {self.requested_position}")
             pass
+        sleep(0.05)
         print("Move complete")
 
     def move_to_pos(self, pos):

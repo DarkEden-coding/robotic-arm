@@ -115,8 +115,8 @@ class odrive_controller:
         self.enabled = False
 
     def zero_motor(self):
-        offset = send_bus_message(3, "axis0.set_abs_pos", self.node_id)
-        print(f"Motor position offset by {offset} counts")
+        send_bus_message(0, "axis0.set_abs_pos", self.node_id)
+        # print(f"Motor position offset by {offset} counts")
         self.position = 0
 
     def get_encoder_pos(self):

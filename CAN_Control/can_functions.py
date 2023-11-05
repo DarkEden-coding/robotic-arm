@@ -34,9 +34,10 @@ format_lookup = {
 bus = can.interface.Bus("can0", bustype="socketcan")
 
 
-def send_bus_message(value, obj_path, node_id):
+def send_bus_message(value, obj_path, node_id, return_value=False):
     """
     Send a CAN message to an ODrive
+    :param return_value: if True, return any output
     :param value: What value to send
     :param obj_path: Path of the property to send to
     :param node_id: Node id of the ODrive controller
@@ -76,7 +77,7 @@ def send_bus_message(value, obj_path, node_id):
                 )
             )
 
-        if len(endpoints[obj_path]["outputs"]) > 0:
+        if return_value and len(endpoints[obj_path]["outputs"]) > 0:
             # Await reply
             for msg in bus:
                 if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
@@ -104,7 +105,7 @@ def send_bus_message(value, obj_path, node_id):
         )
     )
 
-    if "outputs" in endpoints[obj_path]:
+    if "outputs" in endpoints[obj_path] and return_value:
         # Await reply
         for msg in bus:
             if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo

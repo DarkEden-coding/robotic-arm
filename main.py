@@ -25,8 +25,8 @@ def test_move():
 controller_1 = odrive_controller(0)
 controller_2 = odrive_controller(1)
 
-controller_1.enable_motor()
-controller_2.enable_motor()
+# controller_1.enable_motor()
+# controller_2.enable_motor()
 
 test_move()
 

@@ -90,25 +90,10 @@ def error_message(message):
     print(f"{red_text}Error: {message}{reset_text}")
 
 
-def wait_for_move_complete(controller):
-    while (
-        abs(get_property_value("encoder_estimator0.vel_estimate", controller.node_id)) < 0.1
-    ):
-        pass
-
-    while (
-        abs(get_property_value("encoder_estimator0.vel_estimate", controller.node_id)) > 0.1
-    ):
-        pass
-
-    controller.moving = False
-
-
 class odrive_controller:
     def __init__(self, id_number):
         self.node_id = id_number
         self.enabled = False
-        self.moving = False
         self.position = 0
         self.torque_setpoint = 0
 
@@ -139,19 +124,25 @@ class odrive_controller:
         send_bus_message(torque, "axis0.controller.input_torque", self.node_id)
 
     def wait_for_move_complete(self):
-        while self.moving:
+        while (
+                abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)) < 0.1
+        ):
+            pass
+
+        while (
+                abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)) > 0.1
+        ):
             pass
         print("Move complete")
 
     def move_to_pos(self, pos):
+        """
+        Move to a position
+        :param pos: pos in revolutions
+        :return:
+        """
         print(f"Moving to position {pos}...")
         if not self.enabled:
             warning_message("Motor is not enabled, enabling...")
             self.enable_motor()
         send_bus_message(pos, "axis0.controller.input_pos", self.node_id)
-        self.moving = True
-
-        complete_check_thread = threading.Thread(
-            target=wait_for_move_complete, args=(self,)
-        )
-        complete_check_thread.start()

@@ -124,14 +124,17 @@ class odrive_controller:
         send_bus_message(torque, "axis0.controller.input_torque", self.node_id)
 
     def wait_for_move_complete(self):
+        print("Waiting for move to complete...")
         while (
                 abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)) < 0.1
         ):
+            print(get_property_value("encoder_estimator0.vel_estimate", self.node_id))
             pass
 
         while (
                 abs(get_property_value("encoder_estimator0.vel_estimate", self.node_id)) > 0.1
         ):
+            print(get_property_value("encoder_estimator0.vel_estimate", self.node_id))
             pass
         print("Move complete")
 

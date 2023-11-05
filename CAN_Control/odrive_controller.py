@@ -75,7 +75,7 @@ def setup(node_id):
     send_bus_message(None, "clear_errors", node_id)
     print("ODrive errors cleared")
 
-    send_bus_message(10, "axis0.controller.input_vel", node_id)
+    send_bus_message(10, "axis0.controller.config.vel_limit", node_id)
 
     send_bus_message(1, "axis0.controller.config.input_mode", node_id)
 
@@ -130,7 +130,7 @@ class odrive_controller:
         :return:
         """
         speed = speed / 10
-        send_bus_message(speed, "axis0.controller.input_vel", self.node_id)
+        send_bus_message(speed, "axis0.controller.config.vel_limit", self.node_id)
         print(f"Speed set to {speed} rps")
 
     def set_torque(self, torque):

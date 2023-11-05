@@ -70,7 +70,7 @@ def setup(node_id):
         exit(1)
 
     # clear errors
-    send_bus_message(0, "clear_errors", node_id)
+    send_bus_message(None, "clear_errors", node_id)
     print("ODrive errors cleared")
 
 

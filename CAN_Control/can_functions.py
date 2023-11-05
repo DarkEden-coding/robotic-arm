@@ -125,8 +125,6 @@ def get_property_value(obj_path, node_id):
     :param node_id: Node id of odrive controller
     :return:
     """
-    print(node_id << 5)
-    print(node_id << 5)
     # Convert path to endpoint ID
     endpoint_id = endpoints[obj_path]["id"]
     endpoint_type = endpoints[obj_path]["type"]
@@ -146,7 +144,6 @@ def get_property_value(obj_path, node_id):
 
     # Await reply
     for msg in bus:
-        print(msg.arbitration_id)
         if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
             break
 

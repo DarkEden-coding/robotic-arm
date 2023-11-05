@@ -125,6 +125,7 @@ def get_property_value(obj_path, node_id):
     :param node_id: Node id of odrive controller
     :return:
     """
+    print(node_id << 5)
     # Convert path to endpoint ID
     endpoint_id = endpoints[obj_path]["id"]
     endpoint_type = endpoints[obj_path]["type"]

@@ -75,7 +75,7 @@ def setup(node_id):
     print("Clearing errors...")
     send_bus_message(None, "clear_errors", node_id)
     print("ODrive errors cleared")
-    print("----------------------------------Done With Setup----------------------------------")
+    print(f"------------------ ODrive with id {node_id} setup complete ------------------")
 
 
 def warning_message(message):

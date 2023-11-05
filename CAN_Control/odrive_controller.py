@@ -118,7 +118,7 @@ class odrive_controller:
         self.position = 0
 
     def get_encoder_pos(self):
-        return get_property_value("encoder_estimator0.pos_estimate", self.node_id)
+        return get_property_value("axis0.controller.pos_setpoint", self.node_id)
 
     def get_encoder_vel(self):
         return get_property_value("encoder_estimator0.vel_estimate", self.node_id)

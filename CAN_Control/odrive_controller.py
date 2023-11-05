@@ -134,8 +134,10 @@ class odrive_controller:
     def wait_for_move_complete(self):
         while self.moving:
             pass
+        print("Move complete")
 
     def move_to_pos(self, pos):
+        print(f"Moving to position {pos}...")
         if not self.enabled:
             warning_message("Motor is not enabled, enabling...")
             self.enable_motor()

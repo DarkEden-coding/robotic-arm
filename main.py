@@ -28,12 +28,10 @@ controller_2 = odrive_controller(1)
 controller_1.enable_motor()
 controller_2.enable_motor()
 
-controller_2.set_speed(200)
-
 test_move()
 
 controller_1.set_speed(50)
-controller_2.set_speed(100)
+controller_2.set_speed(50)
 
 test_move()
 

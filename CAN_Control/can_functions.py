@@ -60,13 +60,13 @@ def send_bus_message(value, obj_path, node_id):
                     is_extended_id=False,
                 )
             )
-            return
         else:
             bus.send(
                 can.Message(
                     arbitration_id=(node_id << 5 | 0x04),  # 0x04: RxSdo
                     data=struct.pack(
-                        "<BHB" + format_lookup[endpoints[obj_path]["inputs"][0]["type"]],
+                        "<BHB"
+                        + format_lookup[endpoints[obj_path]["inputs"][0]["type"]],
                         OPCODE_WRITE,
                         endpoint_id,
                         0,
@@ -75,8 +75,6 @@ def send_bus_message(value, obj_path, node_id):
                     is_extended_id=False,
                 )
             )
-            return
-
 
         if "outputs" in endpoints[obj_path]:
             # Await reply

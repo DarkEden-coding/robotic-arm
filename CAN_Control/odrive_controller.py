@@ -91,7 +91,6 @@ def error_message(message):
 
 
 def wait_for_move_complete(controller):
-    print(f"node_id: {controller.node_id}")
     while (
         abs(get_property_value("encoder_estimator0.vel_estimate", controller.node_id)) < 0.1
     ):
@@ -151,6 +150,8 @@ class odrive_controller:
             self.enable_motor()
         send_bus_message(pos, "axis0.controller.input_pos", self.node_id)
         self.moving = True
+
+        print("a")
 
         complete_check_thread = threading.Thread(
             target=wait_for_move_complete, args=(self,)

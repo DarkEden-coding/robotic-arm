@@ -81,7 +81,9 @@ def setup(node_id):
     send_bus_message(5, "axis0.trap_traj.config.accel_limit", node_id)
     send_bus_message(5, "axis0.trap_traj.config.decel_limit", node_id)
 
-    print(f"------------------ ODrive with id {node_id} setup complete ------------------")
+    print(
+        f"------------------ ODrive with id {node_id} setup complete ------------------"
+    )
 
 
 def warning_message(message):
@@ -143,9 +145,7 @@ class odrive_controller:
         send_bus_message(torque, "axis0.controller.input_torque", self.node_id)
 
     def wait_for_move(self, delay=0.05):
-        while (
-                abs(self.requested_position - self.get_encoder_pos()) > 0.1
-        ):
+        while abs(self.requested_position - self.get_encoder_pos()) > 0.1:
             pass
         sleep(delay)
         print("Move complete")
@@ -170,7 +170,7 @@ class odrive_controller:
         :param angle: angle in degrees
         :return:
         """
-        revolutions = (angle / 360)*25
+        revolutions = (angle / 360) * 25
 
         print(f"Moving to angle {angle} by going to {revolutions} revolutions...")
         if not self.enabled:

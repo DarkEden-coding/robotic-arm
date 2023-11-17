@@ -44,8 +44,8 @@ def get_angles(x_pos, y_pos, z_pos):
 
     # convert to degrees
     base_angle = math.degrees(base_angle)
-    shoulder_angle = math.degrees(shoulder_angle)
-    elbow_angle = math.degrees(elbow_angle)
+    shoulder_angle = 90 - math.degrees(shoulder_angle)
+    elbow_angle = 180 - math.degrees(elbow_angle)
 
     # get elbow point
     elbow_point = (
@@ -54,34 +54,35 @@ def get_angles(x_pos, y_pos, z_pos):
     )
     print(f"Elbow point: {elbow_point}")
 
-    return base_angle, shoulder_angle, elbow_angle
+    return base_angle, shoulder_angle, -elbow_angle
 
 
 print(get_angles(200, 100, 10))
+angles = get_angles(200, 100, 10)
 
 
 controller_1 = odrive_controller(0)
 controller_2 = odrive_controller(1)
-# controller_3 = odrive_controller(2)
+controller_3 = odrive_controller(2)
 
 controller_1.enable_motor()
 controller_2.enable_motor()
-# controller_3.enable_motor()
+controller_3.enable_motor()
 
 # controller_1.move_to_angle(0)
-controller_2.move_to_angle(15)
-# controller_3.move_to_angle(15)
+controller_2.move_to_angle(angles[1])
+controller_3.move_to_angle(angles[2])
 
 controller_2.wait_for_move()
 
 # controller_1.move_to_angle(0)
 controller_2.move_to_angle(0)
-# controller_3.move_to_angle(0)
+controller_3.move_to_angle(0)
 
 controller_2.wait_for_move()
 
 controller_1.disable_motor()
 controller_2.disable_motor()
-# controller_3.disable_motor()
+controller_3.disable_motor()
 
 shutdown()

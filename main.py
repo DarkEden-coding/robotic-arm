@@ -78,6 +78,8 @@ controller_2.wait_for_move()
 controller_2.move_to_angle(0)
 # controller_3.move_to_angle(0)
 
+controller_2.wait_for_move()
+
 controller_1.disable_motor()
 controller_2.disable_motor()
 # controller_3.disable_motor()

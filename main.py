@@ -72,7 +72,7 @@ controller_2.enable_motor()
 controller_2.move_to_angle(15)
 # controller_3.move_to_angle(15)
 
-sleep(1)
+controller_2.wait_for_move()
 
 # controller_1.move_to_angle(0)
 controller_2.move_to_angle(0)

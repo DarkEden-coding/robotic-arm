@@ -81,6 +81,9 @@ def setup(node_id):
     send_bus_message(.1, "axis0.trap_traj.config.accel_limit", node_id)
     send_bus_message(.1, "axis0.trap_traj.config.decel_limit", node_id)
 
+    # save configuration
+    send_bus_message(None, "save_configuration", node_id)
+
     print(
         f"------------------ ODrive with id {node_id} setup complete ------------------"
     )

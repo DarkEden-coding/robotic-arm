@@ -1,5 +1,6 @@
 from CAN_Control.odrive_controller import odrive_controller
 from CAN_Control.can_functions import shutdown
+from time import sleep
 
 
 def get_angles(x_pos, y_pos, z_pos):

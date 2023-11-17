@@ -47,18 +47,11 @@ def get_angles(x_pos, y_pos, z_pos):
     shoulder_angle = 90 - math.degrees(shoulder_angle)
     elbow_angle = 180 - math.degrees(elbow_angle)
 
-    # get elbow point
-    elbow_point = (
-        arm_1_length * math.cos(math.radians(shoulder_angle)),
-        arm_1_length * math.sin(math.radians(shoulder_angle)),
-    )
-    print(f"Elbow point: {elbow_point}")
-
     return base_angle, shoulder_angle, -elbow_angle
 
 
-print(get_angles(200, 0, 10))
-angles = get_angles(200, 0, 10)
+print(get_angles(600, 0, 100))
+angles = get_angles(600, 0, 100)
 
 
 controller_1 = odrive_controller(0)

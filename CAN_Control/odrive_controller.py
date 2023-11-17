@@ -75,7 +75,7 @@ def setup(node_id):
     send_bus_message(None, "clear_errors", node_id)
     print("ODrive errors cleared")
 
-    send_bus_message(10, "axis0.trap_traj.config.vel_limit", node_id)
+    send_bus_message(1, "axis0.trap_traj.config.vel_limit", node_id)
 
     send_bus_message(5, "axis0.controller.config.input_mode", node_id)
     send_bus_message(.1, "axis0.trap_traj.config.accel_limit", node_id)

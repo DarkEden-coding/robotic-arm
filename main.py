@@ -57,8 +57,8 @@ def get_angles(x_pos, y_pos, z_pos):
     return base_angle, shoulder_angle, -elbow_angle
 
 
-print(get_angles(200, 100, 10))
-angles = get_angles(200, 100, 10)
+print(get_angles(200, 0, 10))
+angles = get_angles(200, 0, 10)
 
 
 controller_1 = odrive_controller(0)

@@ -62,7 +62,7 @@ controller_1.enable_motor()
 controller_2.enable_motor()
 controller_3.enable_motor()
 
-# controller_1.move_to_angle(0)
+controller_1.move_to_angle(angles[0])
 controller_2.move_to_angle(angles[1])
 controller_3.move_to_angle(angles[2])
 
@@ -71,7 +71,7 @@ controller_3.wait_for_move()
 
 input("Press enter to move to next position...")
 
-# controller_1.move_to_angle(0)
+controller_1.move_to_angle(0)
 controller_2.move_to_angle(0)
 controller_3.move_to_angle(0)
 

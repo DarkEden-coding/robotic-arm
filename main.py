@@ -67,6 +67,8 @@ controller_3.move_to_angle(angles[2])
 controller_2.wait_for_move()
 controller_3.wait_for_move()
 
+input("Press enter to move to next position...")
+
 # controller_1.move_to_angle(0)
 controller_2.move_to_angle(0)
 controller_3.move_to_angle(0)

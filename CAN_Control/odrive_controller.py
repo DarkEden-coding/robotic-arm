@@ -2,7 +2,6 @@ from CAN_Control.can_functions import (
     bus,
     send_bus_message,
     get_property_value,
-    endpoints,
     endpoint_data,
 )
 import can
@@ -10,7 +9,7 @@ import struct
 from time import sleep
 
 
-def setup(node_id):
+def setup(node_id, gear_ratio):
     print(f"Setting up CAN for ODrive with id: {node_id}")
 
     print("Waiting for main power...")
@@ -75,11 +74,11 @@ def setup(node_id):
     send_bus_message(None, "clear_errors", node_id)
     print("ODrive errors cleared")
 
-    send_bus_message(1, "axis0.trap_traj.config.vel_limit", node_id)
+    send_bus_message(2 * (gear_ratio / 25), "axis0.trap_traj.config.vel_limit", node_id)
 
     send_bus_message(5, "axis0.controller.config.input_mode", node_id)
-    send_bus_message(0.1, "axis0.trap_traj.config.accel_limit", node_id)
-    send_bus_message(0.1, "axis0.trap_traj.config.decel_limit", node_id)
+    send_bus_message(0.2 * (gear_ratio / 25), "axis0.trap_traj.config.accel_limit", node_id)
+    send_bus_message(0.2 * (gear_ratio / 25), "axis0.trap_traj.config.decel_limit", node_id)
 
     # save configuration
     send_bus_message(None, "save_configuration", node_id)
@@ -151,7 +150,7 @@ class odrive_controller:
         self.requested_position = 0
         self.gear_ratio = gear_ratio
 
-        setup(self.node_id)
+        setup(self.node_id, self.gear_ratio)
         self.zero_motor()
 
     def enable_motor(self):

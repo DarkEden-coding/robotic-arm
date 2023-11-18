@@ -2,8 +2,8 @@ import math
 from CAN_Control.odrive_controller import odrive_controller
 from CAN_Control.can_functions import shutdown
 
-arm_1_length = 400
-arm_2_length = 430
+arm_1_length = 575
+arm_2_length = 650
 
 
 def get_angles(x_pos, y_pos, z_pos):

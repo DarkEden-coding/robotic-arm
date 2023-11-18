@@ -84,6 +84,43 @@ def setup(node_id):
     # save configuration
     send_bus_message(None, "save_configuration", node_id)
 
+    sleep(1)
+
+    for msg in bus:
+        if msg.arbitration_id == message_id:
+            print(f"ODrive with id {node_id}: step 1 complete")
+            break
+
+    # Flush CAN RX buffer so there are no more old pending messages
+    while not (bus.recv(timeout=0) is None):
+        pass
+
+    # Send read command
+    bus.send(
+        can.Message(
+            arbitration_id=(node_id << 5 | 0x00),  # 0x00: Get_Version
+            data=b"",
+            is_extended_id=False,
+        )
+    )
+
+    # Await reply
+    for msg in bus:
+        if msg.arbitration_id == (node_id << 5 | 0x00):  # 0x00: Get_Version
+            print(f"ODrive with id {node_id}: step 2 complete")
+            break
+
+    (
+        _,
+        hw_product_line,
+        hw_version,
+        hw_variant,
+        fw_major,
+        fw_minor,
+        fw_revision,
+        fw_unreleased,
+    ) = struct.unpack("<BBBBBBBB", msg.data)
+
     print(
         f"------------------ ODrive with id {node_id} setup complete ------------------"
     )

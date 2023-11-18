@@ -78,8 +78,8 @@ def setup(node_id):
     send_bus_message(1, "axis0.trap_traj.config.vel_limit", node_id)
 
     send_bus_message(5, "axis0.controller.config.input_mode", node_id)
-    send_bus_message(.1, "axis0.trap_traj.config.accel_limit", node_id)
-    send_bus_message(.1, "axis0.trap_traj.config.decel_limit", node_id)
+    send_bus_message(0.1, "axis0.trap_traj.config.accel_limit", node_id)
+    send_bus_message(0.1, "axis0.trap_traj.config.decel_limit", node_id)
 
     # save configuration
     send_bus_message(None, "save_configuration", node_id)
@@ -102,11 +102,17 @@ def error_message(message):
 
 
 class odrive_controller:
-    def __init__(self, id_number):
+    def __init__(self, id_number, gear_ratio=25):
+        """
+        Odive controller class
+        :param id_number: the CAN Bus ID of the ODrive
+        :param gear_ratio: The gear ratio of the motor, it is in terms of x:1.
+        """
         self.node_id = id_number
         self.enabled = False
         self.position = 0
         self.requested_position = 0
+        self.gear_ratio = gear_ratio
 
         setup(self.node_id)
         self.zero_motor()
@@ -173,7 +179,7 @@ class odrive_controller:
         :param angle: angle in degrees
         :return:
         """
-        revolutions = (angle / 360) * 25
+        revolutions = (angle / 360) * self.gear_ratio
 
         print(f"Moving to angle {angle} by going to {revolutions} revolutions...")
         if not self.enabled:

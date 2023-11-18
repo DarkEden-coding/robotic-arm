@@ -48,12 +48,12 @@ def get_angles(x_pos, y_pos, z_pos):
     return base_angle, shoulder_angle, -elbow_angle
 
 
-print(get_angles(600, 0, 100))
-angles = get_angles(600, 0, 100)
+print(get_angles(300, 0, 100))
+angles = get_angles(300, 0, 100)
 
 
 controller_1 = odrive_controller(0)
-controller_2 = odrive_controller(1)
+controller_2 = odrive_controller(1, gear_ratio=125)
 controller_3 = odrive_controller(2)
 
 controller_1.enable_motor()
@@ -73,6 +73,8 @@ controller_3.move_to_angle(0)
 
 controller_2.wait_for_move()
 controller_3.wait_for_move()
+
+input("Press enter to disable...")
 
 controller_1.disable_motor()
 controller_2.disable_motor()

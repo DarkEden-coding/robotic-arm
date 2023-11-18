@@ -1,7 +1,7 @@
 import math
 
-"""from CAN_Control.odrive_controller import odrive_controller
-from CAN_Control.can_functions import shutdown"""
+from CAN_Control.odrive_controller import odrive_controller
+from CAN_Control.can_functions import shutdown
 
 arm_1_length = 575
 arm_2_length = 650
@@ -54,7 +54,7 @@ print(get_angles(600, 100, 0))
 angles = get_angles(600, 100, 0)
 
 
-"""controller_1 = odrive_controller(0)
+controller_1 = odrive_controller(0)
 controller_2 = odrive_controller(1, gear_ratio=125)
 controller_3 = odrive_controller(2)
 
@@ -84,4 +84,4 @@ controller_1.disable_motor()
 controller_2.disable_motor()
 controller_3.disable_motor()
 
-shutdown()"""
+shutdown()

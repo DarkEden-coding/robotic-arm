@@ -77,8 +77,12 @@ def setup(node_id, gear_ratio):
     send_bus_message(2 * (gear_ratio / 25), "axis0.trap_traj.config.vel_limit", node_id)
 
     send_bus_message(5, "axis0.controller.config.input_mode", node_id)
-    send_bus_message(0.2 * (gear_ratio / 25), "axis0.trap_traj.config.accel_limit", node_id)
-    send_bus_message(0.2 * (gear_ratio / 25), "axis0.trap_traj.config.decel_limit", node_id)
+    send_bus_message(
+        0.2 * (gear_ratio / 25), "axis0.trap_traj.config.accel_limit", node_id
+    )
+    send_bus_message(
+        0.2 * (gear_ratio / 25), "axis0.trap_traj.config.decel_limit", node_id
+    )
 
     # save configuration
     send_bus_message(None, "save_configuration", node_id)
@@ -87,7 +91,7 @@ def setup(node_id, gear_ratio):
 
     for msg in bus:
         if msg.arbitration_id == message_id:
-            print(f"ODrive with id {node_id}: step 1 complete")
+            print(f"ODrive with id {node_id}: step 3 complete")
             break
 
     # Flush CAN RX buffer so there are no more old pending messages
@@ -106,7 +110,7 @@ def setup(node_id, gear_ratio):
     # Await reply
     for msg in bus:
         if msg.arbitration_id == (node_id << 5 | 0x00):  # 0x00: Get_Version
-            print(f"ODrive with id {node_id}: step 2 complete")
+            print(f"ODrive with id {node_id}: step 4 complete")
             break
 
     (

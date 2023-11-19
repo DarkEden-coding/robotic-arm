@@ -8,6 +8,10 @@ import can
 import struct
 from time import sleep
 
+max_speed = 5  # rps
+max_accel = .6  # rps/s
+max_decel = .6  # rps/s
+
 
 def setup(node_id, gear_ratio):
     print(f"Setting up CAN for ODrive with id: {node_id}")
@@ -76,13 +80,13 @@ def setup(node_id, gear_ratio):
 
     send_bus_message(5, "axis0.controller.config.input_mode", node_id)
 
-    send_bus_message(5 * (gear_ratio / 25), "axis0.trap_traj.config.vel_limit", node_id)
+    send_bus_message(max_speed * (gear_ratio / 25), "axis0.trap_traj.config.vel_limit", node_id)
 
     send_bus_message(
-        0.3 * (gear_ratio / 25), "axis0.trap_traj.config.accel_limit", node_id
+        max_accel * (gear_ratio / 25), "axis0.trap_traj.config.accel_limit", node_id
     )
     send_bus_message(
-        0.3 * (gear_ratio / 25), "axis0.trap_traj.config.decel_limit", node_id
+        max_decel * (gear_ratio / 25), "axis0.trap_traj.config.decel_limit", node_id
     )
 
     # save configuration

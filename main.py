@@ -18,6 +18,10 @@ def get_angles(x_pos, y_pos, z_pos):
     # soh cah toa
     z_pos -= 220
 
+    target_distance = math.sqrt(x_pos**2 + y_pos**2 + z_pos**2)
+    if target_distance > arm_1_length + arm_2_length:
+        raise ValueError("Target position is out of reach")
+
     base_angle = math.atan2(y_pos, x_pos)
 
     y_flat_distance = math.sqrt((0 - x_pos) ** 2 + (0 - y_pos) ** 2)
@@ -66,15 +70,37 @@ controller_1.move_to_angle(angles[0])
 controller_2.move_to_angle(angles[1])
 controller_3.move_to_angle(angles[2])
 
+controller_1.wait_for_move()
 controller_2.wait_for_move()
 controller_3.wait_for_move()
 
-input("Press enter to move to next position...")
+print(get_angles(300, 500, 0))
+angles = get_angles(300, 500, 0)
+
+controller_1.move_to_angle(angles[0])
+controller_2.move_to_angle(angles[1])
+controller_3.move_to_angle(angles[2])
+
+controller_1.wait_for_move()
+controller_2.wait_for_move()
+controller_3.wait_for_move()
+
+print(get_angles(400, 200, 300))
+angles = get_angles(400, 200, 300)
+
+controller_1.move_to_angle(angles[0])
+controller_2.move_to_angle(angles[1])
+controller_3.move_to_angle(angles[2])
+
+controller_1.wait_for_move()
+controller_2.wait_for_move()
+controller_3.wait_for_move()
 
 controller_1.move_to_angle(0)
 controller_2.move_to_angle(0)
 controller_3.move_to_angle(0)
 
+controller_1.wait_for_move()
 controller_2.wait_for_move()
 controller_3.wait_for_move()
 

@@ -76,12 +76,12 @@ def setup(node_id, gear_ratio):
 
     send_bus_message(2 * (gear_ratio / 25), "axis0.trap_traj.config.vel_limit", node_id)
 
-    send_bus_message(5, "axis0.controller.config.input_mode", node_id)
+    send_bus_message(15, "axis0.controller.config.input_mode", node_id)
     send_bus_message(
-        0.1 * (gear_ratio / 25), "axis0.trap_traj.config.accel_limit", node_id
+        0.3 * (gear_ratio / 25), "axis0.trap_traj.config.accel_limit", node_id
     )
     send_bus_message(
-        0.1 * (gear_ratio / 25), "axis0.trap_traj.config.decel_limit", node_id
+        0.3 * (gear_ratio / 25), "axis0.trap_traj.config.decel_limit", node_id
     )
 
     # save configuration

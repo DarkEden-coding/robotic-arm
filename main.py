@@ -2,6 +2,9 @@ from CAN_Control.odrive_controller import odrive_controller
 from CAN_Control.can_functions import shutdown
 import math
 
+arm_1_length = 575
+arm_2_length = 640
+
 
 def generate_points_on_circle(center, radius, num_points):
     if num_points < 2:

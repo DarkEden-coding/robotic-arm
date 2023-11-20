@@ -80,6 +80,10 @@ while True:
     controller_3.wait_for_move()
 
 
+controller_1.move_to_angle(0)
+controller_2.move_to_angle(-5)
+controller_3.move_to_angle(0)
+
 input("Press enter to disable...")
 
 controller_1.disable_motor()

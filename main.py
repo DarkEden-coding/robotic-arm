@@ -1,10 +1,22 @@
-import math
-
 from CAN_Control.odrive_controller import odrive_controller
 from CAN_Control.can_functions import shutdown
+import math
 
-arm_1_length = 575
-arm_2_length = 650
+
+def generate_points_on_circle(center, radius, num_points):
+    if num_points < 2:
+        raise ValueError("Number of points should be at least 2.")
+
+    angle_increment = 2 * math.pi / num_points
+    points = []
+
+    for i in range(num_points):
+        angle = i * angle_increment
+        x = center[0] + radius * math.cos(angle)
+        y = center[1] + radius * math.sin(angle)
+        points.append((x, y, 0))
+
+    return points
 
 
 def get_angles(x_pos, y_pos, z_pos):
@@ -54,6 +66,8 @@ def get_angles(x_pos, y_pos, z_pos):
     return base_angle, shoulder_angle, -elbow_angle
 
 
+points = generate_points_on_circle((400, 0), 200, 10)
+
 controller_1 = odrive_controller(0)
 controller_2 = odrive_controller(1, gear_ratio=125)
 controller_3 = odrive_controller(2)
@@ -62,9 +76,8 @@ controller_1.enable_motor()
 controller_2.enable_motor()
 controller_3.enable_motor()
 
-for i in range(10):
-    # move to 400, 0 , 0 and then 400, 0, 200
-    angles = get_angles(400, 0, 0)
+for point in points:
+    angles = get_angles(*point)
 
     controller_1.move_to_angle(angles[0])
     controller_2.move_to_angle(angles[1])
@@ -73,21 +86,14 @@ for i in range(10):
     controller_1.wait_for_move()
     controller_2.wait_for_move()
     controller_3.wait_for_move()
-
-    angles = get_angles(400, 0, 200)
-
-    controller_1.move_to_angle(angles[0])
-    controller_2.move_to_angle(angles[1])
-    controller_3.move_to_angle(angles[2])
-
-    controller_1.wait_for_move()
-    controller_2.wait_for_move()
-    controller_3.wait_for_move()
-
 
 controller_1.move_to_angle(0)
 controller_2.move_to_angle(-5)
 controller_3.move_to_angle(0)
+
+controller_1.wait_for_move()
+controller_2.wait_for_move()
+controller_3.wait_for_move()
 
 controller_1.disable_motor()
 controller_2.disable_motor()

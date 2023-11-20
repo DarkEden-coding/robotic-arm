@@ -54,8 +54,8 @@ def get_angles(x_pos, y_pos, z_pos):
     return base_angle, shoulder_angle, -elbow_angle
 
 
-print(get_angles(600, 100, 0))
-angles = get_angles(600, 100, 0)
+print(get_angles(600, 0, 0))
+angles = get_angles(600, 0, 0)
 
 
 controller_1 = odrive_controller(0)
@@ -74,8 +74,8 @@ controller_1.wait_for_move()
 controller_2.wait_for_move()
 controller_3.wait_for_move()
 
-print(get_angles(300, 500, 0))
-angles = get_angles(300, 500, 0)
+print(get_angles(800, 0, 0))
+angles = get_angles(900, 0, 0)
 
 controller_1.move_to_angle(angles[0])
 controller_2.move_to_angle(angles[1])
@@ -85,8 +85,8 @@ controller_1.wait_for_move()
 controller_2.wait_for_move()
 controller_3.wait_for_move()
 
-print(get_angles(400, 200, 300))
-angles = get_angles(400, 200, 300)
+print(get_angles(1000, 0, 300))
+angles = get_angles(1000, 0, 300)
 
 controller_1.move_to_angle(angles[0])
 controller_2.move_to_angle(angles[1])

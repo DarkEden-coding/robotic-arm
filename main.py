@@ -16,7 +16,7 @@ def get_angles(x_pos, y_pos, z_pos):
     :return: angles in radians (base angle, shoulder angle, elbow angle)
     """
     # soh cah toa
-    # z_pos -= 220
+    z_pos -= 140
 
     target_distance = math.sqrt(x_pos**2 + y_pos**2 + z_pos**2)
     if target_distance > arm_1_length + arm_2_length:
@@ -62,14 +62,19 @@ controller_1.enable_motor()
 controller_2.enable_motor()
 controller_3.enable_motor()
 
-while True:
-    height = input("Enter height: ")
-    if height == "exit":
-        break
-    height = float(height)
-    angles = get_angles(400, 0, height)
+for i in range(10):
+    # move to 400, 0 , 0 and then 400, 0, 200
+    angles = get_angles(400, 0, 0)
 
-    print(f"Moving to (400, 0, {height}) with angles {angles}")
+    controller_1.move_to_angle(angles[0])
+    controller_2.move_to_angle(angles[1])
+    controller_3.move_to_angle(angles[2])
+
+    controller_1.wait_for_move()
+    controller_2.wait_for_move()
+    controller_3.wait_for_move()
+
+    angles = get_angles(400, 0, 200)
 
     controller_1.move_to_angle(angles[0])
     controller_2.move_to_angle(angles[1])
@@ -83,8 +88,6 @@ while True:
 controller_1.move_to_angle(0)
 controller_2.move_to_angle(-5)
 controller_3.move_to_angle(0)
-
-input("Press enter to disable...")
 
 controller_1.disable_motor()
 controller_2.disable_motor()

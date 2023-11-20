@@ -54,10 +54,6 @@ def get_angles(x_pos, y_pos, z_pos):
     return base_angle, shoulder_angle, -elbow_angle
 
 
-print(get_angles(1000, 0, 0))
-angles = get_angles(1000, 0, 0)
-
-
 controller_1 = odrive_controller(0)
 controller_2 = odrive_controller(1, gear_ratio=125)
 controller_3 = odrive_controller(2)
@@ -66,49 +62,23 @@ controller_1.enable_motor()
 controller_2.enable_motor()
 controller_3.enable_motor()
 
-controller_1.move_to_angle(angles[0])
-controller_2.move_to_angle(angles[1])
-controller_3.move_to_angle(angles[2])
+while True:
+    height = input("Enter height: ")
+    if height == "exit":
+        break
+    height = float(height)
+    angles = get_angles(400, 0, height)
 
-controller_1.wait_for_move()
-controller_2.wait_for_move()
-controller_3.wait_for_move()
+    print(f"Moving to (400, 0, {height}) with angles {angles}")
 
-print(get_angles(1200, 0, 0))
-angles = get_angles(1200, 0, 0)
+    controller_1.move_to_angle(angles[0])
+    controller_2.move_to_angle(angles[1])
+    controller_3.move_to_angle(angles[2])
 
-input("Press enter to move...")
+    controller_1.wait_for_move()
+    controller_2.wait_for_move()
+    controller_3.wait_for_move()
 
-controller_1.move_to_angle(angles[0])
-controller_2.move_to_angle(angles[1])
-controller_3.move_to_angle(angles[2])
-
-controller_1.wait_for_move()
-controller_2.wait_for_move()
-controller_3.wait_for_move()
-
-print(get_angles(1400, 0, 300))
-angles = get_angles(1400, 0, 300)
-
-input("Press enter to move...")
-
-controller_1.move_to_angle(angles[0])
-controller_2.move_to_angle(angles[1])
-controller_3.move_to_angle(angles[2])
-
-controller_1.wait_for_move()
-controller_2.wait_for_move()
-controller_3.wait_for_move()
-
-input("Press enter to move...")
-
-controller_1.move_to_angle(0)
-controller_2.move_to_angle(-3)
-controller_3.move_to_angle(0)
-
-controller_1.wait_for_move()
-controller_2.wait_for_move()
-controller_3.wait_for_move()
 
 input("Press enter to disable...")
 

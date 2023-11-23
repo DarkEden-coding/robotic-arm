@@ -53,8 +53,6 @@ def get_angles(x_pos, y_pos, z_pos):
     return base_angle, shoulder_angle, -elbow_angle
 
 
-points = generate_points_on_circle((400, 0), 200, 10)
-
 controller_1 = odrive_controller(0)
 controller_2 = odrive_controller(1, gear_ratio=125)
 controller_3 = odrive_controller(2)

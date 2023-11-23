@@ -6,22 +6,6 @@ arm_1_length = 575
 arm_2_length = 640
 
 
-def generate_points_on_circle(center, radius, num_points):
-    if num_points < 2:
-        raise ValueError("Number of points should be at least 2.")
-
-    angle_increment = 2 * math.pi / num_points
-    points = []
-
-    for i in range(num_points):
-        angle = i * angle_increment
-        x = center[0] + radius * math.cos(angle)
-        y = center[1] + radius * math.sin(angle)
-        points.append((x, y, 0))
-
-    return points
-
-
 def get_angles(x_pos, y_pos, z_pos):
     """
     Get the angles of the robot arm
@@ -79,16 +63,17 @@ controller_1.enable_motor()
 controller_2.enable_motor()
 controller_3.enable_motor()
 
-for point in points:
-    angles = get_angles(*point)
+angles = get_angles(150, -200, 0)
 
-    controller_1.move_to_angle(angles[0])
-    controller_2.move_to_angle(angles[1])
-    controller_3.move_to_angle(angles[2])
+controller_1.move_to_angle(angles[0])
+controller_2.move_to_angle(angles[1])
+controller_3.move_to_angle(angles[2])
 
-    controller_1.wait_for_move()
-    controller_2.wait_for_move()
-    controller_3.wait_for_move()
+controller_1.wait_for_move()
+controller_2.wait_for_move()
+controller_3.wait_for_move()
+
+input("Press enter to continue")
 
 controller_1.move_to_angle(0)
 controller_2.move_to_angle(-5)

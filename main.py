@@ -61,7 +61,7 @@ controller_1.enable_motor()
 controller_2.enable_motor()
 controller_3.enable_motor()
 
-angles = get_angles(150, -200, 0)
+angles = get_angles(0, -200, 0)
 
 controller_1.move_to_angle(angles[0])
 controller_2.move_to_angle(angles[1])

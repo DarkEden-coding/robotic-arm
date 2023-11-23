@@ -15,7 +15,7 @@ def get_angles(x_pos, y_pos, z_pos):
     :return: angles in radians (base angle, shoulder angle, elbow angle)
     """
     # soh cah toa
-    z_pos -= 140
+    z_pos -= 180
 
     target_distance = math.sqrt(x_pos**2 + y_pos**2 + z_pos**2)
     if target_distance > arm_1_length + arm_2_length:
@@ -73,8 +73,32 @@ controller_3.wait_for_move()
 
 input("Press enter to continue")
 
+angles = get_angles(0, -800, 0)
+
+controller_1.move_to_angle(angles[0])
+controller_2.move_to_angle(angles[1])
+controller_3.move_to_angle(angles[2])
+
+controller_1.wait_for_move()
+controller_2.wait_for_move()
+controller_3.wait_for_move()
+
+input("Press enter to continue")
+
+angles = get_angles(0, -200, 0)
+
+controller_1.move_to_angle(angles[0])
+controller_2.move_to_angle(angles[1])
+controller_3.move_to_angle(angles[2])
+
+controller_1.wait_for_move()
+controller_2.wait_for_move()
+controller_3.wait_for_move()
+
+input("Press enter to continue")
+
 controller_1.move_to_angle(0)
-controller_2.move_to_angle(-5)
+controller_2.move_to_angle(-2)
 controller_3.move_to_angle(0)
 
 controller_1.wait_for_move()

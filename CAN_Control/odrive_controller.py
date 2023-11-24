@@ -7,10 +7,7 @@ from CAN_Control.can_functions import (
 import can
 import struct
 from time import sleep
-
-max_speed = 5  # rps
-max_accel = 0.6  # rps/s
-max_decel = 0.6  # rps/s
+from constants import max_speed, max_accel, max_decel
 
 
 def setup(node_id, gear_ratio):
@@ -220,12 +217,31 @@ class odrive_controller:
 
         self.requested_position = pos
 
-    def move_to_angle(self, angle):
+    def move_to_angle(self, angle, speed_offset=1):
         """
         Move to an angle
         :param angle: angle in degrees
+        :param speed_offset: offset for the speed/accel of the motor
         :return:
         """
+        if speed_offset != 1:
+            send_bus_message(
+                max_speed * (self.gear_ratio / 25) * speed_offset,
+                "axis0.trap_traj.config.vel_limit",
+                self.node_id,
+            )
+
+            send_bus_message(
+                max_accel * (self.gear_ratio / 25) * speed_offset,
+                "axis0.trap_traj.config.accel_limit",
+                self.node_id,
+            )
+            send_bus_message(
+                max_decel * (self.gear_ratio / 25) * speed_offset,
+                "axis0.trap_traj.config.decel_limit",
+                self.node_id,
+            )
+
         revolutions = (angle / 360) * self.gear_ratio
 
         print(f"Moving to angle {angle} by going to {revolutions} revolutions...")

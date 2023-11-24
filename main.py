@@ -2,7 +2,12 @@ from CAN_Control.odrive_controller import odrive_controller
 from CAN_Control.can_functions import shutdown
 import math
 
-from constants import arm_1_length, arm_2_length, shoulder_speed_offset, elbow_speed_offset
+from constants import (
+    arm_1_length,
+    arm_2_length,
+    shoulder_speed_offset,
+    elbow_speed_offset,
+)
 
 
 def get_angles(x_pos, y_pos, z_pos):

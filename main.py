@@ -57,24 +57,21 @@ def get_angles(x_pos, y_pos, z_pos):
 
 def get_trajectory(base_angle, shoulder_angle, elbow_angle):
     """
-    Get the trajectory of the robot arm
+    Get the relative speeds for the robot arm joints
     :param base_angle: base angle in degrees
     :param shoulder_angle: shoulder angle in degrees
     :param elbow_angle: elbow angle in degrees
-    :return: speed, acceleration, deceleration in offsets
+    :return: relative speeds for base, shoulder, and elbow joints
     """
-    if base_angle > shoulder_angle and base_angle > elbow_angle:
-        max_angle = base_angle
-    elif shoulder_angle > elbow_angle:
-        max_angle = shoulder_angle
-    else:
-        max_angle = elbow_angle
+    # Find the maximum angle
+    max_angle = max(base_angle, shoulder_angle, elbow_angle)
 
-    base_angle_offset = (max_angle / base_angle) + 1
-    shoulder_angle_offset = (max_angle / shoulder_angle) + 1
-    elbow_angle_offset = (max_angle / elbow_angle) + 1
+    # Calculate relative speeds
+    base_speed = 1 if base_angle == 0 else base_angle / max_angle
+    shoulder_speed = 1 if shoulder_angle == 0 else shoulder_angle / max_angle
+    elbow_speed = 1 if elbow_angle == 0 else elbow_angle / max_angle
 
-    return base_angle_offset, shoulder_angle_offset, elbow_angle_offset
+    return base_speed, shoulder_speed, elbow_speed
 
 
 controller_1 = odrive_controller(0)

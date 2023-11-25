@@ -59,19 +59,29 @@ def get_trajectory(
     base_angle,
     shoulder_angle,
     elbow_angle,
+    base_controller,
+    shoulder_controller,
+    elbow_controller,
 ):
     """
     Get the relative speeds for the robot arm joints
     :param base_angle: base angle in degrees
     :param shoulder_angle: shoulder angle in degrees
     :param elbow_angle: elbow angle in degrees
+    :param base_controller: base controller object
+    :param shoulder_controller: shoulder controller object
+    :param elbow_controller: elbow controller object
     :return: relative speeds for base, shoulder, and elbow joints
     """
     base_angle, shoulder_angle, elbow_angle = (
-        abs(base_angle),
-        abs(shoulder_angle),
-        abs(elbow_angle),
+        abs(base_angle - base_controller.get_encoder_pos()),
+        abs(shoulder_angle - shoulder_controller.get_encoder_pos()),
+        abs(elbow_angle - elbow_controller.get_encoder_pos()),
     )
+
+    print(f"Base angle: {base_angle}")
+    print(f"Shoulder angle: {shoulder_angle}")
+    print(f"Elbow angle: {elbow_angle}")
 
     # Find the maximum angle
     max_angle = max(base_angle, shoulder_angle, elbow_angle)
@@ -107,6 +117,7 @@ controller_2.wait_for_move()
 controller_3.wait_for_move()
 
 input("Press enter to continue")
+print("\n")
 
 angles = get_angles(400, 400, 0)
 base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles)
@@ -120,6 +131,7 @@ controller_2.wait_for_move()
 controller_3.wait_for_move()
 
 input("Press enter to continue")
+print("\n")
 
 angles = get_angles(400, 0, 0)
 base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles)
@@ -133,6 +145,7 @@ controller_2.wait_for_move()
 controller_3.wait_for_move()
 
 input("Press enter to continue")
+print("\n")
 
 controller_1.move_to_angle(0)
 controller_2.move_to_angle(-2)

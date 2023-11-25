@@ -266,12 +266,8 @@ class odrive_controller:
         revolutions = (angle / 360) * self.gear_ratio
 
         print(f"Moving to angle {angle} by going to {revolutions} revolutions...")
-        if not self.enabled:
-            warning_message("Motor is not enabled, enabling...")
-            self.enable_motor()
-        send_bus_message(revolutions, "axis0.controller.input_pos", self.node_id)
 
-        self.requested_position = revolutions
+        self.move_to_pos(revolutions)
 
         self.max_speed = original_speed
         self.max_accel = original_accel

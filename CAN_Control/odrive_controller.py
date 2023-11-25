@@ -61,8 +61,8 @@ def setup(node_id, gear_ratio):
         # If one of these asserts fail, you're probably not using the right flat_endpoints.json file
         assert endpoint_data["fw_version"] == f"{fw_major}.{fw_minor}.{fw_revision}"
         assert (
-                endpoint_data["hw_version"]
-                == f"{hw_product_line}.{hw_version}.{hw_variant}"
+            endpoint_data["hw_version"]
+            == f"{hw_product_line}.{hw_version}.{hw_variant}"
         )
     except AssertionError:
         print(
@@ -281,6 +281,4 @@ class odrive_controller:
         :return:
         """
         self.set_speed(max_speed * speed)
-        self.set_accel_decel(
-            max_accel * speed, max_decel * speed
-        )
+        self.set_accel_decel(max_accel * speed, max_decel * speed)

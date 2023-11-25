@@ -143,6 +143,8 @@ restricted_ares = [
     Cube((-450, 800, 0), (230, 1280, 750)),
 ]
 
+angles = get_angles(-180, 200, -50)
+sleep(100)
 
 controller_1 = odrive_controller(0)
 controller_2 = odrive_controller(1, gear_ratio=125)
@@ -153,7 +155,6 @@ controller_2.enable_motor()
 controller_3.enable_motor()
 
 angles = get_angles(-180, 200, -50)
-sleep(100)
 base_offset, shoulder_offset, elbow_offset = get_trajectory(
     *angles, controller_1, controller_2, controller_3
 )

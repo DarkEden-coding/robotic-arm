@@ -169,7 +169,7 @@ controller_3.wait_for_move()
 input("Press enter to continue")
 print("\n")
 
-angles = get_angles(800, 0, 250)
+angles = get_angles(800, 0, 350)
 base_offset, shoulder_offset, elbow_offset = get_trajectory(
     *angles, controller_1, controller_2, controller_3
 )

@@ -30,9 +30,11 @@ class Cube:
         :return: Boolean indicating whether the point is inside the cube.
         """
         x, y, z = point
-        return (self.min_x <= x <= self.max_x and
-                self.min_y <= y <= self.max_y and
-                self.min_z <= z <= self.max_z)
+        return (
+            self.min_x <= x <= self.max_x
+            and self.min_y <= y <= self.max_y
+            and self.min_z <= z <= self.max_z
+        )
 
 
 def is_point_in_any_cube(cubes, point):
@@ -59,7 +61,7 @@ def get_angles(x_pos, y_pos, z_pos):
     if is_point_in_any_cube(restricted_ares, (x_pos, y_pos, z_pos)):
         raise ValueError("Target position is in a restricted area")
 
-    target_distance = math.sqrt(x_pos ** 2 + y_pos ** 2 + z_pos ** 2)
+    target_distance = math.sqrt(x_pos**2 + y_pos**2 + z_pos**2)
     if target_distance > arm_1_length + arm_2_length:
         raise ValueError("Target position is out of reach")
 
@@ -76,14 +78,14 @@ def get_angles(x_pos, y_pos, z_pos):
     shoulder_offset = math.atan2(rotated_point[1], rotated_point[0])
 
     shoulder_angle = math.acos(
-        (arm_1_length ** 2 + x_flat_distance ** 2 - arm_2_length ** 2)
+        (arm_1_length**2 + x_flat_distance**2 - arm_2_length**2)
         / (2 * arm_1_length * x_flat_distance)
     )
 
     shoulder_angle += shoulder_offset
 
     elbow_angle = math.acos(
-        (arm_2_length ** 2 + arm_1_length ** 2 - x_flat_distance ** 2)
+        (arm_2_length**2 + arm_1_length**2 - x_flat_distance**2)
         / (2 * arm_2_length * arm_1_length)
     )
 
@@ -96,12 +98,12 @@ def get_angles(x_pos, y_pos, z_pos):
 
 
 def get_trajectory(
-        base_angle,
-        shoulder_angle,
-        elbow_angle,
-        base_controller,
-        shoulder_controller,
-        elbow_controller,
+    base_angle,
+    shoulder_angle,
+    elbow_angle,
+    base_controller,
+    shoulder_controller,
+    elbow_controller,
 ):
     """
     Get the relative speeds for the robot arm joints
@@ -143,9 +145,6 @@ restricted_ares = [
     Cube((-450, 800, 0), (230, 1280, 750)),
 ]
 
-angles = get_angles(-180, 200, -50)
-sleep(100)
-
 controller_1 = odrive_controller(0)
 controller_2 = odrive_controller(1, gear_ratio=125)
 controller_3 = odrive_controller(2)
@@ -154,7 +153,7 @@ controller_1.enable_motor()
 controller_2.enable_motor()
 controller_3.enable_motor()
 
-angles = get_angles(-180, 200, -50)
+angles = get_angles(200, 0, -50)
 base_offset, shoulder_offset, elbow_offset = get_trajectory(
     *angles, controller_1, controller_2, controller_3
 )
@@ -170,7 +169,7 @@ controller_3.wait_for_move()
 input("Press enter to continue")
 print("\n")
 
-angles = get_angles(180, -400, 0)
+angles = get_angles(200, 0, 0)
 base_offset, shoulder_offset, elbow_offset = get_trajectory(
     *angles, controller_1, controller_2, controller_3
 )
@@ -186,7 +185,11 @@ controller_3.wait_for_move()
 input("Press enter to continue")
 print("\n")
 
-angles = get_angles(180, -50, 0)
+controller_1.set_percent_traj(0.5)
+controller_2.set_percent_traj(0.5)
+controller_3.set_percent_traj(0.5)
+
+angles = get_angles(600, -50, 0)
 base_offset, shoulder_offset, elbow_offset = get_trajectory(
     *angles, controller_1, controller_2, controller_3
 )
@@ -198,6 +201,10 @@ controller_3.move_to_angle(angles[2], elbow_offset)
 controller_1.wait_for_move()
 controller_2.wait_for_move()
 controller_3.wait_for_move()
+
+controller_1.set_percent_traj(1)
+controller_2.set_percent_traj(1)
+controller_3.set_percent_traj(1)
 
 input("Press enter to continue")
 print("\n")

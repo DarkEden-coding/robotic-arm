@@ -55,7 +55,14 @@ def get_angles(x_pos, y_pos, z_pos):
     return base_angle, shoulder_angle, -elbow_angle
 
 
-def get_trajectory(base_angle, shoulder_angle, elbow_angle):
+def get_trajectory(
+    base_angle,
+    shoulder_angle,
+    elbow_angle,
+    base_controller,
+    shoulder_controller,
+    elbow_controller,
+):
     """
     Get the relative speeds for the robot arm joints
     :param base_angle: base angle in degrees
@@ -64,9 +71,9 @@ def get_trajectory(base_angle, shoulder_angle, elbow_angle):
     :return: relative speeds for base, shoulder, and elbow joints
     """
     base_angle, shoulder_angle, elbow_angle = (
-        abs(base_angle),
-        abs(shoulder_angle),
-        abs(elbow_angle),
+        abs((base_angle / 360) * base_controller.gear_ratio),
+        abs((shoulder_angle / 360) * shoulder_controller.gear_ratio),
+        abs((elbow_angle / 360) * elbow_controller.gear_ratio),
     )
 
     # Find the maximum angle

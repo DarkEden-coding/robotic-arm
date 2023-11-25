@@ -74,9 +74,9 @@ def get_trajectory(
     :return: relative speeds for base, shoulder, and elbow joints
     """
     base_angle, shoulder_angle, elbow_angle = (
-        abs(base_angle - base_controller.get_encoder_pos()),
-        abs(shoulder_angle - shoulder_controller.get_encoder_pos()),
-        abs(elbow_angle - elbow_controller.get_encoder_pos()),
+        abs(base_angle - base_controller.requested_position),
+        abs(shoulder_angle - shoulder_controller.requested_position),
+        abs(elbow_angle - elbow_controller.requested_position),
     )
 
     print(f"Base angle: {base_angle}")
@@ -106,7 +106,9 @@ controller_2.enable_motor()
 controller_3.enable_motor()
 
 angles = get_angles(400, 0, 0)
-base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles, controller_1, controller_2, controller_3)
+base_offset, shoulder_offset, elbow_offset = get_trajectory(
+    *angles, controller_1, controller_2, controller_3
+)
 
 controller_1.move_to_angle(angles[0], base_offset)
 controller_2.move_to_angle(angles[1], shoulder_offset)
@@ -120,7 +122,9 @@ input("Press enter to continue")
 print("\n")
 
 angles = get_angles(400, 400, 0)
-base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles, controller_1, controller_2, controller_3)
+base_offset, shoulder_offset, elbow_offset = get_trajectory(
+    *angles, controller_1, controller_2, controller_3
+)
 
 controller_1.move_to_angle(angles[0], base_offset)
 controller_2.move_to_angle(angles[1], shoulder_offset)
@@ -134,7 +138,9 @@ input("Press enter to continue")
 print("\n")
 
 angles = get_angles(400, 0, 0)
-base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles, controller_1, controller_2, controller_3)
+base_offset, shoulder_offset, elbow_offset = get_trajectory(
+    *angles, controller_1, controller_2, controller_3
+)
 
 controller_1.move_to_angle(angles[0], base_offset)
 controller_2.move_to_angle(angles[1], shoulder_offset)

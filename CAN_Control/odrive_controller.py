@@ -158,6 +158,10 @@ class odrive_controller:
         self.requested_position = 0
         self.gear_ratio = gear_ratio
 
+        self.max_speed = max_speed * (self.gear_ratio / 25)
+        self.max_accel = max_accel * (self.gear_ratio / 25)
+        self.max_decel = max_decel * (self.gear_ratio / 25)
+
         setup(self.node_id, self.gear_ratio)
         self.zero_motor()
 
@@ -183,12 +187,37 @@ class odrive_controller:
     def set_speed(self, speed):
         """
         Set the speed of the motor
-        :param speed: speed in a percentage of 10 rps
+        :param speed: speed in rotations per second
         :return:
         """
-        speed = speed / 10
         send_bus_message(speed, "axis0.trap_traj.config.vel_limit", self.node_id)
+
+        self.max_speed = speed
+
         print(f"Speed set to {speed} rps")
+
+    def set_accel_decel(self, accel, decel):
+        """
+        Set the acceleration and deceleration of the motor
+        :param accel: acceleration in rotations per second per second
+        :param decel: deceleration in rotations per second per second
+        :return:
+        """
+        send_bus_message(accel, "axis0.trap_traj.config.accel_limit", self.node_id)
+        send_bus_message(decel, "axis0.trap_traj.config.decel_limit", self.node_id)
+
+        self.max_accel = accel
+        self.max_decel = decel
+
+        print(f"Acceleration set to {accel} rps/s")
+        print(f"Deceleration set to {decel} rps/s")
+
+    def get_trap_traj(self):
+        """
+        Get the trap_traj values of the motor
+        :return: max_speed, max_accel, max_decel
+        """
+        return self.max_speed, self.max_accel, self.max_decel
 
     def set_torque(self, torque):
         """
@@ -217,31 +246,13 @@ class odrive_controller:
 
         self.requested_position = pos
 
-    def move_to_angle(self, angle, speed_offset=1):
+    def move_to_angle(self, angle):
         """
         Move to an angle
         :param angle: angle in degrees
         :param speed_offset: offset for the speed/accel of the motor
         :return:
         """
-        if speed_offset != 1:
-            send_bus_message(
-                max_speed * (self.gear_ratio / 25) * speed_offset,
-                "axis0.trap_traj.config.vel_limit",
-                self.node_id,
-            )
-
-            send_bus_message(
-                max_accel * (self.gear_ratio / 25) * speed_offset,
-                "axis0.trap_traj.config.accel_limit",
-                self.node_id,
-            )
-            send_bus_message(
-                max_decel * (self.gear_ratio / 25) * speed_offset,
-                "axis0.trap_traj.config.decel_limit",
-                self.node_id,
-            )
-
         revolutions = (angle / 360) * self.gear_ratio
 
         print(f"Moving to angle {angle} by going to {revolutions} revolutions...")

@@ -246,13 +246,23 @@ class odrive_controller:
 
         self.requested_position = pos
 
-    def move_to_angle(self, angle):
+    def move_to_angle(self, angle, speed_offset=1):
         """
         Move to an angle
         :param angle: angle in degrees
         :param speed_offset: offset for the speed/accel of the motor
         :return:
         """
+        original_speed = self.max_speed
+        original_accel = self.max_accel
+        original_decel = self.max_decel
+
+        if speed_offset != 1:
+            self.set_speed(self.max_speed * speed_offset)
+            self.set_accel_decel(
+                self.max_accel * speed_offset, self.max_decel * speed_offset
+            )
+
         revolutions = (angle / 360) * self.gear_ratio
 
         print(f"Moving to angle {angle} by going to {revolutions} revolutions...")
@@ -262,3 +272,7 @@ class odrive_controller:
         send_bus_message(revolutions, "axis0.controller.input_pos", self.node_id)
 
         self.requested_position = revolutions
+
+        self.max_speed = original_speed
+        self.max_accel = original_accel
+        self.max_decel = original_decel

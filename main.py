@@ -70,10 +70,16 @@ def get_trajectory(
     :param elbow_angle: elbow angle in degrees
     :return: relative speeds for base, shoulder, and elbow joints
     """
-    base_angle, shoulder_angle, elbow_angle = (
+    """base_angle, shoulder_angle, elbow_angle = (
         abs((base_angle / 360) * base_controller.gear_ratio),
         abs((shoulder_angle / 360) * shoulder_controller.gear_ratio),
         abs((elbow_angle / 360) * elbow_controller.gear_ratio),
+    )"""
+
+    base_angle, shoulder_angle, elbow_angle = (
+        abs(base_angle),
+        abs(shoulder_angle),
+        abs(elbow_angle),
     )
 
     # Find the maximum angle

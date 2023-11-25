@@ -59,9 +59,6 @@ def get_trajectory(
     base_angle,
     shoulder_angle,
     elbow_angle,
-    base_controller,
-    shoulder_controller,
-    elbow_controller,
 ):
     """
     Get the relative speeds for the robot arm joints
@@ -70,12 +67,6 @@ def get_trajectory(
     :param elbow_angle: elbow angle in degrees
     :return: relative speeds for base, shoulder, and elbow joints
     """
-    """base_angle, shoulder_angle, elbow_angle = (
-        abs((base_angle / 360) * base_controller.gear_ratio),
-        abs((shoulder_angle / 360) * shoulder_controller.gear_ratio),
-        abs((elbow_angle / 360) * elbow_controller.gear_ratio),
-    )"""
-
     base_angle, shoulder_angle, elbow_angle = (
         abs(base_angle),
         abs(shoulder_angle),
@@ -104,10 +95,21 @@ controller_1.enable_motor()
 controller_2.enable_motor()
 controller_3.enable_motor()
 
-angles = get_angles(200, 0, 0)
-base_offset, shoulder_offset, elbow_offset = get_trajectory(
-    *angles, controller_1, controller_2, controller_3
-)
+angles = get_angles(400, 0, 0)
+base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles)
+
+controller_1.move_to_angle(angles[0], base_offset)
+controller_2.move_to_angle(angles[1], shoulder_offset)
+controller_3.move_to_angle(angles[2], elbow_offset)
+
+controller_1.wait_for_move()
+controller_2.wait_for_move()
+controller_3.wait_for_move()
+
+input("Press enter to continue")
+
+angles = get_angles(400, 400, 0)
+base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles)
 
 controller_1.move_to_angle(angles[0], base_offset)
 controller_2.move_to_angle(angles[1], shoulder_offset)
@@ -120,24 +122,7 @@ controller_3.wait_for_move()
 input("Press enter to continue")
 
 angles = get_angles(400, 0, 0)
-base_offset, shoulder_offset, elbow_offset = get_trajectory(
-    *angles, controller_1, controller_2, controller_3
-)
-
-controller_1.move_to_angle(angles[0], base_offset)
-controller_2.move_to_angle(angles[1], shoulder_offset)
-controller_3.move_to_angle(angles[2], elbow_offset)
-
-controller_1.wait_for_move()
-controller_2.wait_for_move()
-controller_3.wait_for_move()
-
-input("Press enter to continue")
-
-angles = get_angles(200, 0, 0)
-base_offset, shoulder_offset, elbow_offset = get_trajectory(
-    *angles, controller_1, controller_2, controller_3
-)
+base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles)
 
 controller_1.move_to_angle(angles[0], base_offset)
 controller_2.move_to_angle(angles[1], shoulder_offset)

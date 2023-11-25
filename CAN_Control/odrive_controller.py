@@ -244,7 +244,8 @@ class odrive_controller:
             self.enable_motor()
         send_bus_message(pos, "axis0.controller.input_pos", self.node_id)
 
-        self.requested_position = (pos * 360) / self.gear_ratio
+        self.requested_position = pos
+        self.position = (pos * 360) / self.gear_ratio
 
     def move_to_angle(self, angle, speed_offset=1):
         """

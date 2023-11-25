@@ -74,9 +74,9 @@ def get_trajectory(
     :return: relative speeds for base, shoulder, and elbow joints
     """
     base_angle, shoulder_angle, elbow_angle = (
-        abs(base_angle - base_controller.requested_position),
-        abs(shoulder_angle - shoulder_controller.requested_position),
-        abs(elbow_angle - elbow_controller.requested_position),
+        abs(base_angle - base_controller.position),
+        abs(shoulder_angle - shoulder_controller.position),
+        abs(elbow_angle - elbow_controller.position),
     )
 
     print(f"Base angle: {base_angle}")

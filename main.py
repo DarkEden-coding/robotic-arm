@@ -99,7 +99,9 @@ controller_2.enable_motor()
 controller_3.enable_motor()
 
 angles = get_angles(200, 0, 0)
-base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles)
+base_offset, shoulder_offset, elbow_offset = get_trajectory(
+    *angles, controller_1, controller_2, controller_3
+)
 
 controller_1.move_to_angle(angles[0], base_offset)
 controller_2.move_to_angle(angles[1], shoulder_offset)
@@ -112,7 +114,9 @@ controller_3.wait_for_move()
 input("Press enter to continue")
 
 angles = get_angles(400, 0, 0)
-base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles)
+base_offset, shoulder_offset, elbow_offset = get_trajectory(
+    *angles, controller_1, controller_2, controller_3
+)
 
 controller_1.move_to_angle(angles[0], base_offset)
 controller_2.move_to_angle(angles[1], shoulder_offset)
@@ -125,7 +129,9 @@ controller_3.wait_for_move()
 input("Press enter to continue")
 
 angles = get_angles(200, 0, 0)
-base_offset, shoulder_offset, elbow_offset = get_trajectory(*angles)
+base_offset, shoulder_offset, elbow_offset = get_trajectory(
+    *angles, controller_1, controller_2, controller_3
+)
 
 controller_1.move_to_angle(angles[0], base_offset)
 controller_2.move_to_angle(angles[1], shoulder_offset)

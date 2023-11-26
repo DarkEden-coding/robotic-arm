@@ -2,6 +2,7 @@ import socket
 from CAN_Control.odrive_controller import odrive_controller
 from inverse_kinematics import get_angles, get_trajectory
 import sys
+import traceback
 
 HOST = "arm.local"  # The server's hostname or IP address
 PORT = 10982  # The port used by the server
@@ -119,8 +120,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     conn.sendall(f"function return {str(result)}".encode())
                 except Exception as e:
                     # Send the error message to the client
-                    exc_type, exc_obj, exc_tb = sys.exc_info()
-                    line_number = exc_tb.tb_lineno
+                    eexc_type, exc_obj, exc_tb = sys.exc_info()
+                    traceback_details = traceback.extract_tb(exc_tb)
+                    last_traceback = traceback_details[-1]
+                    line_number = last_traceback[1]
 
                     conn.sendall(f"Error: {str(e)} on line: {line_number}".encode())
                     print(f"Error calling function: {e} on line: {line_number}")

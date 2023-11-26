@@ -25,4 +25,18 @@ while True:
     # send the message to the server
     send_message(user_input)
 
+    # check to see if the server sent back the request
+    data = server_socket.recv(1024).decode()
+
+    if data == user_input:
+        print("Server received the message")
+
+    # get the response from the server
+    data = server_socket.recv(1024).decode()
+
+    if "Error" in data:
+        print(f"Error: {data}")
+    else:
+        print(f"Server response: {data}")
+
 server_socket.close()

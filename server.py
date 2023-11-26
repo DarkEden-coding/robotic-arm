@@ -16,11 +16,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     # Accept a connection from a client
     conn, addr = s.accept()
 
-    while True:
-        with conn:
-            print(f"Connected by {addr}")
-            while True:
-                data = conn.recv(1024)
-                if not data:
-                    break
-                print(f"Received: {data.decode()}")
+    with conn:
+        print(f"Connected by {addr}")
+        while True:
+            data = conn.recv(1024)
+            if not data:
+                break
+            print(f"Received: {data.decode()}")

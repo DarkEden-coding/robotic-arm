@@ -24,3 +24,5 @@ while True:
 
     # send the message to the server
     send_message(user_input)
+
+server_socket.close()

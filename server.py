@@ -3,7 +3,7 @@ from CAN_Control.odrive_controller import odrive_controller
 from inverse_kinematics import get_angles, get_trajectory
 
 HOST = "arm.local"  # The server's hostname or IP address
-PORT = 1098  # The port used by the server
+PORT = 10981  # The port used by the server
 
 global arm_object, function_map
 

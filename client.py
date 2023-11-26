@@ -1,7 +1,7 @@
 import socket
 
 HOST = "arm.local"  # The server's hostname or IP address
-PORT = 1098  # The port used by the server
+PORT = 10981  # The port used by the server
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

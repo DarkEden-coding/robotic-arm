@@ -5,7 +5,7 @@ from inverse_kinematics import get_angles, get_trajectory
 HOST = "arm.local"  # The server's hostname or IP address
 PORT = 1098  # The port used by the server
 
-global arm_object
+global arm_object, function_map
 
 
 class Arm:
@@ -49,15 +49,14 @@ class Arm:
 
 
 def setup(base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas):
-    global arm_object
+    global arm_object, function_map
     arm_object = Arm(base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas)
 
-
-function_map = {
-    "setup": setup,
-    "move": arm_object.move,
-    "shutdown": arm_object.shutdown,
-}
+    function_map = {
+        "setup": setup,
+        "move": arm_object.move,
+        "shutdown": arm_object.shutdown,
+    }
 
 
 def decode_and_call(input_string):

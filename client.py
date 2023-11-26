@@ -1,7 +1,8 @@
 import socket
+from constants import socket_constants
 
-HOST = "arm.local"  # The server's hostname or IP address
-PORT = 10984  # The port used by the server
+HOST = socket_constants["host"]
+PORT = socket_constants["port"]
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

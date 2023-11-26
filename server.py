@@ -3,9 +3,10 @@ from CAN_Control.odrive_controller import odrive_controller
 from inverse_kinematics import get_angles, get_trajectory
 import sys
 import traceback
+from constants import socket_constants
 
-HOST = "arm.local"  # The server's hostname or IP address
-PORT = 10984  # The port used by the server
+HOST = socket_constants["host"]
+PORT = socket_constants["port"]
 
 global arm_object, function_map
 
@@ -52,7 +53,9 @@ class Arm:
 
 def setup(base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas):
     global arm_object, function_map
-    arm_object = Arm(base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas)
+    arm_object = Arm(
+        int(base_nodeid), int(shoulder_nodeid), int(elbow_nodeid), restricted_areas
+    )
 
     function_map = {
         "setup": setup,
@@ -113,19 +116,25 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 print(f"Received: {data}")
                 conn.sendall(data.encode())
 
-                # try:
-                result = decode_and_call(data)
+                try:
+                    result = decode_and_call(data)
 
-                # Send the result to the client
-                conn.sendall(f"function return {str(result)}".encode())
-                """except Exception as e:
+                    # Send the result to the client
+                    conn.sendall(f"function return {str(result)}".encode())
+                except Exception as e:
                     # Send the error message to the client
                     eexc_type, exc_obj, exc_tb = sys.exc_info()
                     traceback_details = traceback.extract_tb(exc_tb)
                     last_traceback = traceback_details[-1]
                     line_number = last_traceback[1]
 
-                    conn.sendall(f"Error: {str(e)} on line: {line_number}".encode())
-                    print(f"Error calling function: {e} on line: {line_number}")"""
+                    error_file = traceback.format_exc()
+
+                    conn.sendall(
+                        f"Error: {str(e)} on line: {line_number} in file: {error_file}".encode()
+                    )
+                    print(
+                        f"Error calling function: {e} on line: {line_number} in file: {error_file}"
+                    )
 
             print(f"Connection closed by {addr}")

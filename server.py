@@ -113,12 +113,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 print(f"Received: {data}")
                 conn.sendall(data.encode())
 
-                try:
-                    result = decode_and_call(data)
+                # try:
+                result = decode_and_call(data)
 
-                    # Send the result to the client
-                    conn.sendall(f"function return {str(result)}".encode())
-                except Exception as e:
+                # Send the result to the client
+                conn.sendall(f"function return {str(result)}".encode())
+                """except Exception as e:
                     # Send the error message to the client
                     eexc_type, exc_obj, exc_tb = sys.exc_info()
                     traceback_details = traceback.extract_tb(exc_tb)
@@ -126,6 +126,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     line_number = last_traceback[1]
 
                     conn.sendall(f"Error: {str(e)} on line: {line_number}".encode())
-                    print(f"Error calling function: {e} on line: {line_number}")
+                    print(f"Error calling function: {e} on line: {line_number}")"""
 
             print(f"Connection closed by {addr}")

@@ -1,6 +1,7 @@
 import socket
 from CAN_Control.odrive_controller import odrive_controller
 from inverse_kinematics import get_angles, get_trajectory
+import sys
 
 HOST = "arm.local"  # The server's hostname or IP address
 PORT = 10982  # The port used by the server
@@ -118,7 +119,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     conn.sendall(f"function return {str(result)}".encode())
                 except Exception as e:
                     # Send the error message to the client
-                    conn.sendall(f"Error: {str(e)}".encode())
-                    print(f"Error calling function: {e}")
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    line_number = exc_tb.tb_lineno
+
+                    conn.sendall(f"Error: {str(e)} on line: {line_number}".encode())
+                    print(f"Error calling function: {e} on line: {line_number}")
 
             print(f"Connection closed by {addr}")

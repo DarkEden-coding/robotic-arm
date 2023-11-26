@@ -35,7 +35,7 @@ while True:
     data = server_socket.recv(1024).decode()
 
     if "Error" in data:
-        print(f"Error: {data}")
+        print(f"{data}")
     else:
         print(f"Server response: {data}")
 

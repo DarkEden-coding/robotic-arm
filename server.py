@@ -59,6 +59,11 @@ def setup(base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas):
     }
 
 
+function_map = {
+    "setup": setup,
+}
+
+
 def decode_and_call(input_string):
     # Split the input string into individual words
     words = input_string.split()

@@ -5,7 +5,7 @@ import sys
 import traceback
 
 HOST = "arm.local"  # The server's hostname or IP address
-PORT = 10983  # The port used by the server
+PORT = 10984  # The port used by the server
 
 global arm_object, function_map
 

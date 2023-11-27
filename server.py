@@ -7,6 +7,7 @@ from constants import socket_constants
 
 HOST = socket_constants["host"]
 PORT = socket_constants["port"]
+PASSWORD = socket_constants["password"]
 
 global arm_object, function_map
 
@@ -19,6 +20,9 @@ class Arm:
         self.restricted_areas = restricted_areas
 
     def move(self, pos, wait_for_move=True):
+        pos = [float(i) for i in pos.split(",")]
+        wait_for_move = bool(wait_for_move)
+
         angles = get_angles(pos[0], pos[0], pos[0], self.restricted_areas)
         base_offset, shoulder_offset, elbow_offset = get_trajectory(
             *angles,
@@ -50,6 +54,17 @@ class Arm:
         self.shoulder_controller.disable_motor()
         self.elbow_controller.disable_motor()
 
+    def enable_motors(self):
+        self.base_controller.enable_motor()
+        self.shoulder_controller.enable_motor()
+        self.elbow_controller.enable_motor()
+
+    def set_percent_speed(self, percent):
+        percent = float(percent)
+        self.base_controller.set_percent_traj(percent)
+        self.shoulder_controller.set_percent_traj(percent)
+        self.elbow_controller.set_percent_traj(percent)
+
 
 def setup(base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas):
     global arm_object, function_map
@@ -61,6 +76,8 @@ def setup(base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas):
         "setup": setup,
         "move": arm_object.move,
         "shutdown": arm_object.shutdown,
+        "enable_motors": arm_object.enable_motors,
+        "set_percent_speed": arm_object.set_percent_speed,
     }
 
 
@@ -114,6 +131,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 if not data:
                     break
                 print(f"Received: {data}")
+
+                if PASSWORD not in data:
+                    print("Invalid password")
+                    break
+                data = data.replace(PASSWORD, "")
+
                 conn.sendall(data.encode())
 
                 try:

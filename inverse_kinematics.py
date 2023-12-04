@@ -138,24 +138,27 @@ def get_trajectory(
 
 def get_pos_from_angles(angles):
     """
-    Get the position of the end effector from the angles
-    :param angles: angles in radians (base angle, shoulder angle, elbow angle)
-    :return: position of the end effector (x, y, z)
+    Get the position (x, y, z) of the robot arm end effector
+    :param base_angle: Base angle in degrees
+    :param shoulder_angle: Shoulder angle in degrees
+    :param elbow_angle: Elbow angle in degrees
+    :param restricted_areas: List of restricted areas for the robot arm, each area is a Cube object
+    :return: x, y, z coordinates of the end effector
     """
-    base_angle, shoulder_angle, elbow_angle = angles
+    # Convert angles from degrees to radians
+    base_angle = math.radians(angles[0])
+    shoulder_angle = math.radians(90 - angles[1])
+    elbow_angle = math.radians(180 + angles[2])
 
-    base_angle = math.radians(base_angle)
-    shoulder_angle = math.radians(shoulder_angle)
-    elbow_angle = math.radians(elbow_angle)
+    # Calculate the position of the end effector
+    base_length = arm_1_length
+    shoulder_length = arm_2_length * math.cos(elbow_angle)
+    elbow_length = arm_2_length * math.sin(elbow_angle)
 
-    x_pos = (
-        math.cos(base_angle)
-        * (arm_1_length * math.cos(shoulder_angle) + arm_2_length * math.cos(elbow_angle))
-    )
-    y_pos = (
-        math.sin(base_angle)
-        * (arm_1_length * math.cos(shoulder_angle) + arm_2_length * math.cos(elbow_angle))
-    )
-    z_pos = arm_1_length * math.sin(shoulder_angle) + arm_2_length * math.sin(elbow_angle)
+    x_pos = base_length * math.cos(base_angle)
+    y_pos = base_length * math.sin(base_angle)
+    z_pos = shoulder_length + elbow_length
+
+    z_pos += 180  # Reverse the previous subtraction
 
     return x_pos, y_pos, z_pos

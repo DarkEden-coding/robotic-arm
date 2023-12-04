@@ -41,7 +41,7 @@ socket_constants = {
     "host": "arm.local",
     "port": 50131,
     "password": "ScytheIndustries",
-    "function_check": False,
+    "function_check": True,
 }
 
 restricted_areas = [

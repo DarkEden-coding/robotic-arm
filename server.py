@@ -146,7 +146,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         with conn:
             print(f"Connected by {addr}")
             while True:
-                print(1)
                 # Receive data
                 received_data = b""
                 while True:
@@ -154,12 +153,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     if not chunk:
                         break
                     received_data += chunk
-                    print(received_data)
+                    # if data is a complete object, break
+                    if received_data[-1] == '.':
+                        break
 
                 if not received_data:
                     continue
-
-                print(2)
 
                 # Deserialize the received data
                 received_object = pickle.loads(received_data)
@@ -174,8 +173,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         break
 
                 conn.sendall(received_data)
-
-                print(3)
 
                 try:
                     result = decode_and_call(received_object)

@@ -20,9 +20,9 @@ class Cube:
         """
         x, y, z = point
         return (
-                self.min_x <= x <= self.max_x
-                and self.min_y <= y <= self.max_y
-                and self.min_z <= z <= self.max_z
+            self.min_x <= x <= self.max_x
+            and self.min_y <= y <= self.max_y
+            and self.min_z <= z <= self.max_z
         )
 
 

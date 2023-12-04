@@ -150,12 +150,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 # Receive data
                 received_data = b""
                 while True:
-                    print(1.5)
                     chunk = conn.recv(4096)
-                    print(1.6)
                     if not chunk:
                         break
                     received_data += chunk
+                    print(received_data)
 
                 if not received_data:
                     continue

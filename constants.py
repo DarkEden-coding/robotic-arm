@@ -1,3 +1,6 @@
+import datetime
+
+
 class Cube:
     def __init__(self, corner1, corner2):
         """
@@ -20,10 +23,20 @@ class Cube:
         """
         x, y, z = point
         return (
-                self.min_x <= x <= self.max_x
-                and self.min_y <= y <= self.max_y
-                and self.min_z <= z <= self.max_z
+            self.min_x <= x <= self.max_x
+            and self.min_y <= y <= self.max_y
+            and self.min_z <= z <= self.max_z
         )
+
+
+# Get the current time
+current_time = datetime.datetime.now()
+
+# Round the time to the nearest minute
+rounded_time = current_time.replace(second=0, microsecond=0)
+
+# Convert the rounded time to a number (you can choose the format)
+rounded_number = int(rounded_time.strftime("%Y%m%d%H%M"))
 
 
 base_nodeid = 0
@@ -39,7 +52,7 @@ max_decel = 0.6  # rps/s
 
 socket_constants = {
     "host": "arm.local",
-    "port": 5012,
+    "port": rounded_number,
     "password": "ScytheIndustries",
 }
 

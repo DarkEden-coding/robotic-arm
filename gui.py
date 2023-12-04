@@ -1,8 +1,19 @@
 import customtkinter
 from PIL import Image
-from client import setup, enable_motors, disable_motors, shutdown, set_percent_speed, move, emergency_stop, \
-    close_connection, get_position
+from client import (
+    setup,
+    enable_motors,
+    disable_motors,
+    shutdown,
+    set_percent_speed,
+    move,
+    emergency_stop,
+    close_connection,
+    get_position,
+)
 from threading import Thread
+
+global app
 
 print("Starting GUI and setting up connection to server...")
 
@@ -42,8 +53,9 @@ class MovementFrame(customtkinter.CTkFrame):
         self.coordinates_label = customtkinter.CTkLabel(self, text="Coordinates")
         self.coordinates_label.grid(row=0, column=0)
 
-        self.emergency_stop_button = customtkinter.CTkButton(self, text="Emergency Stop", fg_color="red",
-                                                             command=emergency_stop)
+        self.emergency_stop_button = customtkinter.CTkButton(
+            self, text="Emergency Stop", fg_color="red", command=emergency_stop
+        )
         self.emergency_stop_button.grid(row=0, column=2, pady=5)
 
         self.actual_x_label = customtkinter.CTkLabel(self, text="Actual X")
@@ -86,7 +98,9 @@ class MovementFrame(customtkinter.CTkFrame):
         self.target_z_entry = customtkinter.CTkEntry(self)
         self.target_z_entry.grid(row=4, column=2)
 
-        self.enable_motors_button = customtkinter.CTkButton(self, text="Enable Motors", command=enable_motors)
+        self.enable_motors_button = customtkinter.CTkButton(
+            self, text="Enable Motors", command=enable_motors
+        )
         self.enable_motors_button.grid(row=5, column=0, pady=5)
 
         self.disable_motors_button = customtkinter.CTkButton(
@@ -114,10 +128,14 @@ class MovementFrame(customtkinter.CTkFrame):
         )
         self.move_to_target_button.grid(row=0, column=1)
 
-        self.update_speed_button = customtkinter.CTkButton(self, text="Update Speed", command=self.change_speed)
+        self.update_speed_button = customtkinter.CTkButton(
+            self, text="Update Speed", command=self.change_speed
+        )
         self.update_speed_button.grid(row=8, column=1, pady=5)
 
-        self.shutdown_button = customtkinter.CTkButton(self, text="Shutdown", fg_color="red", command=shutdown)
+        self.shutdown_button = customtkinter.CTkButton(
+            self, text="Shutdown", fg_color="red", command=shutdown
+        )
         self.shutdown_button.grid(row=8, column=2, pady=5)
 
     def update_speed_label(self, value):
@@ -132,7 +150,13 @@ class MovementFrame(customtkinter.CTkFrame):
         set_percent_speed(self.speed_slider.get() / 100)
 
     def move_to_target(self):
-        move((self.target_x_entry.get(), self.target_y_entry.get(), self.target_z_entry.get()))
+        move(
+            (
+                self.target_x_entry.get(),
+                self.target_y_entry.get(),
+                self.target_z_entry.get(),
+            )
+        )
 
 
 class SettingsFrame(customtkinter.CTkFrame):

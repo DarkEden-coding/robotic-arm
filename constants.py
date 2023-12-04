@@ -39,7 +39,7 @@ max_decel = 0.6  # rps/s
 
 socket_constants = {
     "host": "arm.local",
-    "port": 50127,
+    "port": 50128,
     "password": "ScytheIndustries",
 }
 
@@ -48,3 +48,14 @@ restricted_areas = [
     Cube((-450, -1000, 500), (-800, 1000, -715)),
     Cube((-450, 800, 0), (230, 1280, 750)),
 ]
+
+return_map = {
+    "setup": False,
+    "move": False,
+    "shutdown": False,
+    "enable_motors": False,
+    "disable_motors": False,
+    "set_percent_speed": False,
+    "emergency_stop": False,
+    "get_position": True,
+}

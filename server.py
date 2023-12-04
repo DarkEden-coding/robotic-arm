@@ -146,8 +146,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         with conn:
             print(f"Connected by {addr}")
             while True:
-                print(1)
-
                 # Receive data
                 received_data = b""
                 while True:
@@ -162,8 +160,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     except Exception as e:
                         print(e)
                         continue
-
-                print(2)
 
                 if not received_data:
                     continue
@@ -180,7 +176,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         print("Incorrect password")
                         break
 
-                conn.sendall(received_data)
+                conn.sendall(pickle.dumps(received_object))
 
                 try:
                     result = decode_and_call(received_object)

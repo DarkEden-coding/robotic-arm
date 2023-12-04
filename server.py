@@ -99,6 +99,7 @@ def setup(base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas):
         "disable_motors": arm_object.disable_motors,
         "set_percent_speed": arm_object.set_percent_speed,
         "emergency_stop": arm_object.emergency_stop,
+        "get_position": arm_object.get_position,
     }
 
 
@@ -108,7 +109,6 @@ function_map = {
 
 
 def decode_and_call(data):
-
     function_name = data["function_name"]
     args = data["args"]
 
@@ -168,11 +168,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 received_object = pickle.loads(received_data)
                 print(f"Received: {received_object}")
 
-                if 'password' not in received_object:
+                if "password" not in received_object:
                     print("Missing password")
                     break
                 else:
-                    if received_object['password'] != PASSWORD:
+                    if received_object["password"] != PASSWORD:
                         print("Incorrect password")
                         break
 
@@ -194,7 +194,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     error_file = traceback.format_exc()
 
                     # Serialize and send the object
-                    serialized_data = pickle.dumps(f"Error: {str(e)} on line: {line_number} in file: {error_file}")
+                    serialized_data = pickle.dumps(
+                        f"Error: {str(e)} on line: {line_number} in file: {error_file}"
+                    )
                     conn.sendall(serialized_data)
 
                     print(

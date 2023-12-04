@@ -158,6 +158,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 if not received_data:
                     continue
 
+                print(2)
+
                 # Deserialize the received data
                 received_object = pickle.loads(received_data)
                 print(f"Received: {received_object}")
@@ -171,6 +173,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         break
 
                 conn.sendall(received_data)
+
+                print(3)
 
                 try:
                     result = decode_and_call(received_object)

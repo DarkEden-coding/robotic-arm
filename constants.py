@@ -1,5 +1,5 @@
-arm_1_length = 580
-arm_2_length = 645
+arm_1_length = 380
+arm_2_length = 445
 
 max_speed = 5  # rps
 max_accel = 0.6  # rps/s

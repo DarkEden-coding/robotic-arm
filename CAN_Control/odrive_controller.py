@@ -91,7 +91,7 @@ def setup(node_id, gear_ratio):
     # save configuration
     send_bus_message(None, "save_configuration", node_id)
 
-    sleep(5)
+    sleep(0)
 
     for msg in bus:
         if msg.arbitration_id == message_id:

@@ -155,11 +155,13 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     if not chunk:
                         break
                     received_data += chunk
-                    print(received_data)
-                    print(str(received_data[-1]))
                     # if data is a complete object, break
-                    if str(received_data[-1]) == '.':
+                    try:
+                        pickle.loads(received_data)
                         break
+                    except Exception as e:
+                        print(e)
+                        continue
 
                 print(2)
 

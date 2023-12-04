@@ -30,8 +30,12 @@ def send_command(command):
             break
         received_data += chunk
         # if data is a complete object, break
-        if received_data[-1] == '.':
+        try:
+            pickle.loads(received_data)
             break
+        except Exception as e:
+            print(e)
+            continue
 
     if received_data == command:
         print("Server received the message")
@@ -47,8 +51,12 @@ def send_command(command):
             break
         received_data += chunk
         # if data is a complete object, break
-        if received_data[-1] == '.':
+        try:
+            pickle.loads(received_data)
             break
+        except Exception as e:
+            print(e)
+            continue
 
     # Deserialize the received data
     received_object = pickle.loads(received_data)

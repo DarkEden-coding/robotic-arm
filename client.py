@@ -37,7 +37,7 @@ def send_command(command):
     # Receive data
     received_data = b""
     while True:
-        chunk = server_socket.recv(1024)
+        chunk = server_socket.recv(4096)
         if not chunk:
             break
         received_data += chunk
@@ -62,7 +62,7 @@ def send_command(command):
         # Receive data
         received_data = b""
         while True:
-            chunk = server_socket.recv(1024)
+            chunk = server_socket.recv(4096)
             if not chunk:
                 break
             received_data += chunk

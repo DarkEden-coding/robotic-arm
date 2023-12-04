@@ -24,7 +24,7 @@ print("Connection to server established.")
 def threaded_tasks(function):
     while True:
         function()
-        sleep(0.01)
+        sleep(0.05)
 
 
 class VisualizationFrame(customtkinter.CTkFrame):

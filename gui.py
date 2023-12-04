@@ -145,9 +145,9 @@ class MovementFrame(customtkinter.CTkFrame):
         self.speed_value_label.configure(text=f"{round(value)} %")
 
     def update_actual_coordinates(self):
-        self.actual_x.set(get_position()[0])
-        self.actual_y.set(get_position()[1])
-        self.actual_z.set(get_position()[2])
+        self.actual_x.set(round(get_position()[0], 2))
+        self.actual_y.set(round(get_position()[1], 2))
+        self.actual_z.set(round(get_position()[2], 2))
 
     def change_speed(self):
         set_percent_speed(self.speed_slider.get() / 100)
@@ -155,9 +155,9 @@ class MovementFrame(customtkinter.CTkFrame):
     def move_to_target(self):
         move(
             (
-                self.target_x_entry.get(),
-                self.target_y_entry.get(),
-                self.target_z_entry.get(),
+                float(self.target_x_entry.get()),
+                float(self.target_y_entry.get()),
+                float(self.target_z_entry.get()),
             )
         )
 

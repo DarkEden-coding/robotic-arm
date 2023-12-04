@@ -12,6 +12,7 @@ server_socket.connect((HOST, PORT))
 
 
 def send_command(command):
+    print(f"Sending command: {command}")
     command["password"] = PASSWORD
 
     # send the message to the server

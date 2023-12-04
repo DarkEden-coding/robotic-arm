@@ -27,7 +27,6 @@ def threaded_tasks(function):
         sleep(0.01)
 
 
-
 class VisualizationFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -189,7 +188,9 @@ class App(customtkinter.CTk):
             row=0, column=1, sticky="nsew", padx=5, pady=5, rowspan=3, columnspan=3
         )
 
-        self.threaded_tasks_thread = Thread(target=threaded_tasks, args=(self.movement_frame.update_actual_coordinates,))
+        self.threaded_tasks_thread = Thread(
+            target=threaded_tasks, args=(self.movement_frame.update_actual_coordinates,)
+        )
         self.threaded_tasks_thread.start()
 
 

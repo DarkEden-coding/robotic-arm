@@ -43,7 +43,7 @@ def send_command(command):
     print(f"Received: {received_object}")
     print(f"Expected: {command}")
 
-    if received_object == command:
+    if dict(received_object) == command:
         print("Server received the message")
     else:
         print("Server did not receive the message")

@@ -11,7 +11,7 @@ setup()
 print("Connection to server established.")
 
 
-def threaded_tasks(app):
+def threaded_tasks():
     while True:
         app.movement_frame.update_actual_coordinates()
 
@@ -164,7 +164,7 @@ class App(customtkinter.CTk):
             row=0, column=1, sticky="nsew", padx=5, pady=5, rowspan=3, columnspan=3
         )
 
-        self.threaded_tasks_thread = Process(target=threaded_tasks, args=(self,))
+        self.threaded_tasks_thread = Process(target=threaded_tasks)
         self.threaded_tasks_thread.start()
 
 

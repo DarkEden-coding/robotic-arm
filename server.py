@@ -176,8 +176,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         print("Incorrect password")
                         break
 
-                print(f"Sending: {received_object}")
-                conn.sendall(pickle.dumps(received_object))
+                print(f"Sending: {received_data}")
+                conn.sendall(received_data)
 
                 try:
                     result = decode_and_call(received_object)

@@ -156,9 +156,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         break
                     received_data += chunk
                     print(received_data)
-                    print(received_data[-1])
+                    print(str(received_data[-1]))
                     # if data is a complete object, break
-                    if received_data[-1] == '.':
+                    if str(received_data[-1]) == '.':
                         break
 
                 print(2)

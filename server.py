@@ -146,6 +146,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         with conn:
             print(f"Connected by {addr}")
             while True:
+                print(1)
                 # Receive data
                 received_data = b""
                 while True:

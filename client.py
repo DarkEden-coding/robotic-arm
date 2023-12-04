@@ -1,6 +1,6 @@
 import socket
-from constants import socket_constants
-from inverse_kinematics import Cube
+from constants import socket_constants, restricted_areas, base_nodeid, shoulder_nodeid, elbow_nodeid
+import pickle
 
 HOST = socket_constants["host"]
 PORT = socket_constants["port"]
@@ -10,42 +10,78 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server_socket.connect((HOST, PORT))
 
-restricted_ares = [
-    Cube((125, -1000, 0), (-450, 800, -715)),
-    Cube((-450, -1000, 500), (-800, 1000, -715)),
-    Cube((-450, 800, 0), (230, 1280, 750)),
-]
 
-
-def send_message(message):
-    # Send a message to the server
-    server_socket.sendall(message.encode())
-
-
-# loop until the user enters 'quit'
-while True:
-    # get input from the user
-    user_input = input("Enter a message: ") + PASSWORD
-
-    # check if the user wants to quit
-    if user_input == "quit":
-        break
+def send_command(command):
+    command["password"] = PASSWORD
 
     # send the message to the server
-    send_message(user_input)
+    # Serialize and send the object
+    serialized_data = pickle.dumps(command)
+    server_socket.sendall(serialized_data)
 
-    # check to see if the server sent back the request
-    data = server_socket.recv(1024).decode()
+    # Receive data
+    received_data = b""
+    while True:
+        chunk = server_socket.recv(4096)
+        if not chunk:
+            break
+        received_data += chunk
 
-    if data == user_input:
+    if received_data == command:
         print("Server received the message")
-
-    # get the response from the server
-    data = server_socket.recv(1024).decode()
-
-    if "Error" in data:
-        print(f"{data}")
     else:
-        print(f"Server response: {data}")
+        print("Server did not receive the message")
+        raise ConnectionError("Server did not receive the message")
 
-server_socket.close()
+    # Receive data
+    received_data = b""
+    while True:
+        chunk = server_socket.recv(4096)
+        if not chunk:
+            break
+        received_data += chunk
+
+    # Deserialize the received data
+    received_object = pickle.loads(received_data)
+
+    if "Error" in received_object:
+        print(f"{received_object}")
+    else:
+        print(f"Server response: {received_object}")
+        return received_object
+
+
+def setup():
+    send_command({"function_name": "setup", "args": [base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas], "password": PASSWORD})
+
+
+def enable_motors():
+    send_command({"function_name": "enable_motors", "args": [], "password": PASSWORD})
+
+
+def disable_motors():
+    send_command({"function_name": "disable_motors", "args": [], "password": PASSWORD})
+
+
+def shutdown():
+    send_command({"function_name": "shutdown", "args": [], "password": PASSWORD})
+
+
+def set_percent_speed(percent_speed):
+    send_command({"function_name": "set_percent_speed", "args": [percent_speed], "password": PASSWORD})
+
+
+def move(pos, wait_for_finish=True):
+    send_command({"function_name": "move", "args": [pos, wait_for_finish], "password": PASSWORD})
+
+
+def emergency_stop():
+    send_command({"function_name": "emergency_stop", "args": [], "password": PASSWORD})
+
+
+def close_connection():
+    server_socket.close()
+
+
+def get_position():
+    return send_command({"function_name": "get_position", "args": [], "password": PASSWORD})

@@ -134,3 +134,28 @@ def get_trajectory(
     print(f"Shoulder speed: {shoulder_speed}")
     print(f"Elbow speed: {elbow_speed}")
     return base_speed, shoulder_speed, elbow_speed
+
+
+def get_pos_from_angles(angles):
+    """
+    Get the position of the end effector from the angles
+    :param angles: angles in radians (base angle, shoulder angle, elbow angle)
+    :return: position of the end effector (x, y, z)
+    """
+    base_angle, shoulder_angle, elbow_angle = angles
+
+    base_angle = math.radians(base_angle)
+    shoulder_angle = math.radians(shoulder_angle)
+    elbow_angle = math.radians(elbow_angle)
+
+    x_pos = (
+        math.cos(base_angle)
+        * (arm_1_length * math.cos(shoulder_angle) + arm_2_length * math.cos(elbow_angle))
+    )
+    y_pos = (
+        math.sin(base_angle)
+        * (arm_1_length * math.cos(shoulder_angle) + arm_2_length * math.cos(elbow_angle))
+    )
+    z_pos = arm_1_length * math.sin(shoulder_angle) + arm_2_length * math.sin(elbow_angle)
+
+    return x_pos, y_pos, z_pos

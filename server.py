@@ -1,9 +1,10 @@
 import socket
 from CAN_Control.odrive_controller import odrive_controller
-from inverse_kinematics import get_angles, get_trajectory
+from inverse_kinematics import get_angles, get_trajectory, get_pos_from_angles
 import sys
 import traceback
 from constants import socket_constants
+import pickle
 
 HOST = socket_constants["host"]
 PORT = socket_constants["port"]
@@ -20,10 +21,9 @@ class Arm:
         self.restricted_areas = restricted_areas
 
     def move(self, pos, wait_for_move=True):
-        pos = [float(i) for i in pos.split(",")]
         wait_for_move = bool(wait_for_move)
 
-        angles = get_angles(pos[0], pos[0], pos[0], self.restricted_areas)
+        angles = get_angles(pos[0], pos[1], pos[2], self.restricted_areas)
         base_offset, shoulder_offset, elbow_offset = get_trajectory(
             *angles,
             self.base_controller,
@@ -59,11 +59,30 @@ class Arm:
         self.shoulder_controller.enable_motor()
         self.elbow_controller.enable_motor()
 
+    def disable_motors(self):
+        self.base_controller.disable_motor()
+        self.shoulder_controller.disable_motor()
+        self.elbow_controller.disable_motor()
+
     def set_percent_speed(self, percent):
         percent = float(percent)
         self.base_controller.set_percent_traj(percent)
         self.shoulder_controller.set_percent_traj(percent)
         self.elbow_controller.set_percent_traj(percent)
+
+    def emergency_stop(self):
+        self.base_controller.emergency_stop()
+        self.shoulder_controller.emergency_stop()
+        self.elbow_controller.emergency_stop()
+
+    def get_position(self):
+        return get_pos_from_angles(
+            (
+                self.base_controller.get_encoder_pos(),
+                self.shoulder_controller.get_encoder_pos(),
+                self.elbow_controller.get_encoder_pos(),
+            )
+        )
 
 
 def setup(base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas):
@@ -77,7 +96,9 @@ def setup(base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas):
         "move": arm_object.move,
         "shutdown": arm_object.shutdown,
         "enable_motors": arm_object.enable_motors,
+        "disable_motors": arm_object.disable_motors,
         "set_percent_speed": arm_object.set_percent_speed,
+        "emergency_stop": arm_object.emergency_stop,
     }
 
 
@@ -86,23 +107,16 @@ function_map = {
 }
 
 
-def decode_and_call(input_string):
-    # Split the input string into individual words
-    words = input_string.split()
+def decode_and_call(data):
 
-    # Check if the string contains at least one word
-    if len(words) < 1:
-        raise ValueError("Invalid input string")
-
-    # Extract the function name and its arguments
-    func_name = words[0]
-    args = words[1:]
+    function_name = data["function_name"]
+    args = data["args"]
 
     # Get the corresponding function from the dictionary
-    func = function_map.get(func_name)
+    func = function_map.get(function_name)
 
     if func is None:
-        raise ValueError(f"Function '{func_name}' not found")
+        raise ValueError(f"Function '{function_name}' not found")
 
     # Call the function with the arguments
     result = func(*args)
@@ -127,23 +141,34 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         with conn:
             print(f"Connected by {addr}")
             while True:
-                data = conn.recv(1024).decode()
-                if not data:
-                    break
-                print(f"Received: {data}")
+                # Receive data
+                received_data = b""
+                while True:
+                    chunk = conn.recv(4096)
+                    if not chunk:
+                        break
+                    received_data += chunk
 
-                if PASSWORD not in data:
-                    print("Invalid password")
-                    break
-                data = data.replace(PASSWORD, "")
+                # Deserialize the received data
+                received_object = pickle.loads(received_data)
+                print(f"Received: {received_object}")
 
-                conn.sendall(data.encode())
+                if 'password' not in received_object:
+                    print("Missing password")
+                    break
+                else:
+                    if received_object['password'] != PASSWORD:
+                        print("Incorrect password")
+                        break
+
+                conn.sendall(received_data)
 
                 try:
-                    result = decode_and_call(data)
+                    result = decode_and_call(received_object)
 
-                    # Send the result to the client
-                    conn.sendall(f"function return {str(result)}".encode())
+                    # Serialize and send the object
+                    serialized_data = pickle.dumps(result)
+                    conn.sendall(serialized_data)
                 except Exception as e:
                     # Send the error message to the client
                     eexc_type, exc_obj, exc_tb = sys.exc_info()
@@ -153,9 +178,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
                     error_file = traceback.format_exc()
 
-                    conn.sendall(
-                        f"Error: {str(e)} on line: {line_number} in file: {error_file}".encode()
-                    )
+                    # Serialize and send the object
+                    serialized_data = pickle.dumps(f"Error: {str(e)} on line: {line_number} in file: {error_file}")
+                    conn.sendall(serialized_data)
+
                     print(
                         f"Error calling function: {e} on line: {line_number} in file: {error_file}"
                     )

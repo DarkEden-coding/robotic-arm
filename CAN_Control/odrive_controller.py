@@ -91,8 +91,6 @@ def setup(node_id, gear_ratio):
     # save configuration
     send_bus_message(None, "save_configuration", node_id)
 
-    sleep(0)
-
     for msg in bus:
         if msg.arbitration_id == message_id:
             print(f"ODrive with id {node_id}: step 3 complete")
@@ -282,3 +280,7 @@ class odrive_controller:
         """
         self.set_speed(max_speed * speed)
         self.set_accel_decel(max_accel * speed, max_decel * speed)
+
+    def emergency_stop(self):
+        self.set_speed(0)
+        self.move_to_pos(self.get_encoder_pos())

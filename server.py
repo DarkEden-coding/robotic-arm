@@ -146,52 +146,52 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         with conn:
             print(f"Connected by {addr}")
             while True:
-                try:
-                    # Receive data
-                    received_data = b""
-                    while True:
-                        chunk = conn.recv(4096)
-                        if not chunk:
-                            break
-                        received_data += chunk
-
-                    # Deserialize the received data
-                    received_object = pickle.loads(received_data)
-                    print(f"Received: {received_object}")
-
-                    if 'password' not in received_object:
-                        print("Missing password")
+                # Receive data
+                received_data = b""
+                while True:
+                    chunk = conn.recv(4096)
+                    if not chunk:
                         break
-                    else:
-                        if received_object['password'] != PASSWORD:
-                            print("Incorrect password")
-                            break
+                    received_data += chunk
 
-                    conn.sendall(received_data)
+                if not received_data:
+                    continue
 
-                    try:
-                        result = decode_and_call(received_object)
+                # Deserialize the received data
+                received_object = pickle.loads(received_data)
+                print(f"Received: {received_object}")
 
-                        # Serialize and send the object
-                        serialized_data = pickle.dumps(result)
-                        conn.sendall(serialized_data)
-                    except Exception as e:
-                        # Send the error message to the client
-                        eexc_type, exc_obj, exc_tb = sys.exc_info()
-                        traceback_details = traceback.extract_tb(exc_tb)
-                        last_traceback = traceback_details[-1]
-                        line_number = last_traceback[1]
+                if 'password' not in received_object:
+                    print("Missing password")
+                    break
+                else:
+                    if received_object['password'] != PASSWORD:
+                        print("Incorrect password")
+                        break
 
-                        error_file = traceback.format_exc()
+                conn.sendall(received_data)
 
-                        # Serialize and send the object
-                        serialized_data = pickle.dumps(f"Error: {str(e)} on line: {line_number} in file: {error_file}")
-                        conn.sendall(serialized_data)
+                try:
+                    result = decode_and_call(received_object)
 
-                        print(
-                            f"Error calling function: {e} on line: {line_number} in file: {error_file}"
-                        )
-                except EOFError:
-                    pass
+                    # Serialize and send the object
+                    serialized_data = pickle.dumps(result)
+                    conn.sendall(serialized_data)
+                except Exception as e:
+                    # Send the error message to the client
+                    eexc_type, exc_obj, exc_tb = sys.exc_info()
+                    traceback_details = traceback.extract_tb(exc_tb)
+                    last_traceback = traceback_details[-1]
+                    line_number = last_traceback[1]
+
+                    error_file = traceback.format_exc()
+
+                    # Serialize and send the object
+                    serialized_data = pickle.dumps(f"Error: {str(e)} on line: {line_number} in file: {error_file}")
+                    conn.sendall(serialized_data)
+
+                    print(
+                        f"Error calling function: {e} on line: {line_number} in file: {error_file}"
+                    )
 
             print(f"Connection closed by {addr}")

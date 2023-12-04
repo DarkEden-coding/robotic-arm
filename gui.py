@@ -47,6 +47,10 @@ class MovementFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
+        self.actual_x = customtkinter.DoubleVar()
+        self.actual_y = customtkinter.DoubleVar()
+        self.actual_z = customtkinter.DoubleVar()
+
         self.columnconfigure((0, 1, 2), weight=1)
 
         self.coordinates_label = customtkinter.CTkLabel(self, text="Coordinates")
@@ -66,13 +70,13 @@ class MovementFrame(customtkinter.CTkFrame):
         self.actual_z_label = customtkinter.CTkLabel(self, text="Actual Z")
         self.actual_z_label.grid(row=1, column=2)
 
-        self.actual_x_entry = customtkinter.CTkEntry(self)
+        self.actual_x_entry = customtkinter.CTkEntry(self, textvariable=self.actual_x)
         self.actual_x_entry.grid(row=2, column=0)
 
-        self.actual_y_entry = customtkinter.CTkEntry(self)
+        self.actual_y_entry = customtkinter.CTkEntry(self, textvariable=self.actual_y)
         self.actual_y_entry.grid(row=2, column=1)
 
-        self.actual_z_entry = customtkinter.CTkEntry(self)
+        self.actual_z_entry = customtkinter.CTkEntry(self, textvariable=self.actual_z)
         self.actual_z_entry.grid(row=2, column=2)
 
         self.actual_x_entry.configure(state="disabled")
@@ -141,9 +145,9 @@ class MovementFrame(customtkinter.CTkFrame):
         self.speed_value_label.configure(text=f"{round(value)} %")
 
     def update_actual_coordinates(self):
-        self.actual_x_entry.configure(text=get_position()[0])
-        self.actual_y_entry.configure(text=get_position()[1])
-        self.actual_z_entry.configure(text=get_position()[2])
+        self.actual_x.set(get_position()[0])
+        self.actual_y.set(get_position()[1])
+        self.actual_z.set(get_position()[2])
 
     def change_speed(self):
         set_percent_speed(self.speed_slider.get() / 100)

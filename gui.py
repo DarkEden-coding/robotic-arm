@@ -4,7 +4,11 @@ from client import setup, enable_motors, disable_motors, shutdown, set_percent_s
     close_connection, get_position
 from multiprocessing import Process
 
+print("Starting GUI and setting up connection to server...")
+
 setup()
+
+print("Connection to server established.")
 
 
 def threaded_tasks(app):

@@ -112,6 +112,8 @@ def decode_and_call(data):
     function_name = data["function_name"]
     args = data["args"]
 
+    print(f"Calling function: {function_name} with args: {args}")
+
     # Get the corresponding function from the dictionary
     func = function_map.get(function_name)
 
@@ -120,6 +122,9 @@ def decode_and_call(data):
 
     # Call the function with the arguments
     result = func(*args)
+
+    if result:
+        print(f"Function {function_name} returned: {result}")
 
     return result
 

@@ -165,7 +165,7 @@ class App(customtkinter.CTk):
         )
 
         self.threaded_tasks_thread = Process(target=threaded_tasks)
-        self.threaded_tasks_thread.start()
+        # self.threaded_tasks_thread.start()
 
 
 app = App()

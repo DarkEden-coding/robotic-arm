@@ -177,7 +177,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         break
 
                 print(f"Sending: {received_object}")
-                conn.sendall(received_data)
+                conn.sendall(pickle.dumps(received_object))
 
                 try:
                     result = decode_and_call(received_object)

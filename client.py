@@ -32,31 +32,32 @@ def send_command(command):
     serialized_data = pickle.dumps(command)
     server_socket.sendall(serialized_data)
 
-    print("Waiting for server to receive the message")
+    if socket_constants["function_check"]:
+        print("Waiting for server to receive the message")
 
-    # Receive data
-    received_data = b""
-    while True:
-        chunk = server_socket.recv(4096)
-        if not chunk:
-            break
-        received_data += chunk
-        # if data is a complete object, break
-        try:
-            pickle.loads(received_data)
-            break
-        except Exception as e:
-            print(e)
-            continue
+        # Receive data
+        received_data = b""
+        while True:
+            chunk = server_socket.recv(4096)
+            if not chunk:
+                break
+            received_data += chunk
+            # if data is a complete object, break
+            try:
+                pickle.loads(received_data)
+                break
+            except Exception as e:
+                print(e)
+                continue
 
-    if received_data == serialized_data:
-        print("Server received the message")
-    else:
-        print("Server did not receive the message")
-        print(f"Sent: {command}")
-        print(f"Received: {pickle.loads(received_data)}")
+        if received_data == serialized_data:
+            print("Server received the message")
+        else:
+            print("Server did not receive the message")
+            print(f"Sent: {command}")
+            print(f"Received: {pickle.loads(received_data)}")
 
-        raise ConnectionError("Server did not receive the message")
+            raise ConnectionError("Server did not receive the message")
 
     if return_from_function:
         # Receive data

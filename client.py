@@ -18,6 +18,8 @@ def send_command(command):
     # send the message to the server
     # Serialize and send the object
     serialized_data = pickle.dumps(command)
+    print(type(serialized_data))
+    print(serialized_data)
     server_socket.sendall(serialized_data)
 
     print("Waiting for server to receive the message")

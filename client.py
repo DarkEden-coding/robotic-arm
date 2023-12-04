@@ -53,8 +53,8 @@ def send_command(command):
         print("Server received the message")
     else:
         print("Server did not receive the message")
-        print(f"Sent: {serialized_data}")
-        print(f"Received: {received_data}")
+        print(f"Sent: {command}")
+        print(f"Received: {pickle.loads(received_data)}")
 
         raise ConnectionError("Server did not receive the message")
 

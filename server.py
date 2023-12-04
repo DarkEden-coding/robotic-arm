@@ -176,6 +176,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         print("Incorrect password")
                         break
 
+                print(f"Sending: {received_object}")
                 conn.sendall(received_data)
 
                 try:

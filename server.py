@@ -146,6 +146,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         with conn:
             print(f"Connected by {addr}")
             while True:
+                print(1)
+
                 # Receive data
                 received_data = b""
                 while True:
@@ -156,6 +158,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     # if data is a complete object, break
                     if received_data[-1] == '.':
                         break
+
+                print(2)
 
                 if not received_data:
                     continue

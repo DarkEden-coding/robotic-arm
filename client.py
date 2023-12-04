@@ -1,5 +1,12 @@
 import socket
-from constants import socket_constants, restricted_areas, base_nodeid, shoulder_nodeid, elbow_nodeid, return_map
+from constants import (
+    socket_constants,
+    restricted_areas,
+    base_nodeid,
+    shoulder_nodeid,
+    elbow_nodeid,
+    return_map,
+)
 import pickle
 
 HOST = socket_constants["host"]
@@ -76,7 +83,13 @@ def send_command(command):
 
 
 def setup():
-    send_command({"function_name": "setup", "args": [base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas], "password": PASSWORD})
+    send_command(
+        {
+            "function_name": "setup",
+            "args": [base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas],
+            "password": PASSWORD,
+        }
+    )
 
 
 def enable_motors():
@@ -92,11 +105,19 @@ def shutdown():
 
 
 def set_percent_speed(percent_speed):
-    send_command({"function_name": "set_percent_speed", "args": [percent_speed], "password": PASSWORD})
+    send_command(
+        {
+            "function_name": "set_percent_speed",
+            "args": [percent_speed],
+            "password": PASSWORD,
+        }
+    )
 
 
 def move(pos, wait_for_finish=True):
-    send_command({"function_name": "move", "args": [pos, wait_for_finish], "password": PASSWORD})
+    send_command(
+        {"function_name": "move", "args": [pos, wait_for_finish], "password": PASSWORD}
+    )
 
 
 def emergency_stop():
@@ -108,4 +129,6 @@ def close_connection():
 
 
 def get_position():
-    return send_command({"function_name": "get_position", "args": [], "password": PASSWORD})
+    return send_command(
+        {"function_name": "get_position", "args": [], "password": PASSWORD}
+    )

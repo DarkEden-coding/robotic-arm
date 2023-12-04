@@ -40,6 +40,9 @@ def send_command(command):
     # Deserialize the received data
     received_object = pickle.loads(received_data)
 
+    print(f"Received: {received_object}")
+    print(f"Expected: {command}")
+
     if received_object == command:
         print("Server received the message")
     else:

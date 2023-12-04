@@ -12,6 +12,7 @@ print("Connection to server established.")
 
 
 def threaded_tasks():
+    global app
     while True:
         app.movement_frame.update_actual_coordinates()
 

@@ -2,7 +2,7 @@ import customtkinter
 from PIL import Image
 from client import setup, enable_motors, disable_motors, shutdown, set_percent_speed, move, emergency_stop, \
     close_connection, get_position
-from multiprocessing import Process
+from threading import Thread
 
 print("Starting GUI and setting up connection to server...")
 
@@ -164,13 +164,11 @@ class App(customtkinter.CTk):
             row=0, column=1, sticky="nsew", padx=5, pady=5, rowspan=3, columnspan=3
         )
 
-        self.threaded_tasks_thread = Process(target=threaded_tasks)
-        # self.threaded_tasks_thread.start()
+        self.threaded_tasks_thread = Thread(target=threaded_tasks)
+        self.threaded_tasks_thread.start()
 
 
 app = App()
 app.mainloop()
-
-app.threaded_tasks_thread.terminate()
 
 close_connection()

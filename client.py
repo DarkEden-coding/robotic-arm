@@ -37,6 +37,9 @@ def send_command(command):
             print(e)
             continue
 
+    print(f"Received: {received_data}")
+    print(f"Expected: {command}")
+
     if received_data == command:
         print("Server received the message")
     else:

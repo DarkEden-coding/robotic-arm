@@ -39,7 +39,7 @@ max_decel = 0.6  # rps/s
 
 socket_constants = {
     "host": "arm.local",
-    "port": 5008,
+    "port": 5009,
     "password": "ScytheIndustries",
 }
 

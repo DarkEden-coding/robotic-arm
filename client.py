@@ -37,13 +37,10 @@ def send_command(command):
             print(e)
             continue
 
-    # Deserialize the received data
-    received_object = pickle.loads(received_data)
+    print(f"Received: {str(received_data)}")
+    print(f"Expected: {str(serialized_data)}")
 
-    print(f"Received: {received_object}")
-    print(f"Expected: {command}")
-
-    if dict(received_object) == command:
+    if received_data == serialized_data:
         print("Server received the message")
     else:
         print("Server did not receive the message")

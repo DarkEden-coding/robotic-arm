@@ -183,9 +183,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 try:
                     result = decode_and_call(received_object)
 
-                    # Serialize and send the object
-                    serialized_data = pickle.dumps(result)
-                    conn.sendall(serialized_data)
+                    if result:
+                        # Serialize and send the object
+                        serialized_data = pickle.dumps(result)
+                        conn.sendall(serialized_data)
                 except Exception as e:
                     # Send the error message to the client
                     eexc_type, exc_obj, exc_tb = sys.exc_info()

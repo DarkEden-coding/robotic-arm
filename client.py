@@ -118,7 +118,7 @@ def set_percent_speed(percent_speed):
     )
 
 
-def move(pos, wait_for_finish=True):
+def move(pos, wait_for_finish=False):
     send_command(
         {"function_name": "move", "args": [pos, wait_for_finish], "password": PASSWORD}
     )

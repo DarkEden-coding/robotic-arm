@@ -44,8 +44,10 @@ class VisualizationFrame(customtkinter.CTkFrame):
 
 
 class MovementFrame(customtkinter.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, settings_frame):
         super().__init__(master)
+
+        self.settings_frame = settings_frame
 
         self.actual_x = customtkinter.DoubleVar()
         self.actual_y = customtkinter.DoubleVar()
@@ -57,7 +59,7 @@ class MovementFrame(customtkinter.CTkFrame):
         self.coordinates_label.grid(row=0, column=0)
 
         self.emergency_stop_button = customtkinter.CTkButton(
-            self, text="Emergency Stop", fg_color="red", command=emergency_stop
+            self, text="Emergency Stop", fg_color="red", command=self.__emergency_stop
         )
         self.emergency_stop_button.grid(row=0, column=2, pady=5)
 
@@ -102,12 +104,12 @@ class MovementFrame(customtkinter.CTkFrame):
         self.target_z_entry.grid(row=4, column=2)
 
         self.enable_motors_button = customtkinter.CTkButton(
-            self, text="Enable Motors", command=enable_motors
+            self, text="Enable Motors", command=self.__enable_motors
         )
         self.enable_motors_button.grid(row=5, column=0, pady=5)
 
         self.disable_motors_button = customtkinter.CTkButton(
-            self, text="Disable Motors", command=disable_motors
+            self, text="Disable Motors", command=self.__disable_motors
         )
         self.disable_motors_button.grid(row=5, column=2, pady=5)
 
@@ -137,7 +139,7 @@ class MovementFrame(customtkinter.CTkFrame):
         self.update_speed_button.grid(row=8, column=1, pady=5)
 
         self.shutdown_button = customtkinter.CTkButton(
-            self, text="Shutdown", fg_color="red", command=shutdown
+            self, text="Shutdown", fg_color="red", command=self.__shutdown
         )
         self.shutdown_button.grid(row=8, column=2, pady=5)
 
@@ -151,9 +153,15 @@ class MovementFrame(customtkinter.CTkFrame):
         self.actual_z.set(round(position[2], 2))
 
     def change_speed(self):
+        self.settings_frame.add_text_to_command_textbox(
+            f"Setting percent speed to {self.speed_slider.get() / 100}%..."
+        )
         set_percent_speed(self.speed_slider.get() / 100)
 
     def move_to_target(self):
+        self.settings_frame.add_text_to_command_textbox(
+            f"Moving to target: ({float(self.target_x_entry.get())}, {float(self.target_y_entry.get())}, {float(self.target_z_entry.get())})."
+        )
         move(
             (
                 float(self.target_x_entry.get()),
@@ -162,10 +170,46 @@ class MovementFrame(customtkinter.CTkFrame):
             )
         )
 
+    def __enable_motors(self):
+        self.settings_frame.add_text_to_command_textbox("Enabling motors...")
+        enable_motors()
+
+    def __disable_motors(self):
+        self.settings_frame.add_text_to_command_textbox("Disabling motors...")
+        disable_motors()
+
+    def __shutdown(self):
+        self.settings_frame.add_text_to_command_textbox("Shutting down...")
+        shutdown()
+
+    def __emergency_stop(self):
+        self.settings_frame.add_text_to_command_textbox("Emergency stopping...")
+        emergency_stop()
+
+    def __close_connection(self):
+        self.settings_frame.add_text_to_command_textbox("Closing connection...")
+        close_connection()
+
 
 class SettingsFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
+
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7), weight=1)
+
+        self.command_textbox_label = customtkinter.CTkLabel(
+            self, text="Command/Error Log:"
+        )
+        self.command_textbox_label.grid(row=6, column=0, sticky="s")
+
+        self.command_textbox = customtkinter.CTkTextbox(self)
+        self.command_textbox.grid(
+            row=7, column=0, sticky="nsew", padx=5, pady=5, columnspan=2
+        )
+
+    def add_text_to_command_textbox(self, text):
+        self.command_textbox.insert("end", f"{text}\n")
 
 
 class App(customtkinter.CTk):
@@ -183,14 +227,14 @@ class App(customtkinter.CTk):
             row=0, column=0, padx=5, pady=5, columnspan=1, rowspan=1
         )
 
-        self.movement_frame = MovementFrame(self)
-        self.movement_frame.grid(
-            row=1, column=0, sticky="nsew", padx=5, pady=5, rowspan=2
-        )
-
         self.settings_frame = SettingsFrame(self)
         self.settings_frame.grid(
             row=0, column=1, sticky="nsew", padx=5, pady=5, rowspan=3, columnspan=3
+        )
+
+        self.movement_frame = MovementFrame(self, settings_frame=self.settings_frame)
+        self.movement_frame.grid(
+            row=1, column=0, sticky="nsew", padx=5, pady=5, rowspan=2
         )
 
         self.threaded_tasks_thread = Thread(

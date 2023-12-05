@@ -7,6 +7,7 @@ from constants import socket_constants
 import pickle
 
 HOST = socket_constants["host"]
+
 PORT = socket_constants["port"]
 PASSWORD = socket_constants["password"]
 

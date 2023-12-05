@@ -23,8 +23,12 @@ print("Connection to server established.")
 
 def threaded_tasks(function):
     while True:
-        function()
-        sleep(0.05)
+        try:
+            function()
+            sleep(0.05)
+        except Exception as e:
+            print(e)
+            continue
 
 
 class VisualizationFrame(customtkinter.CTkFrame):

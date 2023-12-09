@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 # Pin Definitions
-dir_pin = 2   # Direction GPIO Pin
+dir_pin = 2  # Direction GPIO Pin
 step_pin = 3  # Step GPIO Pin
 
 # Setup
@@ -19,6 +19,7 @@ steps = 200  # Change this to the number of steps you want
 delay = 0.01  # Delay between each step
 
 for i in range(steps):
+    print(i)
     GPIO.output(step_pin, GPIO.HIGH)
     time.sleep(delay)
     GPIO.output(step_pin, GPIO.LOW)

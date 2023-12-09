@@ -182,6 +182,10 @@ class odrive_controller:
     def get_encoder_vel(self):
         return get_property_value("encoder_estimator0.vel_estimate", self.node_id)
 
+    def get_angle(self):
+        pos = self.get_encoder_pos()
+        return (pos * 360) / self.gear_ratio
+
     def set_speed(self, speed):
         """
         Set the speed of the motor

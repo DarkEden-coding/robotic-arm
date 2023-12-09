@@ -145,20 +145,12 @@ def get_pos_from_angles(angles):
     :param restricted_areas: List of restricted areas for the robot arm, each area is a Cube object
     :return: x, y, z coordinates of the end effector
     """
-    # Convert angles from degrees to radians
-    base_angle = math.radians(angles[0])
-    shoulder_angle = math.radians(90 - angles[1])
-    elbow_angle = math.radians(180 + angles[2])
+    base_angle, shoulder_angle, elbow_angle = angles
 
-    # Calculate the position of the end effector
-    base_length = arm_1_length
-    shoulder_length = arm_2_length * math.cos(elbow_angle)
-    elbow_length = arm_2_length * math.sin(elbow_angle)
+    print(f"Base angle: {base_angle}")
+    print(f"Shoulder angle: {shoulder_angle}")
+    print(f"Elbow angle: {elbow_angle}")
 
-    x_pos = base_length * math.cos(base_angle)
-    y_pos = base_length * math.sin(base_angle)
-    z_pos = shoulder_length + elbow_length
-
-    z_pos += 180  # Reverse the previous subtraction
+    x_pos, y_pos, z_pos = 0, 0, 0
 
     return x_pos, y_pos, z_pos

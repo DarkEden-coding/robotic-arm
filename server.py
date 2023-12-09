@@ -79,9 +79,9 @@ class Arm:
     def get_position(self):
         return get_pos_from_angles(
             (
-                self.base_controller.get_encoder_pos(),
-                self.shoulder_controller.get_encoder_pos(),
-                self.elbow_controller.get_encoder_pos(),
+                self.base_controller.get_angle(),
+                self.shoulder_controller.get_angle(),
+                self.elbow_controller.get_angle(),
             )
         )
 

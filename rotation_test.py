@@ -37,7 +37,7 @@ except KeyboardInterrupt:
     print("Read interrupted by user")
 
 except Exception as e:
-    print(f"An error occurred: %s" % e)
+    print(f"An error occurred: {e}")
 
 finally:
     pi.stop()

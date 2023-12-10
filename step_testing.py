@@ -6,7 +6,7 @@ dir_pin = 2  # Direction GPIO Pin
 step_pin = 3  # Step GPIO Pin
 
 # Setup
-GPIO.setmode(GPIO.BOARD)  # Use physical GPIO numbering
+GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
 GPIO.setup(dir_pin, GPIO.OUT)
 GPIO.setup(step_pin, GPIO.OUT)
 

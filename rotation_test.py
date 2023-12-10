@@ -27,7 +27,7 @@ try:
         print(f"Angle Value: {angle_value}")
 
         # Sleep for a bit before reading again
-        time.sleep(0.5)
+        time.sleep(0.1)
 
 except KeyboardInterrupt:
     print("\nScript interrupted by user.")

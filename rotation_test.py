@@ -29,7 +29,7 @@ try:
         # Convert the pulse width to absolute rotations
         rotations = calculate_rotations(pulse_width)
 
-        print("Absolute Rotations: %s" % rotations)
+        print(f"Absolute Rotations: {rotations}")
 
         time.sleep(0.1)  # Add a short delay to limit the output frequency
 

@@ -2,11 +2,11 @@ import RPi.GPIO as GPIO
 import time
 
 # Pin Definitions
-dir_pin = 2  # Direction GPIO Pin
-step_pin = 3  # Step GPIO Pin
+dir_pin = 3  # Direction GPIO Pin
+step_pin = 5  # Step GPIO Pin
 
 # Setup
-GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
+GPIO.setmode(GPIO.BOARD)  # Use physical GPIO numbering
 GPIO.setup(dir_pin, GPIO.OUT)
 GPIO.setup(step_pin, GPIO.OUT)
 

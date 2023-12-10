@@ -1,43 +1,49 @@
-import pigpio
+import RPi.GPIO as GPIO
 import time
 
 # GPIO pin connected to the PWM output of the encoder
 PWM_GPIO_PIN = 2  # Change this to the correct GPIO pin number
 
-# Initialize pigpio
-pi = pigpio.pi()
+# Setup GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(PWM_GPIO_PIN, GPIO.IN)
 
-# If the initialization failed
-if not pi.connected:
-    exit()
+# Initialize variables
+pulse_start_time = None
+pulse_end_time = None
+last_pulse_duration = None
 
+# Callback function to be called when a rising edge is detected
+def rising_edge_callback(channel):
+    global pulse_start_time
+    pulse_start_time = time.time()
 
-# Function to calculate rotations from pulse width
-def calculate_rotations(pulse_width):
-    # This function will depend on how your specific encoder translates pulse width to rotations.
-    # You would need to calibrate this function according to your encoder's specifications.
-    rotations = pulse_width  # Placeholder for the actual calculation
-    return rotations
+# Callback function to be called when a falling edge is detected
+def falling_edge_callback(channel):
+    global pulse_end_time, last_pulse_duration
+    pulse_end_time = time.time()
+    if pulse_start_time is not None:
+        last_pulse_duration = pulse_end_time - pulse_start_time
 
+# Add event detections
+GPIO.add_event_detect(PWM_GPIO_PIN, GPIO.RISING, callback=rising_edge_callback)
+GPIO.add_event_detect(PWM_GPIO_PIN, GPIO.FALLING, callback=falling_edge_callback)
 
 try:
-    # Start reading the PWM pulses
     while True:
-        # Get the pulse width in microseconds
-        pulse_width = pi.get_servo_pulsewidth(PWM_GPIO_PIN)
-
-        # Convert the pulse width to absolute rotations
-        rotations = calculate_rotations(pulse_width)
-
-        print(f"Absolute Rotations: {rotations}")
-
-        time.sleep(0.1)  # Add a short delay to limit the output frequency
+        if last_pulse_duration is not None:
+            # Calculate rotations based on pulse duration
+            # The calculation will depend on the specifics of your encoder
+            rotations = last_pulse_duration  # Placeholder calculation
+            print("Absolute Rotations: {}".format(rotations))
+            last_pulse_duration = None
+        time.sleep(0.1)  # Reduce CPU usage with a sleep
 
 except KeyboardInterrupt:
     print("Read interrupted by user")
 
 except Exception as e:
-    print(f"An error occurred: {e}")
+    print("An error occurred: {}".format(e))
 
 finally:
-    pi.stop()
+    GPIO.cleanup()

@@ -1,43 +1,39 @@
-import RPi.GPIO as GPIO
+import smbus2
 import time
 
-# GPIO pin connected to the PWM output of the encoder
-PWM_GPIO_PIN = 18  # Change this to the correct GPIO pin number
+# Replace with the correct I2C address
+DEVICE_ADDRESS = 0x36  # AS5600 I2C address
 
-# Setup GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(PWM_GPIO_PIN, GPIO.IN)
+# Registers for the 12-bit angle value
+ANGLE_HIGH_REGISTER = 0x0E  # High 8 bits of the angle
+ANGLE_LOW_REGISTER = 0x0F  # Low 4 bits of the angle
 
-# Initialize variables
-last_edge_time = None
-pulse_duration = None
+bus = smbus2.SMBus(1)  # 1 indicates /dev/i2c-1
 
-# Callback function to be called when any edge is detected
-def edge_callback(channel):
-    global last_edge_time, pulse_duration
-    current_time = time.time()
-    if last_edge_time is not None:
-        pulse_duration = current_time - last_edge_time
-    last_edge_time = current_time
 
-# Add event detection for both rising and falling edges
-GPIO.add_event_detect(PWM_GPIO_PIN, GPIO.BOTH, callback=edge_callback)
+def read_angle(bus, address):
+    # Read high and low bytes of the angle
+    angle_high = bus.read_byte_data(address, ANGLE_HIGH_REGISTER)
+    angle_low = bus.read_byte_data(address, ANGLE_LOW_REGISTER)
+    # Combine the high and low bytes
+    angle = (angle_high << 8) | angle_low
+    return angle & 0x0FFF  # The angle is a 12-bit value
+
 
 try:
     while True:
-        if pulse_duration is not None:
-            # Calculate rotations based on pulse duration
-            # The calculation will depend on the specifics of your encoder
-            rotations = pulse_duration  # Placeholder calculation
-            print("Pulse Duration: {} seconds".format(pulse_duration))
-            pulse_duration = None
-        time.sleep(0.1)  # Reduce CPU usage with a sleep
+        # Read the angle value
+        angle_value = read_angle(bus, DEVICE_ADDRESS)
+        print(f"Angle Value: {angle_value}")
+
+        # Sleep for a bit before reading again
+        time.sleep(0.5)
 
 except KeyboardInterrupt:
-    print("Read interrupted by user")
+    print("\nScript interrupted by user.")
 
 except Exception as e:
-    print("An error occurred: {}".format(e))
+    print(f"An error occurred: {e}")
 
 finally:
-    GPIO.cleanup()
+    bus.close()

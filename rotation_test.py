@@ -20,11 +20,18 @@ def read_angle(bus, address):
     return angle & 0x0FFF  # The angle is a 12-bit value
 
 
+def angle_to_rotations(angle):
+    # Convert the 12-bit angle to a fraction of a full rotation
+    return angle / 4095.0
+
+
 try:
     while True:
         # Read the angle value
         angle_value = read_angle(bus, DEVICE_ADDRESS)
-        print(f"Angle Value: {angle_value}")
+        # Convert angle to rotations
+        rotations = angle_to_rotations(angle_value)
+        print(f"Rotations: {rotations:.2f}")
 
         # Sleep for a bit before reading again
         time.sleep(0.1)

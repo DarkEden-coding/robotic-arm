@@ -33,9 +33,9 @@ elbow_nodeid = 2
 arm_1_length = 380
 arm_2_length = 445
 
-max_speed = 5  # rps
-max_accel = 0.6  # rps/s
-max_decel = 0.6  # rps/s
+max_speed = 5 * 2  # rps
+max_accel = 0.6 * 2 # rps/s
+max_decel = 0.6 * 2  # rps/s
 
 socket_constants = {
     "host": "arm.local",

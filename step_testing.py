@@ -1,8 +1,8 @@
 from stepper_motor_controller import StepperMotorController, cleanup
 
-max_speed = 1
-acceleration = 0.1
-starting_speed = 0.1
+max_speed = 9
+acceleration = 0.5
+starting_speed = 1
 
 yaw_motor = StepperMotorController(
     enable_pin=2,

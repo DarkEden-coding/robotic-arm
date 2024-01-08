@@ -2,6 +2,7 @@ from stepper_motor_controller import StepperMotorController, cleanup
 
 max_speed = 1
 acceleration = 0.1
+starting_speed = 0.1
 
 yaw_motor = StepperMotorController(
     enable_pin=2,
@@ -10,6 +11,7 @@ yaw_motor = StepperMotorController(
     micro_step_pins=(3, 4),
     acceleration=acceleration,
     max_speed=max_speed,
+    starting_speed=starting_speed,
     gear_ratio=4,
 )
 
@@ -20,6 +22,7 @@ pitch_motor = StepperMotorController(
     micro_step_pins=(5, 6),
     acceleration=acceleration,
     max_speed=max_speed,
+    starting_speed=starting_speed,
     gear_ratio=2,
 )
 
@@ -33,11 +36,11 @@ pitch_motor.set_micro_steps(8)
 pitch_motor.move_to_angle(90)
 """
 
-yaw_motor.move_to_angle(90, .001)
-pitch_motor.move_to_angle(90, .001)
+yaw_motor.move_to_angle(90)
+pitch_motor.move_to_angle(90)
 
-yaw_motor.move_to_angle(-90, .001)
-pitch_motor.move_to_angle(-90, .001)
+yaw_motor.move_to_angle(-90)
+pitch_motor.move_to_angle(-90)
 
 yaw_motor.disable_motor()
 pitch_motor.disable_motor()

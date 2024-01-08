@@ -31,6 +31,7 @@ class StepperMotorController:
         micro_step_pins: tuple,
         acceleration: float,
         max_speed: float,
+        starting_speed: float,
         gear_ratio: float,
     ):
         """
@@ -41,6 +42,7 @@ class StepperMotorController:
         :param micro_step_pins: the micro step pins of the stepper motor (tuple)
         :param acceleration: the acceleration of the stepper motor in rotations per second per second
         :param max_speed: the maximum speed of the stepper motor in rotations per second
+        :param starting_speed: the starting speed of the stepper motor in rotations per second
         :param gear_ratio: the gear ratio of the stepper motor in a decimal form
         """
         self.enable_pin = enable_pin
@@ -50,10 +52,12 @@ class StepperMotorController:
         self.acceleration = acceleration
         self.max_speed = max_speed
         self.gear_ratio = gear_ratio
+        self.starting_speed = starting_speed
 
         self.enabled = False
         self.angle = 0
         self.micro_steps = 8
+        self.speed = 0
 
         GPIO.setup(self.enable_pin, GPIO.OUT)
         GPIO.setup(self.dir_pin, GPIO.OUT)
@@ -86,7 +90,7 @@ class StepperMotorController:
         GPIO.output(self.micro_step_pins, microstep_map[micro_steps])
         self.micro_steps = micro_steps
 
-    def move_to_angle(self, target_angle, delay):
+    def move_to_angle(self, target_angle):
         """
         Move the stepper motor to a specific angle
         :param delay:
@@ -97,17 +101,32 @@ class StepperMotorController:
         steps = target_angle / fixed_degrees_per_step
 
         steps = steps * self.gear_ratio
-        delay = delay / self.gear_ratio
 
         print(f"Steps: {steps}")
-        print(f"Delay: {delay}")
 
         direction = GPIO.HIGH if steps > 0 else GPIO.LOW
         GPIO.output(self.dir_pin, direction)
 
+        self.speed = self.starting_speed
         # Move the motor the specified number of steps at the given speed
-        for _ in range(int(abs(steps))):
+        for step in range(int(abs(steps))):
+            steps_per_second = (self.speed / degrees_per_step) * self.micro_steps
+            delay = 1 / (steps_per_second * 2)
+
+            print(f"Speed: {self.speed}")
+            print(f"Delay: {delay}")
+
+            start_time = time.time()
             GPIO.output(self.step_pin, GPIO.HIGH)
             time.sleep(delay)
             GPIO.output(self.step_pin, GPIO.LOW)
             time.sleep(delay)
+            end_time = time.time()
+
+            step_time = end_time - start_time
+
+            if step < int(steps / 2) and self.speed < self.max_speed:
+                self.speed += self.acceleration * step_time
+            if step > int(steps / 2) and self.speed > self.starting_speed:
+                self.speed -= self.acceleration * step_time
+        self.speed = 0

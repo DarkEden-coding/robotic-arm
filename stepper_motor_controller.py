@@ -125,6 +125,10 @@ class StepperMotorController:
         """
         steps_per_rotation = 360 / degrees_per_step
 
+        # Ensure that speed is not zero to avoid division by zero
+        if speed == 0:
+            return
+
         delay = 1 / (speed * steps_per_rotation)
 
         # Set the direction based on the target angle
@@ -137,3 +141,4 @@ class StepperMotorController:
             time.sleep(delay)
             GPIO.output(self.step_pin, GPIO.LOW)
             time.sleep(delay)
+

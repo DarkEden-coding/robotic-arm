@@ -156,6 +156,7 @@ class StepperMotorController:
 
         # Move the motor the specified number of steps at the given speed
         for _ in range(abs(steps)):
+            print("Step")
             GPIO.output(self.step_pin, GPIO.HIGH)
             time.sleep(delay)
             GPIO.output(self.step_pin, GPIO.LOW)

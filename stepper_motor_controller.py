@@ -17,7 +17,7 @@ def cleanup():
 
 def get_movement_lengths(max_speed, accel, initial_speed, target_distance):
     accel_time = max_speed / accel
-    dist_over_accel = (initial_speed * accel_time) + (1 / 2 * accel * (accel_time ** 2))
+    dist_over_accel = (initial_speed * accel_time) + (1 / 2 * accel * (accel_time**2))
     linear_movement_length = target_distance - (2 * dist_over_accel)
 
     return dist_over_accel, linear_movement_length
@@ -36,23 +36,33 @@ def total_movement_time(acceleration, max_speed, linear_movement_length, target)
         return 2 * acceleration_time
 
 
-def get_speed(current_speed, max_speed, acceleration, dist_over_accel, linear_movement_length, position, target_distance,
-              stage=0):
+def get_speed(
+    current_speed,
+    max_speed,
+    acceleration,
+    dist_over_accel,
+    linear_movement_length,
+    position,
+    target_distance,
+    stage=0,
+):
     if linear_movement_length < 0:
-        if position < (target_distance / 2) + .01:
-            current_speed += acceleration * .001
+        if position < (target_distance / 2) + 0.01:
+            current_speed += acceleration * 0.001
         else:
-            current_speed -= acceleration * .001
+            current_speed -= acceleration * 0.001
         return current_speed, 0
     else:
         if current_speed < max_speed and stage == 0:
-            current_speed += acceleration * .001
-        elif position < target_distance - dist_over_accel and (stage == 0 or stage == 1):
+            current_speed += acceleration * 0.001
+        elif position < target_distance - dist_over_accel and (
+            stage == 0 or stage == 1
+        ):
             stage = 1
             current_speed = max_speed
             pass
         elif stage == 1 or stage == 2:
-            current_speed -= acceleration * .001
+            current_speed -= acceleration * 0.001
             stage = 2
 
         return current_speed, stage

@@ -157,6 +157,9 @@ class StepperMotorController:
         steps = steps * self.gear_ratio
         delay = delay / self.gear_ratio
 
+        print(f"Steps: {steps}")
+        print(f"Delay: {delay}")
+
         direction = GPIO.HIGH if steps > 0 else GPIO.LOW
         GPIO.output(self.dir_pin, direction)
 

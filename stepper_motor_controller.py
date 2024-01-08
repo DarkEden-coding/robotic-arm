@@ -142,3 +142,21 @@ class StepperMotorController:
             time.sleep(delay)
             GPIO.output(self.step_pin, GPIO.LOW)
             time.sleep(delay)
+
+    def force_move_steps(self, steps, delay):
+        """
+        Force the stepper motor to move a specific number of steps
+        :param delay: the delay between steps
+        :param steps: the number of steps to move
+        :return:
+        """
+
+        direction = GPIO.HIGH if steps > 0 else GPIO.LOW
+        GPIO.output(self.dir_pin, direction)
+
+        # Move the motor the specified number of steps at the given speed
+        for _ in range(abs(steps)):
+            GPIO.output(self.step_pin, GPIO.HIGH)
+            time.sleep(delay)
+            GPIO.output(self.step_pin, GPIO.LOW)
+            time.sleep(delay)

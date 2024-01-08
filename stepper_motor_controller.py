@@ -17,8 +17,8 @@ def cleanup():
 microstep_map = {
     8: (GPIO.LOW, GPIO.LOW),
     16: (GPIO.HIGH, GPIO.HIGH),
-    32: (GPIO.LOW, GPIO.HIGH),
-    64: (GPIO.HIGH, GPIO.LOW),
+    32: (GPIO.HIGH, GPIO.LOW),
+    64: (GPIO.LOW, GPIO.HIGH),
 }
 
 
@@ -155,6 +155,7 @@ class StepperMotorController:
         :return:
         """
         steps = steps * self.gear_ratio
+        delay = delay / self.gear_ratio
 
         direction = GPIO.HIGH if steps > 0 else GPIO.LOW
         GPIO.output(self.dir_pin, direction)

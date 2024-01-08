@@ -182,11 +182,11 @@ class StepperMotorController:
                 step,
                 int(abs(steps)),
             )
-            # na
+
             print(f"Speed: {self.speed}")
 
             # convert degrees per second to steps per second
-            delay = 1 / (self.speed * fixed_degrees_per_step)
+            delay = 1 / (float(self.speed) * fixed_degrees_per_step)
 
             GPIO.output(self.step_pin, GPIO.HIGH)
             time.sleep(delay)

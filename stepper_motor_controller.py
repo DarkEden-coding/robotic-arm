@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import time
-import numpy as np
+import math
 
 GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
 
@@ -31,7 +31,7 @@ def total_movement_time(acceleration, max_speed, linear_movement_length, target)
         accel_and_linear_movement_time = (acceleration_time * 2) + linear_movement_time
         return accel_and_linear_movement_time
     else:
-        final_velocity = np.sqrt(2 * acceleration * (target / 2))
+        final_velocity = math.sqrt(2 * acceleration * (target / 2))
         acceleration_time = final_velocity / acceleration
         return 2 * acceleration_time
 

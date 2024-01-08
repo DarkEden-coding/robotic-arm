@@ -62,7 +62,7 @@ class StepperMotorController:
         Enable the stepper motor
         :return:
         """
-        GPIO.output(self.enable_pin, GPIO.HIGH)
+        GPIO.output(self.enable_pin, GPIO.LOW)
         self.enabled = True
 
     def disable_motor(self):
@@ -70,7 +70,7 @@ class StepperMotorController:
         Disable the stepper motor
         :return:
         """
-        GPIO.output(self.enable_pin, GPIO.LOW)
+        GPIO.output(self.enable_pin, GPIO.HIGH)
         self.enabled = False
 
     def set_micro_steps(self, micro_steps):

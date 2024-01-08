@@ -31,6 +31,7 @@ class StepperMotorController:
         micro_step_pins: tuple,
         acceleration: float,
         max_speed: float,
+        gear_ratio: float,
     ):
         """
         Stepper motor controller class
@@ -40,6 +41,7 @@ class StepperMotorController:
         :param micro_step_pins: the micro step pins of the stepper motor (tuple)
         :param acceleration: the acceleration of the stepper motor in rotations per second per second
         :param max_speed: the maximum speed of the stepper motor in rotations per second
+        :param gear_ratio: the gear ratio of the stepper motor in a decimal form
         """
         self.enable_pin = enable_pin
         self.dir_pin = dir_pin
@@ -47,6 +49,7 @@ class StepperMotorController:
         self.micro_step_pins = micro_step_pins
         self.acceleration = acceleration
         self.max_speed = max_speed
+        self.gear_ratio = gear_ratio
 
         self.enabled = False
         self.angle = 0
@@ -151,6 +154,7 @@ class StepperMotorController:
         :param steps: the number of steps to move
         :return:
         """
+        steps = steps * self.gear_ratio
 
         direction = GPIO.HIGH if steps > 0 else GPIO.LOW
         GPIO.output(self.dir_pin, direction)

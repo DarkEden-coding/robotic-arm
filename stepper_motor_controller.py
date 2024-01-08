@@ -172,6 +172,7 @@ class StepperMotorController:
                 step,
                 int(abs(steps)),
             )
+            # na
             print(f"Speed: {self.speed}")
 
             # convert degrees per second to steps per second

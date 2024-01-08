@@ -79,6 +79,7 @@ class StepperMotorController:
         :param micro_steps: the micro steps of the stepper motor
         :return:
         """
+        print(f"setting pins to {microstep_map[micro_steps]}")
         GPIO.output(self.micro_step_pins, microstep_map[micro_steps])
         self.micro_steps = micro_steps
 

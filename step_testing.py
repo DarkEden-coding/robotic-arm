@@ -26,18 +26,18 @@ pitch_motor = StepperMotorController(
 yaw_motor.enable_motor()
 pitch_motor.enable_motor()
 
-yaw_motor.set_micro_steps(32)
-pitch_motor.set_micro_steps(32)
+yaw_motor.set_micro_steps(16)
+pitch_motor.set_micro_steps(16)
 
 """yaw_motor.move_to_angle(90)
 pitch_motor.move_to_angle(90)
 """
 
-yaw_motor.force_move_steps(1600, .0001)
-pitch_motor.force_move_steps(1600, .0001)
+yaw_motor.force_move_steps(800, .0001)
+pitch_motor.force_move_steps(800, .0001)
 
-yaw_motor.force_move_steps(-1600, .0001)
-pitch_motor.force_move_steps(-1600, .0001)
+yaw_motor.force_move_steps(-800, .0001)
+pitch_motor.force_move_steps(-800, .0001)
 
 yaw_motor.disable_motor()
 pitch_motor.disable_motor()

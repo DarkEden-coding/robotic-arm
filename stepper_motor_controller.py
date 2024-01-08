@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 import time
+import numpy as np
 
 GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
 
@@ -12,6 +13,49 @@ def cleanup():
     :return:
     """
     GPIO.cleanup()
+
+
+def get_movement_lengths(max_speed, accel, initial_speed, target_distance):
+    accel_time = max_speed / accel
+    dist_over_accel = (initial_speed * accel_time) + (1 / 2 * accel * (accel_time ** 2))
+    linear_movement_length = target_distance - (2 * dist_over_accel)
+
+    return dist_over_accel, linear_movement_length
+
+
+def total_movement_time(acceleration, max_speed, linear_movement_length, target):
+    if linear_movement_length > 0:
+        acceleration_time = max_speed / acceleration
+        linear_movement_time = linear_movement_length / max_speed
+
+        accel_and_linear_movement_time = (acceleration_time * 2) + linear_movement_time
+        return accel_and_linear_movement_time
+    else:
+        final_velocity = np.sqrt(2 * acceleration * (target / 2))
+        acceleration_time = final_velocity / acceleration
+        return 2 * acceleration_time
+
+
+def get_speed(current_speed, max_speed, acceleration, dist_over_accel, linear_movement_length, position, target_distance,
+              stage=0):
+    if linear_movement_length < 0:
+        if position < (target_distance / 2) + .01:
+            current_speed += acceleration * .001
+        else:
+            current_speed -= acceleration * .001
+        return current_speed, 0
+    else:
+        if current_speed < max_speed and stage == 0:
+            current_speed += acceleration * .001
+        elif position < target_distance - dist_over_accel and (stage == 0 or stage == 1):
+            stage = 1
+            current_speed = max_speed
+            pass
+        elif stage == 1 or stage == 2:
+            current_speed -= acceleration * .001
+            stage = 2
+
+        return current_speed, stage
 
 
 microstep_map = {
@@ -93,7 +137,6 @@ class StepperMotorController:
     def move_to_angle(self, target_angle):
         """
         Move the stepper motor to a specific angle
-        :param delay:
         :param target_angle: the target angle in degrees
         :return:
         """
@@ -107,26 +150,37 @@ class StepperMotorController:
         direction = GPIO.HIGH if steps > 0 else GPIO.LOW
         GPIO.output(self.dir_pin, direction)
 
+        movement_step_lengths = get_movement_lengths(
+            self.max_speed, self.acceleration, self.starting_speed, int(abs(steps))
+        )
+        total_time = total_movement_time(
+            self.acceleration,
+            self.max_speed,
+            movement_step_lengths[1],
+            int(abs(steps)),
+        )
+        print(f"Total time: {total_time}")
+
         self.speed = self.starting_speed
         # Move the motor the specified number of steps at the given speed
         for step in range(int(abs(steps))):
-            steps_per_second = (self.speed / degrees_per_step) * self.micro_steps
-            delay = 1 / (steps_per_second * 2)
-
+            self.speed = get_speed(
+                self.speed,
+                self.max_speed,
+                self.acceleration,
+                *movement_step_lengths,
+                step,
+                int(abs(steps)),
+            )
             print(f"Speed: {self.speed}")
-            print(f"Delay: {delay}")
 
-            start_time = time.time()
+            # convert degrees per second to steps per second
+            delay = 1 / (self.speed * fixed_degrees_per_step)
+
             GPIO.output(self.step_pin, GPIO.HIGH)
             time.sleep(delay)
             GPIO.output(self.step_pin, GPIO.LOW)
             time.sleep(delay)
-            end_time = time.time()
 
-            step_time = end_time - start_time
-
-            if step < int(steps / 2) and self.speed < self.max_speed:
-                self.speed += self.acceleration * step_time
-            if step > int(steps / 2) and self.speed > self.starting_speed:
-                self.speed -= self.acceleration * step_time
         self.speed = 0
+        self.angle = target_angle

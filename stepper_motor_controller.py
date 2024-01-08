@@ -171,16 +171,18 @@ class StepperMotorController:
         )
         print(f"Total time: {total_time}")
 
+        stage = 0
         self.speed = self.starting_speed
         # Move the motor the specified number of steps at the given speed
         for step in range(int(abs(steps))):
-            self.speed = get_speed(
+            self.speed, stage = get_speed(
                 self.speed,
                 self.max_speed,
                 self.acceleration,
                 *movement_step_lengths,
                 step,
                 int(abs(steps)),
+                stage,
             )
 
             print(f"Speed: {self.speed}")

@@ -1,29 +1,36 @@
-import RPi.GPIO as GPIO
-import time
+from stepper_motor_controller import StepperMotorController, cleanup
 
-# Pin Definitions
-dir_pin = 2  # Direction GPIO Pin
-step_pin = 3  # Step GPIO Pin
+max_speed = 1
+acceleration = 0.1
 
-# Setup
-GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
-GPIO.setup(dir_pin, GPIO.OUT)
-GPIO.setup(step_pin, GPIO.OUT)
+yaw_motor = StepperMotorController(
+    enable_pin=2,
+    dir_pin=27,
+    step_pin=17,
+    micro_step_pins=(3, 4),
+    acceleration=acceleration,
+    max_speed=max_speed,
+)
 
-# Set the rotation direction
-direction = True  # True for clockwise, False for counterclockwise
-GPIO.output(dir_pin, direction)
+pitch_motor = StepperMotorController(
+    enable_pin=0,
+    dir_pin=12,
+    step_pin=1,
+    micro_step_pins=(5, 6),
+    acceleration=acceleration,
+    max_speed=max_speed,
+)
 
-# Drive the motor
-steps = 200  # Change this to the number of steps you want
-delay = 0.01  # Delay between each step
+yaw_motor.enable_motor()
+pitch_motor.enable_motor()
 
-for i in range(steps):
-    print(i)
-    GPIO.output(step_pin, GPIO.HIGH)
-    time.sleep(delay)
-    GPIO.output(step_pin, GPIO.LOW)
-    time.sleep(delay)
+yaw_motor.set_micro_steps(64)
+pitch_motor.set_micro_steps(64)
 
-# Cleanup
-GPIO.cleanup()
+yaw_motor.move_to_angle(90)
+pitch_motor.move_to_angle(90)
+
+yaw_motor.disable_motor()
+pitch_motor.disable_motor()
+
+cleanup()

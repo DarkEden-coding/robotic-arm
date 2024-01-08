@@ -33,11 +33,11 @@ pitch_motor.set_micro_steps(16)
 pitch_motor.move_to_angle(90)
 """
 
-yaw_motor.force_move_steps(800, .0001)
-pitch_motor.force_move_steps(800, .0001)
+yaw_motor.force_move_steps(800, .001)
+pitch_motor.force_move_steps(800, .001)
 
-yaw_motor.force_move_steps(-800, .0001)
-pitch_motor.force_move_steps(-800, .0001)
+yaw_motor.force_move_steps(-800, .001)
+pitch_motor.force_move_steps(-800, .001)
 
 yaw_motor.disable_motor()
 pitch_motor.disable_motor()

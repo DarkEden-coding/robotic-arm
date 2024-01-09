@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import math
 from constants import trapezoidal_step, degrees_per_step
+from multiprocessing import Process
 
 GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
 
@@ -143,6 +144,7 @@ class StepperMotorController:
         self.micro_steps = 8
         self.speed = 0
         self.step_position = 0
+        self.moving = False
 
         GPIO.setup(self.enable_pin, GPIO.OUT)
         GPIO.setup(self.dir_pin, GPIO.OUT)
@@ -175,18 +177,11 @@ class StepperMotorController:
         GPIO.output(self.micro_step_pins, microstep_map[micro_steps])
         self.micro_steps = micro_steps
 
-    def move_to_angle(self, target_angle):
-        """
-        Move the stepper motor to a specific angle
-        :param target_angle: the target angle in degrees
-        :return:
-        """
+    def _move_to_angle(self, target_angle):
         fixed_degrees_per_step = degrees_per_step / self.micro_steps
         steps = target_angle / fixed_degrees_per_step
 
         steps = steps * self.gear_ratio
-
-        print(f"Steps: {steps}")
 
         direction = GPIO.HIGH if steps > 0 else GPIO.LOW
         GPIO.output(self.dir_pin, direction)
@@ -197,21 +192,15 @@ class StepperMotorController:
         acceleration_steps = self.acceleration / fixed_degrees_per_step
         starting_speed_steps = self.starting_speed / fixed_degrees_per_step
 
-        print(f"\nMax speed steps: {max_speed_steps}")
-        print(f"Acceleration steps: {acceleration_steps}")
-
         dist_over_accel, linear_movement_length = get_movement_lengths(
             max_speed_steps, acceleration_steps, starting_speed_steps, steps
         )
 
-        print(f"Distance over acceleration: {dist_over_accel}")
-        print(f"Linear movement length: {linear_movement_length}")
-
         time_estimate = total_movement_time(
             acceleration_steps, max_speed_steps, linear_movement_length, steps
         )
-        print(f"Time estimate: {time_estimate}\n")
 
+        self.moving = True
         stage = 0
         self.speed = starting_speed_steps
         self.step_position = 0
@@ -232,8 +221,6 @@ class StepperMotorController:
             else:
                 delay = (trapezoidal_step / (self.speed * trapezoidal_step)) / 2
 
-            print(f"steps: {self.speed * trapezoidal_step}")
-
             for _ in range(int(self.speed * trapezoidal_step)):
                 GPIO.output(self.step_pin, GPIO.HIGH)
                 time.sleep(delay)
@@ -244,11 +231,33 @@ class StepperMotorController:
             if self.step_position >= steps:
                 break
 
+        self.moving = False
         self.angle = target_angle
+
+    def wait_until_stopped(self):
+        """
+        Wait until the stepper motor is stopped
+        :return:
+        """
+        while self.moving:
+            time.sleep(0.01)
+
+    def move_to_angle(self, target_angle, threaded=False):
+        """
+        Move the stepper motor to a specific angle
+        :param target_angle: the target angle in degrees
+        :param threaded: whether or not to thread the movement
+        :return:
+        """
+        if threaded:
+            process = Process(target=self._move_to_angle, args=(target_angle,))
+            process.start()
+        else:
+            self._move_to_angle(target_angle)
 
     def force_move_steps(self, steps):
         """
-        Force the stepper motor to move a specific number of steps
+        Force the stepper motor to move a specific number of steps, not recommended for use
         :param steps: the number of steps to move
         :return:
         """

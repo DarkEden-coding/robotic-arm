@@ -16,6 +16,14 @@ def cleanup():
 
 
 def get_movement_lengths(max_speed, accel, initial_speed, target_distance):
+    """
+    Get the length of the acceleration and linear movement
+    :param max_speed: the maximum speed of the motor in rotations per second
+    :param accel: the acceleration of the motor in rotations per second per second
+    :param initial_speed: the initial speed of the motor in rotations per second
+    :param target_distance: the target distance in degrees
+    :return:
+    """
     accel_time = max_speed / accel
     dist_over_accel = (initial_speed * accel_time) + (1 / 2 * accel * (accel_time**2))
     linear_movement_length = target_distance - (2 * dist_over_accel)
@@ -24,6 +32,14 @@ def get_movement_lengths(max_speed, accel, initial_speed, target_distance):
 
 
 def total_movement_time(acceleration, max_speed, linear_movement_length, target):
+    """
+    Get the total movement time
+    :param acceleration: the acceleration of the motor in rotations per second per second
+    :param max_speed: the maximum speed of the motor in rotations per second
+    :param linear_movement_length: the length of the linear movement
+    :param target: the target distance
+    :return:
+    """
     if linear_movement_length > 0:
         acceleration_time = max_speed / acceleration
         linear_movement_time = linear_movement_length / max_speed
@@ -46,6 +62,18 @@ def get_speed(
     target_distance,
     stage=0,
 ):
+    """
+    Get the speed of the motor
+    :param current_speed: the current speed of the object in units per second
+    :param max_speed: the maximum speed of the object in units per second
+    :param acceleration: the acceleration of the object in units per second per second
+    :param dist_over_accel: the distance over the acceleration
+    :param linear_movement_length: the length of the linear movement
+    :param position: the current position of the object
+    :param target_distance: the target distance of the object
+    :param stage: the stage of the movement
+    :return:
+    """
     if linear_movement_length < 0:
         if position < (target_distance / 2) + 0.01:
             current_speed += acceleration * 0.001
@@ -160,40 +188,37 @@ class StepperMotorController:
         direction = GPIO.HIGH if steps > 0 else GPIO.LOW
         GPIO.output(self.dir_pin, direction)
 
-        movement_step_lengths = get_movement_lengths(
-            self.max_speed, self.acceleration, self.starting_speed, int(abs(steps))
+        steps = abs(steps)
+
+        max_speed_steps = self.max_speed / fixed_degrees_per_step
+        acceleration_steps = self.acceleration / fixed_degrees_per_step
+        starting_speed_steps = self.starting_speed / fixed_degrees_per_step
+
+        dist_over_accel, linear_movement_length = get_movement_lengths(
+            max_speed_steps, acceleration_steps, starting_speed_steps, steps
         )
-        total_time = total_movement_time(
-            self.acceleration,
-            self.max_speed,
-            movement_step_lengths[1],
-            int(abs(steps)),
-        )
-        print(f"Total time: {total_time}")
 
         stage = 0
-        self.speed = self.starting_speed
-        # Move the motor the specified number of steps at the given speed
-        for step in range(int(abs(steps))):
+        self.speed = starting_speed_steps
+        for step in range(int(steps)):
             self.speed, stage = get_speed(
                 self.speed,
-                self.max_speed,
-                self.acceleration,
-                *movement_step_lengths,
+                max_speed_steps,
+                acceleration_steps,
+                dist_over_accel,
+                linear_movement_length,
                 step,
-                int(abs(steps)),
+                steps,
                 stage,
             )
 
             print(f"Speed: {self.speed}")
 
-            # convert degrees per second to steps per second
-            delay = 1 / (float(self.speed) * fixed_degrees_per_step)
+            delay = (1 / self.speed) / 2
 
             GPIO.output(self.step_pin, GPIO.HIGH)
             time.sleep(delay)
             GPIO.output(self.step_pin, GPIO.LOW)
             time.sleep(delay)
 
-        self.speed = 0
         self.angle = target_angle

@@ -234,6 +234,8 @@ class StepperMotorController:
             else:
                 delay = (1 / self.speed) / 2
 
+            print(f"Delay: {delay}")
+
             iterations = trapezoidal_step / (delay * 2)
             print(f"Iterations: {iterations}")
 

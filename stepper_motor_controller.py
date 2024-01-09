@@ -232,11 +232,9 @@ class StepperMotorController:
             if self.speed <= 0:
                 delay = 0
             else:
-                delay = (1 / self.speed) / 2
+                delay = (trapezoidal_step / self.speed) / 2
 
-            iterations = trapezoidal_step / (delay * 2)
-
-            for _ in range(int(iterations)):
+            for _ in range(int(self.speed)):
                 GPIO.output(self.step_pin, GPIO.HIGH)
                 time.sleep(delay)
                 GPIO.output(self.step_pin, GPIO.LOW)

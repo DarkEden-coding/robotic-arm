@@ -243,6 +243,7 @@ class StepperMotorController:
         :return:
         """
         while self.moving:
+            print(1)
             time.sleep(0.01)
 
     def move_to_angle(self, target_angle, threaded=False):

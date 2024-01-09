@@ -136,6 +136,9 @@ class StepperMotorController:
         self.gear_ratio = gear_ratio
         self.starting_speed = starting_speed
 
+        self.position_data = []
+        self.speed_data = []
+
         self.enabled = False
         self.angle = 0
         self.micro_steps = 8
@@ -198,6 +201,11 @@ class StepperMotorController:
         dist_over_accel, linear_movement_length = get_movement_lengths(
             max_speed_steps, acceleration_steps, starting_speed_steps, steps
         )
+
+        time_estimate = total_movement_time(
+            acceleration_steps, max_speed_steps, linear_movement_length, steps
+        )
+        print(f"Time estimate: {time_estimate}")
 
         stage = 0
         self.speed = starting_speed_steps

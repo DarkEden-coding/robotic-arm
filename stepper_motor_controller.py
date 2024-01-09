@@ -236,12 +236,15 @@ class StepperMotorController:
             else:
                 delay = (trapezoidal_step / self.speed) / 2
 
-            print(f"Delay: {delay}")
+            print(f"moving {self.speed} steps with delay {delay * 2}")
 
+            t1 = time.time()
             for _ in range(int(self.speed)):
                 GPIO.output(self.step_pin, GPIO.HIGH)
                 time.sleep(delay)
                 GPIO.output(self.step_pin, GPIO.LOW)
                 time.sleep(delay)
+            t2 = time.time()
+            print(f"took {t2 - t1} seconds")
 
         self.angle = target_angle

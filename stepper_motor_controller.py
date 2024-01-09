@@ -215,7 +215,10 @@ class StepperMotorController:
 
             print(f"Speed: {self.speed}")
 
-            delay = (1 / self.speed) / 2
+            if self.speed == 0:
+                delay = 0
+            else:
+                delay = (1 / self.speed) / 2
 
             GPIO.output(self.step_pin, GPIO.HIGH)
             time.sleep(delay)

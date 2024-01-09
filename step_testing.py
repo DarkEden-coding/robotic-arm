@@ -33,11 +33,11 @@ yaw_motor.set_micro_steps(8)
 pitch_motor.set_micro_steps(8)
 
 try:
-    yaw_motor.move_to_angle(180)
-    pitch_motor.move_to_angle(90)
-
     yaw_motor.move_to_angle(-180)
-    pitch_motor.move_to_angle(-90)
+    # pitch_motor.move_to_angle(90)
+
+    yaw_motor.move_to_angle(0)
+    # pitch_motor.move_to_angle(-90)
 except KeyboardInterrupt:
     pass
 

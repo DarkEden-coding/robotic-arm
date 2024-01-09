@@ -186,9 +186,7 @@ class StepperMotorController:
         :return:
         """
         fixed_degrees_per_step = 1.8 / self.micro_steps
-        print(f"Fixed degrees per step: {fixed_degrees_per_step}")
         steps = target_angle / fixed_degrees_per_step
-        print(f"Steps before gear ratio: {steps}")
 
         steps = steps * self.gear_ratio
 
@@ -232,8 +230,6 @@ class StepperMotorController:
                 steps,
                 stage,
             )
-
-            # print(f"Speed: {self.speed}")
 
             if self.speed * trapezoidal_step <= 0:
                 delay = 0

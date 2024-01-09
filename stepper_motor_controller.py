@@ -231,6 +231,8 @@ class StepperMotorController:
                 stage,
             )
 
+            print(f"Speed: {self.speed}")
+
             if self.speed * trapezoidal_step <= 0:
                 delay = 0
             else:

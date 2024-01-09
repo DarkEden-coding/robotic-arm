@@ -178,6 +178,8 @@ class StepperMotorController:
         self.micro_steps = micro_steps
 
     def _move_to_angle(self, target_angle):
+        self.moving = True
+
         fixed_degrees_per_step = degrees_per_step / self.micro_steps
         steps = target_angle / fixed_degrees_per_step
 
@@ -200,7 +202,6 @@ class StepperMotorController:
             acceleration_steps, max_speed_steps, linear_movement_length, steps
         )
 
-        self.moving = True
         stage = 0
         self.speed = starting_speed_steps
         self.step_position = 0
@@ -254,6 +255,7 @@ class StepperMotorController:
         if threaded:
             process = Process(target=self._move_to_angle, args=(target_angle,))
             process.start()
+            time.sleep(0.05)
         else:
             self._move_to_angle(target_angle)
 

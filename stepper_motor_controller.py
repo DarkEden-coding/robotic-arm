@@ -84,14 +84,17 @@ def get_speed(
     else:
         if current_speed < max_speed and stage == 0:
             current_speed += acceleration * trapezoidal_step
+            print(f"accelerating to {current_speed}")
         elif position < target_distance - dist_over_accel and (
             stage == 0 or stage == 1
         ):
             stage = 1
             current_speed = max_speed
+            print(f"moving at {current_speed}")
             pass
         elif stage == 1 or stage == 2:
             current_speed -= acceleration * trapezoidal_step
+            print(f"decelerating to {current_speed}")
             stage = 2
 
         return current_speed, stage
@@ -229,14 +232,14 @@ class StepperMotorController:
 
             self.speed = self.speed * trapezoidal_step
 
-            print(f"Speed: {self.speed}")
+            # print(f"Speed: {self.speed}")
 
             if self.speed <= 0:
                 delay = 0
             else:
                 delay = (trapezoidal_step / self.speed) / 2
 
-            print(f"moving {self.speed} steps with delay {delay * 2}")
+            # print(f"moving {self.speed} steps with delay {delay * 2}")
 
             t1 = time.time()
             for _ in range(int(self.speed)):
@@ -245,6 +248,6 @@ class StepperMotorController:
                 GPIO.output(self.step_pin, GPIO.LOW)
                 time.sleep(delay)
             t2 = time.time()
-            print(f"took {t2 - t1} seconds")
+            # print(f"took {t2 - t1} seconds")
 
         self.angle = target_angle

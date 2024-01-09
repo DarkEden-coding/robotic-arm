@@ -235,6 +235,7 @@ class StepperMotorController:
                 delay = (1 / self.speed) / 2
 
             iterations = int(trapezoidal_step / (delay * 2))
+            print(f"Iterations: {iterations}")
 
             for _ in range(iterations):
                 GPIO.output(self.step_pin, GPIO.HIGH)

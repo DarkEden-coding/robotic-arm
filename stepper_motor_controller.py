@@ -227,6 +227,7 @@ class StepperMotorController:
             for _ in range(int(self.speed * trapezoidal_step)):
                 GPIO.output(self.step_pin, GPIO.HIGH)
                 time.sleep(delay)
+                GPIO.setmode(GPIO.BCM)
                 GPIO.output(self.step_pin, GPIO.LOW)
                 time.sleep(delay)
                 self.step_position += 1

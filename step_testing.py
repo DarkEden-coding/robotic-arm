@@ -35,13 +35,13 @@ yaw_motor.set_micro_steps(microstepping)
 pitch_motor.set_micro_steps(microstepping)
 
 try:
-    yaw_motor.move_to_angle(-180, threaded=True)
+    yaw_motor.move_to_angle(180, threaded=True)
     pitch_motor.move_to_angle(90, threaded=True)
 
     yaw_motor.wait_until_stopped()
     pitch_motor.wait_until_stopped()
 
-    yaw_motor.move_to_angle(180, threaded=True)
+    yaw_motor.move_to_angle(-180, threaded=True)
     pitch_motor.move_to_angle(-90, threaded=True)
 except KeyboardInterrupt:
     print("KeyboardInterrupt")

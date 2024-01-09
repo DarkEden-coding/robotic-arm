@@ -20,9 +20,9 @@ class Cube:
         """
         x, y, z = point
         return (
-            self.min_x <= x <= self.max_x
-            and self.min_y <= y <= self.max_y
-            and self.min_z <= z <= self.max_z
+                self.min_x <= x <= self.max_x
+                and self.min_y <= y <= self.max_y
+                and self.min_z <= z <= self.max_z
         )
 
 
@@ -60,3 +60,20 @@ return_map = {
     "emergency_stop": False,
     "get_position": True,
 }
+
+# ----------------------
+# Stepper Motor Constants
+# ----------------------
+
+degrees_per_step = 1.8  # direct degrees per step
+trapezoidal_step = 0.01  # time between speed updates in trapezoidal profile (seconds)
+microstepping = 16  # microstepping of the stepper motor (8, 16, 32, 64)
+
+# -----------
+# Speed Curve
+# -----------
+
+max_speed_stepper = 360
+acceleration_stepper = 240
+starting_speed_stepper = 0
+

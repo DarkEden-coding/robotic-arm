@@ -1,11 +1,9 @@
 import RPi.GPIO as GPIO
 import time
 import math
+from constants import trapezoidal_step, degrees_per_step
 
 GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
-
-degrees_per_step = 1.8
-trapezoidal_step = 0.01
 
 
 def cleanup():
@@ -26,7 +24,7 @@ def get_movement_lengths(max_speed, accel, initial_speed, target_distance):
     :return:
     """
     accel_time = max_speed / accel
-    dist_over_accel = (initial_speed * accel_time) + (1 / 2 * accel * (accel_time**2))
+    dist_over_accel = (initial_speed * accel_time) + (1 / 2 * accel * (accel_time ** 2))
     linear_movement_length = target_distance - (2 * dist_over_accel)
 
     return dist_over_accel, linear_movement_length
@@ -54,14 +52,14 @@ def total_movement_time(acceleration, max_speed, linear_movement_length, target)
 
 
 def get_speed(
-    current_speed,
-    max_speed,
-    acceleration,
-    dist_over_accel,
-    linear_movement_length,
-    position,
-    target_distance,
-    stage=0,
+        current_speed,
+        max_speed,
+        acceleration,
+        dist_over_accel,
+        linear_movement_length,
+        position,
+        target_distance,
+        stage=0,
 ):
     """
     Get the speed of the motor
@@ -85,7 +83,7 @@ def get_speed(
         if current_speed < max_speed and stage == 0:
             current_speed = float(current_speed) + float(acceleration * trapezoidal_step)
         elif position < target_distance - dist_over_accel and (
-            stage == 0 or stage == 1
+                stage == 0 or stage == 1
         ):
             stage = 1
             current_speed = max_speed
@@ -107,15 +105,15 @@ microstep_map = {
 
 class StepperMotorController:
     def __init__(
-        self,
-        enable_pin: int,
-        dir_pin: int,
-        step_pin: int,
-        micro_step_pins: tuple,
-        acceleration: float,
-        max_speed: float,
-        starting_speed: float,
-        gear_ratio: float,
+            self,
+            enable_pin: int,
+            dir_pin: int,
+            step_pin: int,
+            micro_step_pins: tuple,
+            acceleration: float,
+            max_speed: float,
+            starting_speed: float,
+            gear_ratio: float,
     ):
         """
         Stepper motor controller class
@@ -183,7 +181,7 @@ class StepperMotorController:
         :param target_angle: the target angle in degrees
         :return:
         """
-        fixed_degrees_per_step = 1.8 / self.micro_steps
+        fixed_degrees_per_step = degrees_per_step / self.micro_steps
         steps = target_angle / fixed_degrees_per_step
 
         steps = steps * self.gear_ratio

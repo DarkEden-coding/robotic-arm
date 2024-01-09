@@ -215,7 +215,7 @@ class StepperMotorController:
 
             print(f"Speed: {self.speed}")
 
-            if self.speed == 0:
+            if self.speed <= 0:
                 delay = 0
             else:
                 delay = (1 / self.speed) / 2

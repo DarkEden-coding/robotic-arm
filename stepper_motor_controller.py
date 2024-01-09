@@ -87,6 +87,8 @@ def get_speed(
         elif position < target_distance - dist_over_accel and (
             stage == 0 or stage == 1
         ):
+            print(f"Position: {position}")
+            print(f"Target distance: {target_distance - dist_over_accel}")
             stage = 1
             current_speed = max_speed
             pass

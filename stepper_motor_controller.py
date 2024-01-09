@@ -85,6 +85,7 @@ def get_speed(
         if current_speed < max_speed and stage == 0:
             current_speed += acceleration * trapezoidal_step
             print(f"adding {acceleration * trapezoidal_step} to {current_speed}")
+            print(f"current speed: {current_speed}")
         elif position < target_distance - dist_over_accel and (
             stage == 0 or stage == 1
         ):

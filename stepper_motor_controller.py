@@ -5,6 +5,7 @@ import math
 GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
 
 degrees_per_step = 1.8
+trapezoidal_step = .001
 
 
 def cleanup():
@@ -76,13 +77,13 @@ def get_speed(
     """
     if linear_movement_length < 0:
         if position < (target_distance / 2) + 0.01:
-            current_speed += acceleration
+            current_speed += acceleration * trapezoidal_step
         else:
-            current_speed -= acceleration
+            current_speed -= acceleration * trapezoidal_step
         return current_speed, 0
     else:
         if current_speed < max_speed and stage == 0:
-            current_speed += acceleration
+            current_speed += acceleration * trapezoidal_step
         elif position < target_distance - dist_over_accel and (
             stage == 0 or stage == 1
         ):
@@ -90,7 +91,7 @@ def get_speed(
             current_speed = max_speed
             pass
         elif stage == 1 or stage == 2:
-            current_speed -= acceleration
+            current_speed -= acceleration * trapezoidal_step
             stage = 2
 
         return current_speed, stage
@@ -233,9 +234,12 @@ class StepperMotorController:
             else:
                 delay = (1 / self.speed) / 2
 
-            GPIO.output(self.step_pin, GPIO.HIGH)
-            time.sleep(delay)
-            GPIO.output(self.step_pin, GPIO.LOW)
-            time.sleep(delay)
+            iterations = int(trapezoidal_step / (delay * 2))
+
+            for _ in range(iterations):
+                GPIO.output(self.step_pin, GPIO.HIGH)
+                time.sleep(delay)
+                GPIO.output(self.step_pin, GPIO.LOW)
+                time.sleep(delay)
 
         self.angle = target_angle

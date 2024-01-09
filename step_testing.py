@@ -36,9 +36,10 @@ try:
     yaw_motor.move_to_angle(-180)
     # pitch_motor.move_to_angle(90)
 
-    yaw_motor.move_to_angle(0)
+    yaw_motor.move_to_angle(180)
     # pitch_motor.move_to_angle(-90)
 except KeyboardInterrupt:
+    print("KeyboardInterrupt")
     pass
 
 yaw_motor.disable_motor()

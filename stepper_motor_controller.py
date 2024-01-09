@@ -76,13 +76,13 @@ def get_speed(
     """
     if linear_movement_length < 0:
         if position < (target_distance / 2) + 0.01:
-            current_speed += acceleration * 0.001
+            current_speed += acceleration
         else:
-            current_speed -= acceleration * 0.001
+            current_speed -= acceleration
         return current_speed, 0
     else:
         if current_speed < max_speed and stage == 0:
-            current_speed += acceleration * 0.001
+            current_speed += acceleration
         elif position < target_distance - dist_over_accel and (
             stage == 0 or stage == 1
         ):
@@ -90,7 +90,7 @@ def get_speed(
             current_speed = max_speed
             pass
         elif stage == 1 or stage == 2:
-            current_speed -= acceleration * 0.001
+            current_speed -= acceleration
             stage = 2
 
         return current_speed, stage

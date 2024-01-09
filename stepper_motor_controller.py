@@ -5,7 +5,7 @@ import math
 GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
 
 degrees_per_step = 1.8
-trapezoidal_step = 0.001
+trapezoidal_step = 0.1
 
 
 def cleanup():
@@ -234,10 +234,7 @@ class StepperMotorController:
             else:
                 delay = (1 / self.speed) / 2
 
-            print(f"Delay: {delay * 2}")
-
             iterations = trapezoidal_step / (delay * 2)
-            print(f"Iterations: {iterations}")
 
             for _ in range(int(iterations)):
                 GPIO.output(self.step_pin, GPIO.HIGH)

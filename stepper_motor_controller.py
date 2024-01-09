@@ -227,6 +227,8 @@ class StepperMotorController:
                 stage,
             )
 
+            self.speed = self.speed * trapezoidal_step
+
             print(f"Speed: {self.speed}")
 
             if self.speed <= 0:

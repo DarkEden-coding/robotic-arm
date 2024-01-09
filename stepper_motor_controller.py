@@ -75,7 +75,7 @@ def get_speed(
     :param stage: the stage of the movement
     :return:
     """
-    if linear_movement_length < 0:
+    if linear_movement_length <= 0:
         if position < (target_distance / 2) + 0.01:
             current_speed += acceleration * trapezoidal_step
         else:

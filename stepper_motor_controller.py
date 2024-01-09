@@ -232,7 +232,7 @@ class StepperMotorController:
             if self.speed <= 0:
                 delay = 0
             else:
-                delay = (1 / self.speed) / 2
+                delay = (1 / self.speed) / 2 # na
 
             iterations = int(trapezoidal_step / (delay * 2))
 

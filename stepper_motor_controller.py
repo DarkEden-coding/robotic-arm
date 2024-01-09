@@ -195,17 +195,22 @@ class StepperMotorController:
 
         max_speed_steps = self.max_speed / fixed_degrees_per_step
         acceleration_steps = self.acceleration / fixed_degrees_per_step
-        print(f"Acceleration steps: {acceleration_steps}")
         starting_speed_steps = self.starting_speed / fixed_degrees_per_step
+
+        print(f"\nMax speed steps: {max_speed_steps}")
+        print(f"Acceleration steps: {acceleration_steps}")
 
         dist_over_accel, linear_movement_length = get_movement_lengths(
             max_speed_steps, acceleration_steps, starting_speed_steps, steps
         )
 
+        print(f"Distance over acceleration: {dist_over_accel}")
+        print(f"Linear movement length: {linear_movement_length}")
+
         time_estimate = total_movement_time(
             acceleration_steps, max_speed_steps, linear_movement_length, steps
         )
-        print(f"Time estimate: {time_estimate}")
+        print(f"Time estimate: {time_estimate}\n")
 
         stage = 0
         self.speed = starting_speed_steps

@@ -1,6 +1,6 @@
 from stepper_motor_controller import StepperMotorController, cleanup
 
-max_speed = 90
+max_speed = 180
 acceleration = 360
 starting_speed = 0
 

@@ -84,8 +84,6 @@ def get_speed(
     else:
         if current_speed < max_speed and stage == 0:
             current_speed = float(current_speed) + float(acceleration * trapezoidal_step)
-            print(f"adding {acceleration * trapezoidal_step} to {current_speed}")
-            print(f"current speed: {current_speed}")
         elif position < target_distance - dist_over_accel and (
             stage == 0 or stage == 1
         ):
@@ -234,7 +232,9 @@ class StepperMotorController:
             if self.speed * trapezoidal_step <= 0:
                 delay = 0
             else:
-                delay = (trapezoidal_step / self.speed * trapezoidal_step) / 2
+                delay = (trapezoidal_step / (self.speed * trapezoidal_step)) / 2
+
+            print(f"steps: {self.speed * trapezoidal_step}")
 
             t1 = time.time()
             for _ in range(int(self.speed * trapezoidal_step)):

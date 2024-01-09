@@ -192,6 +192,7 @@ class StepperMotorController:
 
         max_speed_steps = self.max_speed / fixed_degrees_per_step
         acceleration_steps = self.acceleration / fixed_degrees_per_step
+        print(f"Acceleration steps: {acceleration_steps}")
         starting_speed_steps = self.starting_speed / fixed_degrees_per_step
 
         dist_over_accel, linear_movement_length = get_movement_lengths(

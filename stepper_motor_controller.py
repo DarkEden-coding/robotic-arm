@@ -76,7 +76,7 @@ def get_speed(
     :return:
     """
     if linear_movement_length <= 0:
-        if position < (target_distance / 2) + 0.01:
+        if position < (target_distance / 2):
             current_speed += acceleration * trapezoidal_step
         else:
             current_speed -= acceleration * trapezoidal_step

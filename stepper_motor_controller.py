@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import math
 from constants import trapezoidal_step, degrees_per_step
-from multiprocessing import Process
+from threading import Thread
 
 GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
 
@@ -146,6 +146,8 @@ class StepperMotorController:
         self.step_position = 0
         self.moving = False
 
+        self.process = None
+
         GPIO.setup(self.enable_pin, GPIO.OUT)
         GPIO.setup(self.dir_pin, GPIO.OUT)
         GPIO.setup(self.step_pin, GPIO.OUT)
@@ -242,9 +244,7 @@ class StepperMotorController:
         Wait until the stepper motor is stopped
         :return:
         """
-        while self.moving:
-            print(1)
-            time.sleep(0.01)
+        self.process.join()
 
     def move_to_angle(self, target_angle, threaded=False):
         """
@@ -254,9 +254,8 @@ class StepperMotorController:
         :return:
         """
         if threaded:
-            process = Process(target=self._move_to_angle, args=(target_angle,))
-            process.start()
-            time.sleep(0.05)
+            self.process = Thread(target=self._move_to_angle, args=(target_angle,))
+            self.process.start()
         else:
             self._move_to_angle(target_angle)
 

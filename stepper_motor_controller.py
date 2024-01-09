@@ -247,3 +247,20 @@ class StepperMotorController:
             t2 = time.time()
 
         self.angle = target_angle
+
+    def force_move_steps(self, steps):
+        """
+        Force the stepper motor to move a specific number of steps
+        :param steps: the number of steps to move
+        :return:
+        """
+        direction = GPIO.HIGH if steps > 0 else GPIO.LOW
+        GPIO.output(self.dir_pin, direction)
+
+        steps = abs(steps)
+
+        for step in range(int(steps)):
+            GPIO.output(self.step_pin, GPIO.HIGH)
+            time.sleep(0.001)
+            GPIO.output(self.step_pin, GPIO.LOW)
+            time.sleep(0.001)

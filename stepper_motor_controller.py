@@ -140,11 +140,9 @@ class StepperMotorController:
         self.speed_data = []
 
         self.enabled = False
-        self.angle = 0
         self.micro_steps = 8
         self.speed = 0
         self.step_position = 0
-        self.moving = False
 
         self.process = None
 
@@ -180,7 +178,7 @@ class StepperMotorController:
         self.micro_steps = micro_steps
 
     def _move_to_angle(self, target_angle):
-        self.moving = True
+        GPIO.setmode(GPIO.BCM)
 
         fixed_degrees_per_step = degrees_per_step / self.micro_steps
         steps = target_angle / fixed_degrees_per_step
@@ -235,9 +233,6 @@ class StepperMotorController:
 
             if self.step_position >= steps:
                 break
-
-        self.moving = False
-        self.angle = target_angle
 
     def wait_until_stopped(self):
         """

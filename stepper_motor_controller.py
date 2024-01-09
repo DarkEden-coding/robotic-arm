@@ -232,14 +232,14 @@ class StepperMotorController:
             if self.speed <= 0:
                 delay = 0
             else:
-                delay = (1 / self.speed) / 2  # na
+                delay = (1 / self.speed) / 2
 
             iterations = int(trapezoidal_step / (delay * 2))
 
             for _ in range(iterations):
                 GPIO.output(self.step_pin, GPIO.HIGH)
-                time.sleep(delay)
+                time.sleep(delay * 2)
                 GPIO.output(self.step_pin, GPIO.LOW)
-                time.sleep(delay)
+                time.sleep(delay * 2)
 
         self.angle = target_angle

@@ -146,6 +146,7 @@ class StepperMotorController:
         self.angle = 0
         self.micro_steps = 8
         self.speed = 0
+        self.step_position = 0
 
         GPIO.setup(self.enable_pin, GPIO.OUT)
         GPIO.setup(self.dir_pin, GPIO.OUT)
@@ -219,14 +220,15 @@ class StepperMotorController:
 
         stage = 0
         self.speed = starting_speed_steps
-        for step in range(int(steps)):
+        self.step_position = 0
+        while True:
             self.speed, stage = get_speed(
                 self.speed,
                 max_speed_steps,
                 acceleration_steps,
                 dist_over_accel,
                 linear_movement_length,
-                step,
+                self.step_position,
                 steps,
                 stage,
             )
@@ -240,13 +242,15 @@ class StepperMotorController:
 
             print(f"steps: {self.speed * trapezoidal_step}")
 
-            t1 = time.time()
             for _ in range(int(self.speed * trapezoidal_step)):
                 GPIO.output(self.step_pin, GPIO.HIGH)
                 time.sleep(delay)
                 GPIO.output(self.step_pin, GPIO.LOW)
                 time.sleep(delay)
-            t2 = time.time()
+                self.step_position += 1
+
+            if self.step_position >= steps:
+                break
 
         self.angle = target_angle
 

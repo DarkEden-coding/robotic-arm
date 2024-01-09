@@ -5,7 +5,7 @@ import math
 GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
 
 degrees_per_step = 1.8
-trapezoidal_step = 0.1
+trapezoidal_step = 0.01
 
 
 def cleanup():

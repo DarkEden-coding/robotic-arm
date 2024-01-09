@@ -219,7 +219,7 @@ class StepperMotorController:
         stage = 0
         self.speed = starting_speed_steps
         for step in range(int(steps)):
-            print(acceleration_steps)
+            print(trapezoidal_step)
             self.speed, stage = get_speed(
                 self.speed,
                 max_speed_steps,

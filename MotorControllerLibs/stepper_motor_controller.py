@@ -25,7 +25,7 @@ def get_movement_lengths(max_speed, accel, initial_speed, target_distance):
     :return:
     """
     accel_time = max_speed / accel
-    dist_over_accel = (initial_speed * accel_time) + (1 / 2 * accel * (accel_time ** 2))
+    dist_over_accel = (initial_speed * accel_time) + (1 / 2 * accel * (accel_time**2))
     linear_movement_length = target_distance - (2 * dist_over_accel)
 
     return dist_over_accel, linear_movement_length
@@ -53,14 +53,14 @@ def total_movement_time(acceleration, max_speed, linear_movement_length, target)
 
 
 def get_speed(
-        current_speed,
-        max_speed,
-        acceleration,
-        dist_over_accel,
-        linear_movement_length,
-        position,
-        target_distance,
-        stage=0,
+    current_speed,
+    max_speed,
+    acceleration,
+    dist_over_accel,
+    linear_movement_length,
+    position,
+    target_distance,
+    stage=0,
 ):
     """
     Get the speed of the motor
@@ -82,13 +82,14 @@ def get_speed(
         return current_speed, 0
     else:
         if current_speed < max_speed and stage == 0:
-            current_speed = float(current_speed) + float(acceleration * trapezoidal_step)
+            current_speed = float(current_speed) + float(
+                acceleration * trapezoidal_step
+            )
         elif position < target_distance - dist_over_accel and (
-                stage == 0 or stage == 1
+            stage == 0 or stage == 1
         ):
             stage = 1
             current_speed = max_speed
-            pass
         elif stage == 1 or stage == 2:
             current_speed -= acceleration * trapezoidal_step
             stage = 2
@@ -106,15 +107,15 @@ microstep_map = {
 
 class StepperMotorController:
     def __init__(
-            self,
-            enable_pin: int,
-            dir_pin: int,
-            step_pin: int,
-            micro_step_pins: tuple,
-            acceleration: float,
-            max_speed: float,
-            starting_speed: float,
-            gear_ratio: float,
+        self,
+        enable_pin: int,
+        dir_pin: int,
+        step_pin: int,
+        micro_step_pins: tuple,
+        acceleration: float,
+        max_speed: float,
+        starting_speed: float,
+        gear_ratio: float,
     ):
         """
         Stepper motor controller class
@@ -143,6 +144,7 @@ class StepperMotorController:
         self.micro_steps = 8
         self.speed = 0
         self.step_position = 0
+        self.current_angle = 0
 
         self.process = None
 
@@ -177,8 +179,11 @@ class StepperMotorController:
         GPIO.output(self.micro_step_pins, microstep_map[micro_steps])
         self.micro_steps = micro_steps
 
-    def _move_to_angle(self, target_angle):
+    def _move_to_angle(self, target_angle, relative):
         GPIO.setmode(GPIO.BCM)
+
+        if not relative:
+            target_angle = target_angle - self.current_angle
 
         fixed_degrees_per_step = degrees_per_step / self.micro_steps
         steps = target_angle / fixed_degrees_per_step
@@ -196,10 +201,6 @@ class StepperMotorController:
 
         dist_over_accel, linear_movement_length = get_movement_lengths(
             max_speed_steps, acceleration_steps, starting_speed_steps, steps
-        )
-
-        time_estimate = total_movement_time(
-            acceleration_steps, max_speed_steps, linear_movement_length, steps
         )
 
         stage = 0
@@ -222,8 +223,6 @@ class StepperMotorController:
             else:
                 delay = (trapezoidal_step / (self.speed * trapezoidal_step)) / 2
 
-            # print(f"steps: {self.speed * trapezoidal_step}")
-
             for _ in range(int(self.speed * trapezoidal_step)):
                 GPIO.output(self.step_pin, GPIO.HIGH)
                 time.sleep(delay)
@@ -234,6 +233,7 @@ class StepperMotorController:
 
             if self.step_position >= steps:
                 break
+        self.current_angle = target_angle
 
     def wait_until_stopped(self):
         """
@@ -242,18 +242,21 @@ class StepperMotorController:
         """
         self.process.join()
 
-    def move_to_angle(self, target_angle, threaded=False):
+    def move_to_angle(self, target_angle, threaded=False, relative=False):
         """
         Move the stepper motor to a specific angle
         :param target_angle: the target angle in degrees
         :param threaded: whether or not to thread the movement
+        :param relative: whether or not the movement is relative to the current position instead of absolute
         :return:
         """
         if threaded:
-            self.process = Thread(target=self._move_to_angle, args=(target_angle,))
+            self.process = Thread(
+                target=self._move_to_angle, args=(target_angle, relative)
+            )
             self.process.start()
         else:
-            self._move_to_angle(target_angle)
+            self._move_to_angle(target_angle, relative)
 
     def force_move_steps(self, steps):
         """
@@ -266,7 +269,7 @@ class StepperMotorController:
 
         steps = abs(steps)
 
-        for step in range(int(steps)):
+        for _ in range(int(steps)):
             GPIO.output(self.step_pin, GPIO.HIGH)
             time.sleep(0.001)
             GPIO.output(self.step_pin, GPIO.LOW)

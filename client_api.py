@@ -57,8 +57,6 @@ def send_command(command):
             print(f"Sent: {command}")
             print(f"Received: {pickle.loads(received_data)}")
 
-            # raise ConnectionError("Server did not receive the message")
-
     if return_from_function:
         # Receive data
         received_data = b""

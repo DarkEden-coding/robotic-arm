@@ -1,5 +1,5 @@
 import socket
-from CAN_Control.odrive_controller import odrive_controller
+from MotorControllerLibs.CANControlledMotors.odrive_controller import odrive_controller
 from inverse_kinematics import get_angles, get_trajectory, get_pos_from_angles
 import sys
 import traceback
@@ -16,9 +16,9 @@ global arm_object, function_map
 
 class Arm:
     def __init__(self, base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas):
-        self.base_controller = odrive_controller(base_nodeid)
+        self.base_controller = odrive_controller(base_nodeid, motor_reversed=True)
         self.shoulder_controller = odrive_controller(shoulder_nodeid, gear_ratio=125)
-        self.elbow_controller = odrive_controller(elbow_nodeid)
+        self.elbow_controller = odrive_controller(elbow_nodeid, motor_reversed=True)
         self.restricted_areas = restricted_areas
 
     def move(self, pos, wait_for_move=True):

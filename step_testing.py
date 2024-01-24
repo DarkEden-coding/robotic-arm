@@ -1,4 +1,4 @@
-from stepper_motor_controller import StepperMotorController, cleanup
+from MotorControllerLibs.stepper_motor_controller import StepperMotorController, cleanup
 from constants import (
     max_speed_stepper,
     acceleration_stepper,
@@ -45,7 +45,6 @@ try:
     pitch_motor.move_to_angle(-90, threaded=True)
 except KeyboardInterrupt:
     print("KeyboardInterrupt")
-    pass
 
 yaw_motor.disable_motor()
 pitch_motor.disable_motor()

@@ -1,4 +1,4 @@
-from CAN_Control.can_functions import (
+from MotorControllerLibs.CANControlledMotors.can_functions import (
     bus,
     send_bus_message,
     get_property_value,
@@ -16,7 +16,6 @@ def setup(node_id, gear_ratio):
     print("Waiting for main power...")
     while get_property_value("vbus_voltage", node_id) < 40:
         print(get_property_value("vbus_voltage", node_id))
-        pass
     print("Main power detected")
 
     cmd_id = 0x01  # heartbeat command ID
@@ -28,8 +27,8 @@ def setup(node_id, gear_ratio):
             break
 
     # Flush CAN RX buffer so there are no more old pending messages
-    while not (bus.recv(timeout=0) is None):
-        pass
+    while bus.recv(timeout=0) is not None:
+        sleep(0.01)
 
     # Send read command
     bus.send(
@@ -97,8 +96,8 @@ def setup(node_id, gear_ratio):
             break
 
     # Flush CAN RX buffer so there are no more old pending messages
-    while not (bus.recv(timeout=0) is None):
-        pass
+    while bus.recv(timeout=0) is not None:
+        sleep(0.01)
 
     # Send read command
     bus.send(
@@ -144,17 +143,20 @@ def error_message(message):
 
 
 class odrive_controller:
-    def __init__(self, id_number, gear_ratio=25):
+    def __init__(self, id_number, gear_ratio=25, motor_reversed=False):
         """
         Odive controller class
         :param id_number: the CAN Bus ID of the ODrive
         :param gear_ratio: The gear ratio of the motor, it is in terms of x:1.
+        :param motor_reversed: Whether or not the motor is reversed
         """
         self.node_id = id_number
         self.enabled = False
         self.position = 0
         self.requested_position = 0
         self.gear_ratio = gear_ratio
+
+        self.reversed = motor_reversed
 
         self.max_speed = max_speed * (self.gear_ratio / 25)
         self.max_accel = max_accel * (self.gear_ratio / 25)
@@ -230,7 +232,7 @@ class odrive_controller:
 
     def wait_for_move(self, delay=0.05):
         while abs(self.requested_position - self.get_encoder_pos()) > 0.1:
-            pass
+            sleep(0.01)
         sleep(delay)
         print("Move complete")
 
@@ -259,6 +261,9 @@ class odrive_controller:
         original_speed = self.max_speed
         original_accel = self.max_accel
         original_decel = self.max_decel
+
+        if self.reversed:
+            angle = -angle
 
         if speed_offset != 1:
             self.set_speed(self.max_speed * speed_offset)

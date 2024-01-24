@@ -3,6 +3,7 @@ import struct
 import json
 import subprocess
 from threading import Lock
+from time import sleep
 
 can_bus_lock = Lock()
 
@@ -135,8 +136,8 @@ def get_property_value(obj_path, node_id):
         endpoint_type = endpoints[obj_path]["type"]
 
         # Flush CAN RX buffer so there are no more old pending messages
-        while not (bus.recv(timeout=0) is None):
-            pass
+        while bus.recv(timeout=0) is not None:
+            sleep(0.01)
 
         # Send read command
         bus.send(

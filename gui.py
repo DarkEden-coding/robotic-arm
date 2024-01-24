@@ -14,6 +14,8 @@ from client_api import (
 from threading import Thread
 from time import sleep
 
+tmp_image_path = "Screenshot 2023-11-27 212549.png"
+
 print("Starting GUI and setting up connection to server...")
 
 setup()
@@ -36,10 +38,10 @@ class VisualizationFrame(customtkinter.CTkFrame):
         super().__init__(master)
 
         self.image = customtkinter.CTkImage(
-            light_image=Image.open("Screenshot 2023-11-27 212549.png"),
+            light_image=Image.open(tmp_image_path),
             size=(
-                Image.open("Screenshot 2023-11-27 212549.png").size[0] / 2,
-                Image.open("Screenshot 2023-11-27 212549.png").size[1] / 2,
+                int(Image.open(tmp_image_path).size[0] / 2),
+                int(Image.open(tmp_image_path).size[1] / 2),
             ),
         )
 

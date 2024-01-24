@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 NetworkTables.initialize()
-sd = NetworkTables.getTable("SmartDashboard")
+sd = NetworkTables.getTable("RoboticArmData")
 
 i = 0
 while True:

@@ -4,7 +4,7 @@ from constants import (
 )
 import math
 import numpy as np
-from geometry import (
+from MathFunctions.geometry import (
     Vector3,
     rotate_point,
     rotate_point_around_axis,

@@ -7,7 +7,7 @@ from time import sleep
 
 can_bus_lock = Lock()
 
-with open("flat_endpoints.json", "r") as f:
+with open("MotorControllerLibs/CANControlledMotors/flat_endpoints.json", "r") as f:
     endpoint_data = json.load(f)
     endpoints = endpoint_data["endpoints"]
 

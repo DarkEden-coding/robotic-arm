@@ -215,11 +215,11 @@ def main():
     print(Colors.GREEN + "Starting server..." + Colors.RESET)
     print(
         Colors.YELLOW
-        + "Connecting Network Tables to {NetworkTablesConstants.ip}"
+        + f"Connecting Network Tables to: {NetworkTablesConstants.ip} at port: {NetworkTablesConstants.port}"
         + Colors.RESET
     )
 
-    NetworkTables.initialize(server=NetworkTablesConstants.ip)
+    NetworkTables.initialize()
     data_table = NetworkTables.getTable("RoboticArmData")
 
     print(Colors.GREEN + "Connected to Network Tables" + Colors.RESET)

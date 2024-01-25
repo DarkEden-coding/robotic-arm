@@ -1,14 +1,13 @@
 import customtkinter
 from PIL import Image
-from client_api import (
+from client_api_v2 import (
     setup,
     enable_motors,
     disable_motors,
     shutdown,
-    set_percent_speed,
+    set_percentage_speed,
     move,
     emergency_stop,
-    close_connection,
     get_position,
 )
 from threading import Thread
@@ -162,7 +161,7 @@ class MovementFrame(customtkinter.CTkFrame):
         self.settings_frame.add_text_to_command_textbox(
             f"Setting percent speed to {self.speed_slider.get() / 100}%..."
         )
-        set_percent_speed(self.speed_slider.get() / 100)
+        set_percentage_speed(self.speed_slider.get() / 100)
 
     def move_to_target(self):
         self.settings_frame.add_text_to_command_textbox(
@@ -173,7 +172,8 @@ class MovementFrame(customtkinter.CTkFrame):
                 float(self.target_x_entry.get()),
                 float(self.target_y_entry.get()),
                 float(self.target_z_entry.get()),
-            )
+            ),
+            (0, 0),
         )
 
     def __enable_motors(self):
@@ -191,10 +191,6 @@ class MovementFrame(customtkinter.CTkFrame):
     def __emergency_stop(self):
         self.settings_frame.add_text_to_command_textbox("Emergency stopping...")
         emergency_stop()
-
-    def __close_connection(self):
-        self.settings_frame.add_text_to_command_textbox("Closing connection...")
-        close_connection()
 
 
 class SettingsFrame(customtkinter.CTkFrame):
@@ -251,5 +247,3 @@ class App(customtkinter.CTk):
 
 app = App()
 app.mainloop()
-
-close_connection()

@@ -1,41 +1,56 @@
-from constants import NetworkTablesConstants, CanIds, restricted_areas
+from constants import NetworkTablesConstants, restricted_areas_encoded
 from networktables import NetworkTables
+from time import sleep
 
 NetworkTables.initialize(server=NetworkTablesConstants.ip)
 
-table = NetworkTables.getTable("RoboticArmData")
+data_table = NetworkTables.getTable("RoboticArmData")
 
 
 def setup():
-    table.putNumber("base_nodeid", CanIds.base_nodeid)
-    table.putNumber("shoulder_nodeid", CanIds.shoulder_nodeid)
-    table.putNumber("elbow_nodeid", CanIds.elbow_nodeid)
-    table.putValue("restricted_areas", restricted_areas)
+    data_table.putStringArray("restricted_areas", restricted_areas_encoded)
+
+    data_table.putBoolean("enable_motors", False)
+    data_table.putBoolean("shutdown", False)
+    data_table.putBoolean("emergency_stop", False)
+    data_table.putNumber("percentage_speed", 1)
+    data_table.putValue("target_position", (0, 0, 0))
+    data_table.putBoolean("moving", False)
+    data_table.putValue("current_position", (0, 0, 0))
+
+    data_table.putBoolean("setup", True)
 
 
 def enable_motors():
-    table.putBoolean("enable_motors", True)
+    data_table.putBoolean("enable_motors", True)
 
 
 def disable_motors():
-    table.putBoolean("enable_motors", False)
+    data_table.putBoolean("enable_motors", False)
 
 
 def shutdown():
-    table.putBoolean("shutdown", True)
+    data_table.putBoolean("shutdown", True)
 
 
 def set_percentage_speed(percentage_speed):
-    table.putNumber("percentage_speed", percentage_speed)
+    data_table.putNumber("percentage_speed", percentage_speed)
 
 
-def move(pos, wait_for_finish=False):
-    table.putNumber("target_position", pos)
+def move(pos, rotations, wait_for_finish=False):
+    if not data_table.getBoolean("moving", False):
+        data_table.putValue("target_position", pos)
+        data_table.putValue("target_rotations", rotations)
+        data_table.putBoolean("request", True)
+
+        if wait_for_finish:
+            while data_table.getBoolean("moving", True):
+                sleep(0.1)
 
 
 def emergency_stop():
-    table.putBoolean("emergency_stop", True)
+    data_table.putBoolean("emergency_stop", True)
 
 
 def get_position():
-    return table.getValue("current_position", (0, 0, 0))
+    return data_table.getValue("current_position", (0, 0, 0))

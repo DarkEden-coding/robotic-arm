@@ -146,12 +146,19 @@ class StepperMotorController:
         self.step_position = 0
         self.current_angle = 0
 
-        self.process = None
+        self.movement_thread = None
+
+        self.emergency_stop = False
+
+        self.moving = False
 
         GPIO.setup(self.enable_pin, GPIO.OUT)
         GPIO.setup(self.dir_pin, GPIO.OUT)
         GPIO.setup(self.step_pin, GPIO.OUT)
         GPIO.setup(self.micro_step_pins, GPIO.OUT)
+
+    def emergency_stop(self):
+        self.emergency_stop = True
 
     def enable_motor(self):
         """
@@ -182,6 +189,8 @@ class StepperMotorController:
     def _move_to_angle(self, target_angle, relative):
         GPIO.setmode(GPIO.BCM)
 
+        self.enable_motor()
+
         if not relative:
             target_angle = target_angle - self.current_angle
 
@@ -206,7 +215,11 @@ class StepperMotorController:
         stage = 0
         self.speed = starting_speed_steps
         self.step_position = 0
+        self.moving = True
         while True:
+            if self.emergency_stop:
+                break
+
             self.speed, stage = get_speed(
                 self.speed,
                 max_speed_steps,
@@ -236,30 +249,37 @@ class StepperMotorController:
 
             if self.step_position >= steps:
                 break
-        self.current_angle = target_angle
 
-    def wait_until_stopped(self):
+            # set the current angle
+            if direction == GPIO.HIGH:
+                self.current_angle += self.step_position * fixed_degrees_per_step
+            else:
+                self.current_angle -= self.step_position * fixed_degrees_per_step
+        self.current_angle = target_angle
+        self.moving = False
+
+    def get_angle(self):
+        return self.current_angle
+
+    def wait_for_move(self):
         """
         Wait until the stepper motor is stopped
         :return:
         """
-        self.process.join()
+        self.movement_thread.join()
 
-    def move_to_angle(self, target_angle, threaded=False, relative=False):
+    def move_to_angle(self, target_angle, relative=False):
         """
         Move the stepper motor to a specific angle
         :param target_angle: the target angle in degrees
-        :param threaded: whether or not to thread the movement
-        :param relative: whether or not the movement is relative to the current position instead of absolute
+        :param wait_for_move: whether to wait for the movement to finish
+        :param relative: whether the movement is relative to the current position instead of absolute
         :return:
         """
-        if threaded:
-            self.process = Thread(
-                target=self._move_to_angle, args=(target_angle, relative)
-            )
-            self.process.start()
-        else:
-            self._move_to_angle(target_angle, relative)
+        self.movement_thread = Thread(
+            target=self._move_to_angle, args=(target_angle, relative)
+        )
+        self.movement_thread.start()
 
     def force_move_steps(self, steps):
         """

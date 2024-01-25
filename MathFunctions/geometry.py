@@ -2,6 +2,17 @@ import math
 import numpy as np
 
 
+def decode_string_to_cube(string):
+    """
+    Decode a string into a Cube object.
+    :param string: the string to decode
+    :return:
+    """
+    corner1 = tuple(string.split(" ")[:3])
+    corner2 = tuple(string.split(" ")[3:])
+    return Cube(corner1, corner2)
+
+
 class Cube:
     def __init__(self, corner1, corner2):
         """
@@ -9,6 +20,8 @@ class Cube:
         :param corner1: Tuple (x, y, z) representing one corner of the cube.
         :param corner2: Tuple (x, y, z) representing the opposite corner of the cube.
         """
+        self.corner1 = corner1
+        self.corner2 = corner2
         self.min_x = min(corner1[0], corner2[0])
         self.max_x = max(corner1[0], corner2[0])
         self.min_y = min(corner1[1], corner2[1])
@@ -28,6 +41,9 @@ class Cube:
             and self.min_y <= y <= self.max_y
             and self.min_z <= z <= self.max_z
         )
+
+    def encode(self):
+        return f"{self.corner1[0]} {self.corner1[1]} {self.corner1[2]} {self.corner2[0]} {self.corner2[1]} {self.corner2[2]}"
 
 
 class Vector3:
@@ -148,17 +164,34 @@ def rotate_point_around_axis(point, axis_start, axis_end, angle_degrees):
     axis_unit_vector = axis_vector / np.linalg.norm(axis_vector)
 
     # Create the rotation matrix
-    rotation_matrix = np.array([
-        [np.cos(angle_radians) + axis_unit_vector[0]**2 * (1 - np.cos(angle_radians)),
-         axis_unit_vector[0] * axis_unit_vector[1] * (1 - np.cos(angle_radians)) - axis_unit_vector[2] * np.sin(angle_radians),
-         axis_unit_vector[0] * axis_unit_vector[2] * (1 - np.cos(angle_radians)) + axis_unit_vector[1] * np.sin(angle_radians)],
-        [axis_unit_vector[1] * axis_unit_vector[0] * (1 - np.cos(angle_radians)) + axis_unit_vector[2] * np.sin(angle_radians),
-         np.cos(angle_radians) + axis_unit_vector[1]**2 * (1 - np.cos(angle_radians)),
-         axis_unit_vector[1] * axis_unit_vector[2] * (1 - np.cos(angle_radians)) - axis_unit_vector[0] * np.sin(angle_radians)],
-        [axis_unit_vector[2] * axis_unit_vector[0] * (1 - np.cos(angle_radians)) - axis_unit_vector[1] * np.sin(angle_radians),
-         axis_unit_vector[2] * axis_unit_vector[1] * (1 - np.cos(angle_radians)) + axis_unit_vector[0] * np.sin(angle_radians),
-         np.cos(angle_radians) + axis_unit_vector[2]**2 * (1 - np.cos(angle_radians))]
-    ])
+    rotation_matrix = np.array(
+        [
+            [
+                np.cos(angle_radians)
+                + axis_unit_vector[0] ** 2 * (1 - np.cos(angle_radians)),
+                axis_unit_vector[0] * axis_unit_vector[1] * (1 - np.cos(angle_radians))
+                - axis_unit_vector[2] * np.sin(angle_radians),
+                axis_unit_vector[0] * axis_unit_vector[2] * (1 - np.cos(angle_radians))
+                + axis_unit_vector[1] * np.sin(angle_radians),
+            ],
+            [
+                axis_unit_vector[1] * axis_unit_vector[0] * (1 - np.cos(angle_radians))
+                + axis_unit_vector[2] * np.sin(angle_radians),
+                np.cos(angle_radians)
+                + axis_unit_vector[1] ** 2 * (1 - np.cos(angle_radians)),
+                axis_unit_vector[1] * axis_unit_vector[2] * (1 - np.cos(angle_radians))
+                - axis_unit_vector[0] * np.sin(angle_radians),
+            ],
+            [
+                axis_unit_vector[2] * axis_unit_vector[0] * (1 - np.cos(angle_radians))
+                - axis_unit_vector[1] * np.sin(angle_radians),
+                axis_unit_vector[2] * axis_unit_vector[1] * (1 - np.cos(angle_radians))
+                + axis_unit_vector[0] * np.sin(angle_radians),
+                np.cos(angle_radians)
+                + axis_unit_vector[2] ** 2 * (1 - np.cos(angle_radians)),
+            ],
+        ]
+    )
 
     # Convert point and axis to NumPy arrays for easier manipulation
     point = np.array(point)

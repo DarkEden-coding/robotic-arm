@@ -1,4 +1,5 @@
 from MathFunctions.geometry import Cube
+from MotorControllerLibs.stepper_motor_controller import StepperMotorController
 
 
 class CanIds:
@@ -45,14 +46,37 @@ class StepperConstants:
     # Speed Curve
     # -----------
 
-    max_speed_stepper = 360
-    acceleration_stepper = 240
-    starting_speed_stepper = 0
+    max_speed = 360
+    acceleration = 240
+    starting_speed = 0
+
+    yaw_motor = StepperMotorController(
+        enable_pin=2,
+        dir_pin=27,
+        step_pin=17,
+        micro_step_pins=(3, 4),
+        acceleration=acceleration,
+        max_speed=max_speed,
+        starting_speed=starting_speed,
+        gear_ratio=4,
+    )
+
+    pitch_motor = StepperMotorController(
+        enable_pin=0,
+        dir_pin=12,
+        step_pin=1,
+        micro_step_pins=(5, 6),
+        acceleration=acceleration,
+        max_speed=max_speed,
+        starting_speed=starting_speed,
+        gear_ratio=2,
+    )
 
 
 class NetworkTablesConstants:
     ip = "arm.local"
     port = 1735
+    refresh_rate = 60  # hz
 
 
 restricted_areas = [
@@ -60,14 +84,18 @@ restricted_areas = [
     Cube((-450, -1000, 500), (-800, 1000, -715)),
     Cube((-450, 800, 0), (230, 1280, 750)),
 ]
+# encode restricted areas into one string
+restricted_areas_encoded = []
+for area in restricted_areas:
+    restricted_areas_encoded.append(area.encode())
 
-return_map = {
-    "setup": False,
-    "move": False,
-    "shutdown": False,
-    "enable_motors": False,
-    "disable_motors": False,
-    "set_percent_speed": False,
-    "emergency_stop": False,
-    "get_position": True,
-}
+
+# ANSI escape codes for colors
+class Colors:
+    RESET = "\033[0m"
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    PURPLE = "\033[95m"
+    CYAN = "\033[96m"

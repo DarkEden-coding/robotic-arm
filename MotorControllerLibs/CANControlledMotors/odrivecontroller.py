@@ -8,6 +8,7 @@ import can
 import struct
 from time import sleep
 from constants import OdriveSpeeds
+import threading
 
 
 def setup(node_id, gear_ratio):
@@ -148,7 +149,7 @@ def error_message(message):
     print(f"{red_text}Error: {message}{reset_text}")
 
 
-class odrive_controller:
+class OdriveController:
     def __init__(self, id_number, gear_ratio=25, motor_reversed=False):
         """
         Odive controller class
@@ -170,6 +171,8 @@ class odrive_controller:
 
         setup(self.node_id, self.gear_ratio)
         self.zero_motor()
+
+        self.moving = False
 
     def enable_motor(self):
         send_bus_message(8, "axis0.requested_state", self.node_id)
@@ -242,7 +245,11 @@ class odrive_controller:
         sleep(delay)
         print("Move complete")
 
-    def move_to_pos(self, pos):
+    def check_for_move(self):
+        self.wait_for_move()
+        self.moving = False
+
+    def move_to_rotation(self, pos):
         """
         Move to a position
         :param pos: pos in revolutions
@@ -252,7 +259,11 @@ class odrive_controller:
         if not self.enabled:
             warning_message("Motor is not enabled, enabling...")
             self.enable_motor()
+        self.moving = True
         send_bus_message(pos, "axis0.controller.input_pos", self.node_id)
+
+        moving_thread = threading.Thread(target=self.check_for_move)
+        moving_thread.start()
 
         self.requested_position = pos
         self.position = (pos * 360) / self.gear_ratio
@@ -281,7 +292,7 @@ class odrive_controller:
 
         print(f"Moving to angle {angle} by going to {revolutions} revolutions...")
 
-        self.move_to_pos(revolutions)
+        self.move_to_rotation(revolutions)
 
         self.max_speed = original_speed
         self.max_accel = original_accel
@@ -300,4 +311,4 @@ class odrive_controller:
 
     def emergency_stop(self):
         self.set_speed(0)
-        self.move_to_pos(self.get_encoder_pos())
+        self.move_to_rotation(self.get_encoder_pos())

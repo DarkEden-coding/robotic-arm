@@ -1,5 +1,4 @@
 from MathFunctions.geometry import Cube
-from MotorControllerLibs.stepper_motor_controller import StepperMotorController
 
 
 class CanIds:
@@ -49,28 +48,6 @@ class StepperConstants:
     max_speed = 360
     acceleration = 240
     starting_speed = 0
-
-    yaw_motor = StepperMotorController(
-        enable_pin=2,
-        dir_pin=27,
-        step_pin=17,
-        micro_step_pins=(3, 4),
-        acceleration=acceleration,
-        max_speed=max_speed,
-        starting_speed=starting_speed,
-        gear_ratio=4,
-    )
-
-    pitch_motor = StepperMotorController(
-        enable_pin=0,
-        dir_pin=12,
-        step_pin=1,
-        micro_step_pins=(5, 6),
-        acceleration=acceleration,
-        max_speed=max_speed,
-        starting_speed=starting_speed,
-        gear_ratio=2,
-    )
 
 
 class NetworkTablesConstants:

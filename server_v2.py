@@ -6,6 +6,7 @@ from MathFunctions.inverse_kinematics import (
     get_wrist_position,
     get_wrist_angles,
 )
+from MotorControllerLibs.stepper_motor_controller import StepperMotorController
 from constants import CanIds, StepperConstants, NetworkTablesConstants, Colors
 from networktables import NetworkTables
 from logging import basicConfig, DEBUG
@@ -29,8 +30,27 @@ class Arm:
             CanIds.elbow_nodeid, motor_reversed=True
         )
 
-        self.yaw_motor = StepperConstants.yaw_motor
-        self.pitch_motor = StepperConstants.pitch_motor
+        self.yaw_motor = StepperMotorController(
+            enable_pin=2,
+            dir_pin=27,
+            step_pin=17,
+            micro_step_pins=(3, 4),
+            acceleration=StepperConstants.acceleration,
+            max_speed=StepperConstants.max_speed,
+            starting_speed=StepperConstants.starting_speed,
+            gear_ratio=4,
+        )
+
+        self.pitch_motor = StepperMotorController(
+            enable_pin=0,
+            dir_pin=12,
+            step_pin=1,
+            micro_step_pins=(5, 6),
+            acceleration=StepperConstants.acceleration,
+            max_speed=StepperConstants.max_speed,
+            starting_speed=StepperConstants.starting_speed,
+            gear_ratio=2,
+        )
 
         self.restricted_areas = restricted_areas
 

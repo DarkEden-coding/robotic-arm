@@ -9,11 +9,8 @@ from MathFunctions.inverse_kinematics import (
 from MotorControllerLibs.stepper_motor_controller import StepperMotorController
 from constants import CanIds, StepperConstants, NetworkTablesConstants, Colors
 from networktables import NetworkTables
-from logging import basicConfig, DEBUG
 from time import sleep, time
 from MathFunctions.geometry import decode_string_to_cube
-
-basicConfig(level=DEBUG)
 
 
 class Arm:

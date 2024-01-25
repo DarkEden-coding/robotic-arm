@@ -14,7 +14,7 @@ from client_api import (
 from threading import Thread
 from time import sleep
 
-tmp_image_path = "Screenshot 2023-11-27 212549.png"
+tmp_image_path = "Assets/Screenshot 2023-11-27 212549.png"
 
 print("Starting GUI and setting up connection to server...")
 

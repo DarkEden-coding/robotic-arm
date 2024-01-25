@@ -1,17 +1,15 @@
 import socket
 from constants import (
-    socket_constants,
+    SocketConstants,
     restricted_areas,
-    base_nodeid,
-    shoulder_nodeid,
-    elbow_nodeid,
     return_map,
+    CanIds,
 )
 import pickle
 
-HOST = socket_constants["host"]
-PORT = socket_constants["port"]
-PASSWORD = socket_constants["password"]
+HOST = SocketConstants.host
+PORT = SocketConstants.port
+PASSWORD = SocketConstants.password
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -32,7 +30,7 @@ def send_command(command):
     serialized_data = pickle.dumps(command)
     server_socket.sendall(serialized_data)
 
-    if socket_constants["function_check"]:
+    if SocketConstants.function_check:
         print("Waiting for server to receive the message")
 
         # Receive data
@@ -88,7 +86,12 @@ def setup():
     send_command(
         {
             "function_name": "setup",
-            "args": [base_nodeid, shoulder_nodeid, elbow_nodeid, restricted_areas],
+            "args": [
+                CanIds.base_nodeid,
+                CanIds.shoulder_nodeid,
+                CanIds.elbow_nodeid,
+                restricted_areas,
+            ],
             "password": PASSWORD,
         }
     )

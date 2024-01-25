@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 import math
-from constants import trapezoidal_step, degrees_per_step
+from constants import StepperConstants
 from threading import Thread
 
 GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
@@ -76,14 +76,14 @@ def get_speed(
     """
     if linear_movement_length <= 0:
         if position < (target_distance / 2):
-            current_speed += acceleration * trapezoidal_step
+            current_speed += acceleration * StepperConstants.trapezoidal_step
         else:
-            current_speed -= acceleration * trapezoidal_step
+            current_speed -= acceleration * StepperConstants.trapezoidal_step
         return current_speed, 0
     else:
         if current_speed < max_speed and stage == 0:
             current_speed = float(current_speed) + float(
-                acceleration * trapezoidal_step
+                acceleration * StepperConstants.trapezoidal_step
             )
         elif position < target_distance - dist_over_accel and (
             stage == 0 or stage == 1
@@ -91,7 +91,7 @@ def get_speed(
             stage = 1
             current_speed = max_speed
         elif stage == 1 or stage == 2:
-            current_speed -= acceleration * trapezoidal_step
+            current_speed -= acceleration * StepperConstants.trapezoidal_step
             stage = 2
 
         return current_speed, stage
@@ -185,7 +185,7 @@ class StepperMotorController:
         if not relative:
             target_angle = target_angle - self.current_angle
 
-        fixed_degrees_per_step = degrees_per_step / self.micro_steps
+        fixed_degrees_per_step = StepperConstants.degrees_per_step / self.micro_steps
         steps = target_angle / fixed_degrees_per_step
 
         steps = steps * self.gear_ratio
@@ -218,12 +218,15 @@ class StepperMotorController:
                 stage,
             )
 
-            if self.speed * trapezoidal_step <= 0:
+            if self.speed * StepperConstants.trapezoidal_step <= 0:
                 break
             else:
-                delay = (trapezoidal_step / (self.speed * trapezoidal_step)) / 2
+                delay = (
+                    StepperConstants.trapezoidal_step
+                    / (self.speed * StepperConstants.trapezoidal_step)
+                ) / 2
 
-            for _ in range(int(self.speed * trapezoidal_step)):
+            for _ in range(int(self.speed * StepperConstants.trapezoidal_step)):
                 GPIO.output(self.step_pin, GPIO.HIGH)
                 time.sleep(delay)
                 GPIO.setmode(GPIO.BCM)

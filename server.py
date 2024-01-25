@@ -1,15 +1,19 @@
 import socket
 from MotorControllerLibs.CANControlledMotors.odrive_controller import odrive_controller
-from inverse_kinematics import get_angles, get_trajectory, get_pos_from_angles
+from MathFunctions.inverse_kinematics import (
+    get_angles,
+    get_trajectory,
+    get_pos_from_angles,
+)
 import sys
 import traceback
-from constants import socket_constants
+from constants import SocketConstants
 import pickle
 
-HOST = socket_constants["host"]
+HOST = SocketConstants.host
 
-PORT = socket_constants["port"]
-PASSWORD = socket_constants["password"]
+PORT = SocketConstants.port
+PASSWORD = SocketConstants.password
 
 global arm_object, function_map
 
@@ -177,7 +181,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         print("Incorrect password")
                         break
 
-                if socket_constants["function_check"]:
+                if SocketConstants.function_check:
                     print(f"Sending: {received_data}")
                     conn.sendall(received_data)
 

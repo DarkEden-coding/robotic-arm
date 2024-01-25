@@ -7,7 +7,7 @@ from MotorControllerLibs.CANControlledMotors.can_functions import (
 import can
 import struct
 from time import sleep
-from constants import max_speed, max_accel, max_decel
+from constants import OdriveSpeeds
 
 
 def setup(node_id, gear_ratio):
@@ -77,14 +77,20 @@ def setup(node_id, gear_ratio):
     send_bus_message(5, "axis0.controller.config.input_mode", node_id)
 
     send_bus_message(
-        max_speed * (gear_ratio / 25), "axis0.trap_traj.config.vel_limit", node_id
+        OdriveSpeeds.max_speed * (gear_ratio / 25),
+        "axis0.trap_traj.config.vel_limit",
+        node_id,
     )
 
     send_bus_message(
-        max_accel * (gear_ratio / 25), "axis0.trap_traj.config.accel_limit", node_id
+        OdriveSpeeds.max_accel * (gear_ratio / 25),
+        "axis0.trap_traj.config.accel_limit",
+        node_id,
     )
     send_bus_message(
-        max_decel * (gear_ratio / 25), "axis0.trap_traj.config.decel_limit", node_id
+        OdriveSpeeds.max_decel * (gear_ratio / 25),
+        "axis0.trap_traj.config.decel_limit",
+        node_id,
     )
 
     # save configuration
@@ -158,9 +164,9 @@ class odrive_controller:
 
         self.reversed = motor_reversed
 
-        self.max_speed = max_speed * (self.gear_ratio / 25)
-        self.max_accel = max_accel * (self.gear_ratio / 25)
-        self.max_decel = max_decel * (self.gear_ratio / 25)
+        self.max_speed = OdriveSpeeds.max_speed * (self.gear_ratio / 25)
+        self.max_accel = OdriveSpeeds.max_accel * (self.gear_ratio / 25)
+        self.max_decel = OdriveSpeeds.max_decel * (self.gear_ratio / 25)
 
         setup(self.node_id, self.gear_ratio)
         self.zero_motor()
@@ -287,8 +293,10 @@ class odrive_controller:
         :param speed: percentage of max values
         :return:
         """
-        self.set_speed(max_speed * speed)
-        self.set_accel_decel(max_accel * speed, max_decel * speed)
+        self.set_speed(OdriveSpeeds.max_speed * speed)
+        self.set_accel_decel(
+            OdriveSpeeds.max_accel * speed, OdriveSpeeds.max_decel * speed
+        )
 
     def emergency_stop(self):
         self.set_speed(0)

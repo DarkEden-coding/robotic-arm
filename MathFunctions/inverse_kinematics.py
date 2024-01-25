@@ -1,10 +1,6 @@
 from constants import (
-    arm_1_length,
-    arm_2_length,
-    end_effector_length,
-    shoulder_y_offset,
-    height_to_shoulder,
-    position_error_offsets,
+    Lengths,
+    Offsets,
 )
 import math
 import numpy as np
@@ -26,17 +22,17 @@ def get_angles(x_pos, y_pos, z_pos, restricted_ares):
     :return: angles in radians (base angle, shoulder angle, elbow angle)
     """
     # soh cah toa
-    z_pos -= height_to_shoulder
+    z_pos -= Offsets.height_to_shoulder
 
-    x_pos += position_error_offsets[0]
-    y_pos += position_error_offsets[1]
-    z_pos += position_error_offsets[2]
+    x_pos += Offsets.position_error_offsets[0]
+    y_pos += Offsets.position_error_offsets[1]
+    z_pos += Offsets.position_error_offsets[2]
 
     if is_point_in_any_cube(restricted_ares, (x_pos, y_pos, z_pos)):
         raise ValueError("Target position is in a restricted area")
 
     target_distance = math.sqrt(x_pos**2 + y_pos**2 + z_pos**2)
-    if target_distance > arm_1_length + arm_2_length:
+    if target_distance > Lengths.arm_1_length + Lengths.arm_2_length:
         raise ValueError("Target position is out of reach")
 
     base_angle = math.atan2(y_pos, x_pos)
@@ -52,15 +48,15 @@ def get_angles(x_pos, y_pos, z_pos, restricted_ares):
     shoulder_offset = math.atan2(rotated_point[1], rotated_point[0])
 
     shoulder_angle = math.acos(
-        (arm_1_length**2 + x_flat_distance**2 - arm_2_length**2)
-        / (2 * arm_1_length * x_flat_distance)
+        (Lengths.arm_1_length**2 + x_flat_distance**2 - Lengths.arm_2_length**2)
+        / (2 * Lengths.arm_1_length * x_flat_distance)
     )
 
     shoulder_angle += shoulder_offset
 
     elbow_angle = math.acos(
-        (arm_2_length**2 + arm_1_length**2 - x_flat_distance**2)
-        / (2 * arm_2_length * arm_1_length)
+        (Lengths.arm_2_length**2 + Lengths.arm_1_length**2 - x_flat_distance**2)
+        / (2 * Lengths.arm_2_length * Lengths.arm_1_length)
     )
 
     # convert to degrees
@@ -69,7 +65,7 @@ def get_angles(x_pos, y_pos, z_pos, restricted_ares):
     elbow_angle = 180 - math.degrees(elbow_angle)
 
     # correct for offset
-    base_angle -= math.degrees(math.tan(shoulder_y_offset / y_flat_distance))
+    base_angle -= math.degrees(math.tan(Offsets.shoulder_y_offset / y_flat_distance))
 
     return -base_angle, -shoulder_angle, -elbow_angle
 
@@ -116,7 +112,7 @@ def get_wrist_position(position, wrist_angles):
     :param wrist_angles: wrist angles in degrees (x_axis, y_axis, z_axis)
     :return: wrist position (x, y, z)
     """
-    end_effector_vector = Vector3(position, wrist_angles, end_effector_length)
+    end_effector_vector = Vector3(position, wrist_angles, Lengths.end_effector_length)
 
     return end_effector_vector.end_point
 
@@ -163,12 +159,12 @@ def get_pos_from_angles(arm_angles, wrist_angles):
     """
     base_angle, shoulder_angle, elbow_angle = arm_angles
 
-    base_vector = Vector3((0, 0, 0), (0, 0, 0), height_to_shoulder)
+    base_vector = Vector3((0, 0, 0), (0, 0, 0), Offsets.height_to_shoulder)
 
     transfer_vector = Vector3(
         base_vector.end_point,
         (90, 0, 0),
-        shoulder_y_offset,
+        Offsets.shoulder_y_offset,
         angle_order="xyz",
     )
     transfer_vector.rotate_global((0, 0, base_angle))
@@ -176,7 +172,7 @@ def get_pos_from_angles(arm_angles, wrist_angles):
     shoulder_vector = Vector3(
         transfer_vector.end_point,
         (0, shoulder_angle, 0),
-        arm_1_length,
+        Lengths.arm_1_length,
         angle_order="yxz",
     )
     shoulder_vector.rotate_global((0, 0, base_angle))
@@ -184,7 +180,7 @@ def get_pos_from_angles(arm_angles, wrist_angles):
     elbow_vector = Vector3(
         shoulder_vector.end_point,
         (0, elbow_angle + shoulder_angle, 0),
-        arm_2_length,
+        Lengths.arm_2_length,
         angle_order="yxz",
     )
     elbow_vector.rotate_global((0, 0, base_angle))
@@ -192,7 +188,7 @@ def get_pos_from_angles(arm_angles, wrist_angles):
     wrist_vector = Vector3(
         elbow_vector.end_point,
         (0, shoulder_angle + elbow_angle + wrist_angles[1], 0),
-        end_effector_length,
+        Lengths.end_effector_length,
         angle_order="xyz",
     )
     wrist_vector.rotate_global((0, 0, base_angle))

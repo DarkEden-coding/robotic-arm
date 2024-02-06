@@ -52,7 +52,6 @@ class StepperConstants:
 
 class NetworkTablesConstants:
     ip = "arm.local"
-    port = 5811
     refresh_rate = 60  # hz
 
 

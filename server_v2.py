@@ -216,7 +216,7 @@ def main():
     print(Colors.GREEN + "Starting server..." + Colors.RESET)
     print(
         Colors.YELLOW
-        + f"Connecting Network Tables to: {NetworkTablesConstants.ip} at port: {NetworkTablesConstants.port}"
+        + f"Connecting Network Tables to: {NetworkTablesConstants.ip}"
         + Colors.RESET
     )
 

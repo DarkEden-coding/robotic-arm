@@ -216,7 +216,7 @@ def main():
         + Colors.RESET
     )
 
-    NetworkTables.initialize()
+    NetworkTables.initialize(port=NetworkTablesConstants.port)
     data_table = NetworkTables.getTable("RoboticArmData")
 
     print(Colors.GREEN + "Connected to Network Tables" + Colors.RESET)

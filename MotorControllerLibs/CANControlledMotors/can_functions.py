@@ -16,7 +16,13 @@ try:
     subprocess.run(command, shell=True, check=True)
     print("CAN Connection command executed successfully.")
 except subprocess.CalledProcessError as e:
-    print(f"Error: {e}")
+    if (
+        e
+        == "Command 'sudo ip link set can0 up type can bitrate 250000' returned non-zero exit status 2."
+    ):
+        print("CAN Connection command already executed.")
+    else:
+        print(f"Error: {e}")
 
 OPCODE_READ = 0x00
 OPCODE_WRITE = 0x01
@@ -150,6 +156,7 @@ def get_property_value(obj_path, node_id):
 
         # Await reply
         for msg in bus:
+            print(msg.arbitration_id, (node_id << 5 | 0x05))
             if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
                 break
 

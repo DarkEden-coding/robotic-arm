@@ -1,6 +1,6 @@
 import customtkinter
 from PIL import Image
-from client_api_v2 import (
+from client_api import (
     setup,
     enable_motors,
     disable_motors,

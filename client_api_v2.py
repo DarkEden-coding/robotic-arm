@@ -41,7 +41,7 @@ def move(pos, rotations, wait_for_finish=False):
     if not data_table.getBoolean("moving", False):
         data_table.putValue("target_position", pos)
         data_table.putValue("target_rotations", rotations)
-        data_table.putBoolean("request", True)
+        data_table.putBoolean("request_move", True)
 
         if wait_for_finish:
             while data_table.getBoolean("moving", True):

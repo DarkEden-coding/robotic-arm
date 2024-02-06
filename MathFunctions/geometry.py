@@ -8,8 +8,8 @@ def decode_string_to_cube(string):
     :param string: the string to decode
     :return:
     """
-    corner1 = tuple(string.split(" ")[:3])
-    corner2 = tuple(string.split(" ")[3:])
+    corner1 = tuple(map(float, string.split(" ")[:3]))
+    corner2 = tuple(map(float, string.split(" ")[3:]))
     return Cube(corner1, corner2)
 
 

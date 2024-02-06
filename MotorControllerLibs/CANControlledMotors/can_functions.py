@@ -141,13 +141,13 @@ def get_property_value(obj_path, node_id):
         endpoint_id = endpoints[obj_path]["id"]
         endpoint_type = endpoints[obj_path]["type"]
 
-        """print("flushing")
+        print("flushing")
 
         # Flush CAN RX buffer so there are no more old pending messages
         while bus.recv(timeout=0) is not None:
             sleep(0.01)
 
-        print("flushed")"""
+        print("flushed")
         print("sending")
 
         # Send read command
@@ -164,7 +164,6 @@ def get_property_value(obj_path, node_id):
 
         # Await reply
         for msg in bus:
-            print(msg.arbitration_id, (node_id << 5 | 0x05))
             if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
                 break
 

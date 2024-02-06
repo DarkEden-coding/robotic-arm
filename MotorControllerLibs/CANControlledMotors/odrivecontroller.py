@@ -29,7 +29,7 @@ def setup(node_id, gear_ratio):
 
     # Flush CAN RX buffer so there are no more old pending messages
     while bus.recv(timeout=0) is not None:
-        sleep(0.01)
+        sleep(0.001)
 
     # Send read command
     bus.send(
@@ -104,7 +104,7 @@ def setup(node_id, gear_ratio):
 
     # Flush CAN RX buffer so there are no more old pending messages
     while bus.recv(timeout=0) is not None:
-        sleep(0.01)
+        sleep(0.001)
 
     # Send read command
     bus.send(

@@ -108,21 +108,33 @@ class MovementFrame(customtkinter.CTkFrame):
         self.target_z_entry = customtkinter.CTkEntry(self)
         self.target_z_entry.grid(row=4, column=2)
 
+        self.target_wrist_z_label = customtkinter.CTkLabel(self, text="Target Wrist Z")
+        self.target_wrist_z_label.grid(row=5, column=0)
+
+        self.target_wrist_z_entry = customtkinter.CTkEntry(self)
+        self.target_wrist_z_entry.grid(row=6, column=0)
+
+        self.target_wrist_x_label = customtkinter.CTkLabel(self, text="Target Wrist X")
+        self.target_wrist_x_label.grid(row=5, column=1)
+
+        self.target_wrist_x_entry = customtkinter.CTkEntry(self)
+        self.target_wrist_x_entry.grid(row=6, column=1)
+
         self.enable_motors_button = customtkinter.CTkButton(
             self, text="Enable Motors", command=self.__enable_motors
         )
-        self.enable_motors_button.grid(row=5, column=0, pady=5)
+        self.enable_motors_button.grid(row=7, column=0, pady=5)
 
         self.disable_motors_button = customtkinter.CTkButton(
             self, text="Disable Motors", command=self.__disable_motors
         )
-        self.disable_motors_button.grid(row=5, column=2, pady=5)
+        self.disable_motors_button.grid(row=7, column=2, pady=5)
 
         self.speed_label = customtkinter.CTkLabel(self, text="Speed")
-        self.speed_label.grid(row=6, column=1)
+        self.speed_label.grid(row=8, column=1)
 
         self.speed_value_label = customtkinter.CTkLabel(self, text="100 %")
-        self.speed_value_label.grid(row=6, column=2)
+        self.speed_value_label.grid(row=8, column=2)
 
         self.speed_slider = customtkinter.CTkSlider(
             self,
@@ -131,7 +143,7 @@ class MovementFrame(customtkinter.CTkFrame):
             command=self.update_speed_label,
             number_of_steps=190,
         )
-        self.speed_slider.grid(row=7, column=0, columnspan=3, sticky="nsew")
+        self.speed_slider.grid(row=9, column=0, columnspan=3, sticky="nsew")
 
         self.move_to_target_button = customtkinter.CTkButton(
             self, text="Move to Target", command=self.move_to_target
@@ -141,12 +153,12 @@ class MovementFrame(customtkinter.CTkFrame):
         self.update_speed_button = customtkinter.CTkButton(
             self, text="Update Speed", command=self.change_speed
         )
-        self.update_speed_button.grid(row=8, column=1, pady=5)
+        self.update_speed_button.grid(row=10, column=1, pady=5)
 
         self.shutdown_button = customtkinter.CTkButton(
             self, text="Shutdown", fg_color="red", command=self.__shutdown
         )
-        self.shutdown_button.grid(row=8, column=2, pady=5)
+        self.shutdown_button.grid(row=10, column=2, pady=5)
 
     def update_speed_label(self, value):
         self.speed_value_label.configure(text=f"{round(value)} %")
@@ -173,7 +185,10 @@ class MovementFrame(customtkinter.CTkFrame):
                 float(self.target_y_entry.get()),
                 float(self.target_z_entry.get()),
             ),
-            (0, 0),
+            (
+                float(self.target_wrist_z_entry.get()),
+                float(self.target_wrist_z_entry.get()),
+            ),
         )
 
     def __enable_motors(self):
@@ -197,17 +212,17 @@ class SettingsFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.columnconfigure(0, weight=1)
+        self.columnconfigure((0, 1, 2, 3, 4), weight=1)
         self.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7), weight=1)
 
         self.command_textbox_label = customtkinter.CTkLabel(
             self, text="Command/Error Log:"
         )
-        self.command_textbox_label.grid(row=6, column=0, sticky="s")
+        self.command_textbox_label.grid(row=6, column=1, sticky="s")
 
         self.command_textbox = customtkinter.CTkTextbox(self)
         self.command_textbox.grid(
-            row=7, column=0, sticky="nsew", padx=5, pady=5, columnspan=2
+            row=7, column=0, sticky="nsew", padx=5, pady=5, columnspan=5
         )
 
     def add_text_to_command_textbox(self, text):

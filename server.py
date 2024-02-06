@@ -75,8 +75,12 @@ class Arm:
             self.elbow_controller,
         )
 
+        print(f"Angles: {angles}")
+
         target_wrist_pos = get_wrist_position(pos, rotations)
         wrist_angles = get_wrist_angles(angles, pos, target_wrist_pos)
+
+        print(f"Wrist Angles: {wrist_angles}")
 
         self.moving = True
 
@@ -253,12 +257,14 @@ def main():
             break
 
         if data_table.getBoolean("enable_motors", False):
-            arm_object.enable_motors()
-            print(Colors.GREEN + "Motors enabled" + Colors.RESET)
+            if not arm_object.motors_enabled:
+                arm_object.enable_motors()
+                print(Colors.GREEN + "Motors enabled" + Colors.RESET)
 
         if not data_table.getBoolean("enable_motors", False):
-            arm_object.disable_motors()
-            print(Colors.YELLOW + "Motors disabled" + Colors.RESET)
+            if arm_object.motors_enabled:
+                arm_object.disable_motors()
+                print(Colors.YELLOW + "Motors disabled" + Colors.RESET)
 
         if data_table.getBoolean("request_move", False):
             arm_object.move(

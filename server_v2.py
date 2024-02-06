@@ -21,10 +21,10 @@ class Arm:
         """
         self.base_controller = OdriveController(CanIds.base_nodeid, motor_reversed=True)
         self.shoulder_controller = OdriveController(
-            CanIds.shoulder_nodeid, gear_ratio=125
+            CanIds.shoulder_nodeid, gear_ratio=125, motor_reversed=True
         )
         self.elbow_controller = OdriveController(
-            CanIds.elbow_nodeid, motor_reversed=True
+            CanIds.elbow_nodeid, motor_reversed=False
         )
 
         self.yaw_motor = StepperMotorController(

@@ -166,6 +166,8 @@ class Arm:
             self.yaw_motor.disable_motor()
             self.pitch_motor.disable_motor()
 
+            self.motors_enabled = False
+
     def set_percent_speed(self, percent):
         """
         Set the percent speed of the arm

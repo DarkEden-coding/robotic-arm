@@ -141,14 +141,9 @@ def get_property_value(obj_path, node_id):
         endpoint_id = endpoints[obj_path]["id"]
         endpoint_type = endpoints[obj_path]["type"]
 
-        print("flushing")
-
         # Flush CAN RX buffer so there are no more old pending messages
         while bus.recv(timeout=0) is not None:
             sleep(0.001)
-
-        print("flushed")
-        print("sending")
 
         # Send read command
         bus.send(
@@ -159,15 +154,10 @@ def get_property_value(obj_path, node_id):
             )
         )
 
-        print("sent")
-        print("awaiting")
-
         # Await reply
         for msg in bus:
             if msg.arbitration_id == (node_id << 5 | 0x05):  # 0x05: TxSdo
                 break
-
-        print("awaited")
 
         # Unpack and print reply
         _, _, _, return_value = struct.unpack(

@@ -53,7 +53,7 @@ class StepperConstants:
 class NetworkTablesConstants:
     ip = "arm.local"
     refresh_rate = 60  # hz
-    heart_beat_timeout = 3  # seconds
+    heart_beat_timeout = 10  # seconds
 
 
 restricted_areas = [

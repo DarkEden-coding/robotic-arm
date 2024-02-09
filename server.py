@@ -261,7 +261,7 @@ def main():
 
     print(Colors.GREEN + "Setup complete" + Colors.RESET)
     arm_object.add_to_log("Server started")
-    arm_object.update_log("Setup complete")
+    arm_object.update_log(data_table)
 
     data_table.putBoolean("setup", False)
 

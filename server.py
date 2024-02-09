@@ -116,6 +116,7 @@ class Arm:
         :param network_table: the network table
         :return:
         """
+        print(network_table)
         if network_table.getString("server_log", "") != self.log[-2000:]:
             network_table.putString("server_log", self.log[-2000:])
 

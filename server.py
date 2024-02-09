@@ -81,6 +81,9 @@ class Arm:
         self.add_to_log(f"Target Angles: {angles}")
 
         target_wrist_pos = get_wrist_position(pos, rotations)
+
+        self.add_to_log(f"Target Wrist Position: {target_wrist_pos}")
+
         wrist_angles = get_wrist_angles(angles, pos, target_wrist_pos)
 
         self.add_to_log(f"Target Wrist Angles: {wrist_angles}")

@@ -332,6 +332,8 @@ def main():
         frame_time = frame_end - frame_start
         sleep_time = 1 / NetworkTablesConstants.refresh_rate - frame_time
 
+        data_table.putNumber("frame_time", frame_time)
+
         if sleep_time > 0:
             sleep(sleep_time)
             data_table.putNumber("server_refresh_rate", 1 / (frame_time + sleep_time))

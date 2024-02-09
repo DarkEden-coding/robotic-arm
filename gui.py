@@ -30,7 +30,7 @@ def threaded_tasks(function):
             function()
             sleep(0.05)
         except Exception as e:
-            print(e)
+            print(f"Error in threaded task: {e} with function {function}")
             continue
 
 
@@ -327,7 +327,7 @@ class App(customtkinter.CTk):
         )
         self.update_server_log_thread.start()
 
-        self.check_hb_thread = Thread(target=threaded_tasks, args=(self.check_hb(),))
+        self.check_hb_thread = Thread(target=threaded_tasks, args=(self.check_hb,))
         self.check_hb_thread.start()
 
     def check_hb(self):

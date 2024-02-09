@@ -36,6 +36,7 @@ class Arm:
             max_speed=StepperConstants.max_speed,
             starting_speed=StepperConstants.starting_speed,
             gear_ratio=4,
+            reverse=True,
         )
 
         self.pitch_motor = StepperMotorController(

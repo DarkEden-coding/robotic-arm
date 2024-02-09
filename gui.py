@@ -159,11 +159,17 @@ class MovementFrame(customtkinter.CTkFrame):
         self.target_wrist_z_entry = customtkinter.CTkEntry(self)
         self.target_wrist_z_entry.grid(row=6, column=0)
 
+        # set value to 0
+        self.target_wrist_z_entry.insert(0, "0")
+
         self.target_wrist_x_label = customtkinter.CTkLabel(self, text="Target Wrist X")
         self.target_wrist_x_label.grid(row=5, column=1)
 
         self.target_wrist_x_entry = customtkinter.CTkEntry(self)
         self.target_wrist_x_entry.grid(row=6, column=1)
+
+        # set value to 0
+        self.target_wrist_x_entry.insert(0, "0")
 
         self.enable_motors_button = customtkinter.CTkButton(
             self, text="Enable Motors", command=self.__enable_motors
@@ -340,6 +346,9 @@ class App(customtkinter.CTk):
             )
 
             print(
+                "If no connection is established, checking will continue every 5 seconds."
+            )
+            self.settings_frame.add_text_to_client_log(
                 "If no connection is established, checking will continue every 5 seconds."
             )
             sleep(5)

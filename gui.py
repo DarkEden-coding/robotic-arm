@@ -9,6 +9,8 @@ from client_api import (
     move,
     emergency_stop,
     get_position,
+    get_server_log,
+    check_connection,
 )
 from threading import Thread
 from time import sleep
@@ -30,6 +32,49 @@ def threaded_tasks(function):
         except Exception as e:
             print(e)
             continue
+
+
+class LogTabView(customtkinter.CTkTabview):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.client_log_display_name = "Client Log"
+        self.server_log_display_name = "Server Log"
+
+        # create tabs
+        self.add(self.client_log_display_name)
+        self.add(self.server_log_display_name)
+
+        self.tab(self.client_log_display_name).grid_columnconfigure(0, weight=1)
+        self.tab(self.client_log_display_name).grid_rowconfigure(0, weight=1)
+
+        self.tab(self.server_log_display_name).grid_columnconfigure(0, weight=1)
+        self.tab(self.server_log_display_name).grid_rowconfigure(0, weight=1)
+
+        self.client_command_textbox = customtkinter.CTkTextbox(
+            self.tab(self.client_log_display_name)
+        )
+        self.client_command_textbox.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+
+        self.server_command_textbox = customtkinter.CTkTextbox(
+            self.tab(self.server_log_display_name)
+        )
+        self.server_command_textbox.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+
+        self.client_command_textbox.configure(state="disabled")
+        self.server_command_textbox.configure(state="disabled")
+
+    def add_text_to_tab(self, tab_name, text):
+        if tab_name == self.client_log_display_name:
+            self.client_command_textbox.configure(state="normal")
+            self.client_command_textbox.insert("end", f"{text}\n")
+            self.client_command_textbox.configure(state="disabled")
+        elif tab_name == self.server_log_display_name:
+            self.server_command_textbox.configure(state="normal")
+            # replace content of textbox with new content
+            self.server_command_textbox.delete(1.0, "end")
+            self.server_command_textbox.insert("end", f"{text}\n")
+            self.server_command_textbox.configure(state="disabled")
 
 
 class VisualizationFrame(customtkinter.CTkFrame):
@@ -170,15 +215,32 @@ class MovementFrame(customtkinter.CTkFrame):
         self.actual_z.set(round(position[2], 2))
 
     def change_speed(self):
-        self.settings_frame.add_text_to_command_textbox(
+        self.settings_frame.add_text_to_client_log(
             f"Setting percent speed to {self.speed_slider.get() / 100}%..."
         )
         set_percentage_speed(self.speed_slider.get() / 100)
 
     def move_to_target(self):
-        self.settings_frame.add_text_to_command_textbox(
+        # check input validity
+        if (
+            not self.target_x_entry.get()
+            or not self.target_y_entry.get()
+            or not self.target_z_entry.get()
+            or not self.target_wrist_z_entry.get()
+            or not self.target_wrist_x_entry.get()
+        ):
+            self.settings_frame.add_text_to_client_log(
+                "Please enter a valid target position."
+            )
+            return
+
+        # set focus to emergency stop button
+        self.emergency_stop_button.focus_set()
+
+        self.settings_frame.add_text_to_client_log(
             f"Moving to target: ({float(self.target_x_entry.get())}, {float(self.target_y_entry.get())}, {float(self.target_z_entry.get())})."
         )
+
         move(
             (
                 float(self.target_x_entry.get()),
@@ -192,19 +254,19 @@ class MovementFrame(customtkinter.CTkFrame):
         )
 
     def __enable_motors(self):
-        self.settings_frame.add_text_to_command_textbox("Enabling motors...")
+        self.settings_frame.add_text_to_client_log("Enabling motors...")
         enable_motors()
 
     def __disable_motors(self):
-        self.settings_frame.add_text_to_command_textbox("Disabling motors...")
+        self.settings_frame.add_text_to_client_log("Disabling motors...")
         disable_motors()
 
     def __shutdown(self):
-        self.settings_frame.add_text_to_command_textbox("Shutting down...")
+        self.settings_frame.add_text_to_client_log("Shutting down...")
         shutdown()
 
     def __emergency_stop(self):
-        self.settings_frame.add_text_to_command_textbox("Emergency stopping...")
+        self.settings_frame.add_text_to_client_log("Emergency stopping...")
         emergency_stop()
 
 
@@ -215,18 +277,19 @@ class SettingsFrame(customtkinter.CTkFrame):
         self.columnconfigure((0, 1, 2, 3, 4), weight=1)
         self.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7), weight=1)
 
-        self.command_textbox_label = customtkinter.CTkLabel(
-            self, text="Command/Error Log:"
-        )
-        self.command_textbox_label.grid(row=6, column=1, sticky="s")
-
-        self.command_textbox = customtkinter.CTkTextbox(self)
-        self.command_textbox.grid(
-            row=7, column=0, sticky="nsew", padx=5, pady=5, columnspan=5
+        self.log_tabview = LogTabView(self)
+        self.log_tabview.grid(
+            row=6, column=0, columnspan=5, sticky="nsew", rowspan=2, padx=5, pady=5
         )
 
-    def add_text_to_command_textbox(self, text):
-        self.command_textbox.insert("end", f"{text}\n")
+    def add_text_to_client_log(self, text):
+        self.log_tabview.add_text_to_tab("Client Log", text)
+
+    def add_text_to_server_log(self, text):
+        self.log_tabview.add_text_to_tab("Server Log", text)
+
+    def update_server_log(self):
+        self.add_text_to_server_log(get_server_log())
 
 
 class App(customtkinter.CTk):
@@ -234,7 +297,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.title("ScytheArm Control Panel")
-        self.geometry("1500x800")
+        self.geometry("1500x850")
 
         self.grid_columnconfigure((0, 1, 2, 3), weight=1)
         self.grid_rowconfigure((0, 1, 2), weight=1)
@@ -254,10 +317,32 @@ class App(customtkinter.CTk):
             row=1, column=0, sticky="nsew", padx=5, pady=5, rowspan=2
         )
 
-        self.threaded_tasks_thread = Thread(
+        self.update_pos_thread = Thread(
             target=threaded_tasks, args=(self.movement_frame.update_actual_coordinates,)
         )
-        self.threaded_tasks_thread.start()
+        self.update_pos_thread.start()
+
+        self.update_server_log_thread = Thread(
+            target=threaded_tasks, args=(self.settings_frame.update_server_log,)
+        )
+        self.update_server_log_thread.start()
+
+        self.check_hb_thread = Thread(target=threaded_tasks, args=(self.check_hb(),))
+        self.check_hb_thread.start()
+
+    def check_hb(self):
+        if not check_connection():
+            self.settings_frame.add_text_to_client_log("Connection to server lost.")
+            self.settings_frame.add_text_to_client_log("Attempting to reconnect...")
+            setup()
+            self.settings_frame.add_text_to_client_log(
+                "Connection to server reestablished."
+            )
+
+            print(
+                "If no connection is established, checking will continue every 5 seconds."
+            )
+            sleep(5)
 
 
 app = App()

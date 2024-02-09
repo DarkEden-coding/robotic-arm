@@ -57,6 +57,8 @@ class Arm:
 
         self.percentage_speed = 100
 
+        self.log = ""
+
     def move(self, pos, rotations, wait_for_move=True):
         """
         Move the arm to a position
@@ -75,12 +77,12 @@ class Arm:
             self.elbow_controller,
         )
 
-        print(f"Angles: {angles}")
+        self.add_to_log(f"Target Angles: {angles}")
 
         target_wrist_pos = get_wrist_position(pos, rotations)
         wrist_angles = get_wrist_angles(angles, pos, target_wrist_pos)
 
-        print(f"Wrist Angles: {wrist_angles}")
+        self.add_to_log(f"Target Wrist Angles: {wrist_angles}")
 
         self.moving = True
 
@@ -99,6 +101,23 @@ class Arm:
             self.pitch_motor.wait_for_move()
 
             self.moving = False
+
+    def add_to_log(self, message):
+        """
+        Add a message to the log
+        :param message: the message to add
+        :return:
+        """
+        self.log += message + "\n"
+
+    def update_log(self, network_table):
+        """
+        Update the log in the network table, only send the last 2000 characters, only update if the log has changed
+        :param network_table: the network table
+        :return:
+        """
+        if network_table.getString("server_log", "") != self.log[-2000:]:
+            network_table.putString("server_log", self.log[-2000:])
 
     def check_moving(self):
         """
@@ -240,31 +259,50 @@ def main():
     arm_object = Arm(restricted_areas_decoded)
 
     print(Colors.GREEN + "Setup complete" + Colors.RESET)
+    arm_object.add_to_log("Server started")
+    arm_object.update_log("Setup complete")
+
+    data_table.putBoolean("setup", False)
 
     while True:
         frame_start = time()
 
+        # update server heartbeat by getting the client heartbeat
+        data_table.putNumber(
+            "server_heartbeat", data_table.getNumber("client_heartbeat", 0)
+        )
+
         if data_table.getBoolean("shutdown", False):
             print(Colors.RED + "Shutting down..." + Colors.RESET)
+            arm_object.add_to_log("Shutting down")
+
             arm_object.shutdown()
+
             print(Colors.YELLOW + "Shutdown complete" + Colors.RESET)
+            arm_object.add_to_log("Shutdown complete")
             break
 
         if data_table.getBoolean("emergency_stop", False):
             print(Colors.RED + "Emergency stopping..." + Colors.RESET)
+            arm_object.add_to_log("Emergency stopping")
+
             arm_object.emergency_stop()
+
             print(Colors.YELLOW + "Emergency stop complete" + Colors.RESET)
+            arm_object.add_to_log("Emergency stop complete")
             break
 
         if data_table.getBoolean("enable_motors", False):
             if not arm_object.motors_enabled:
                 arm_object.enable_motors()
                 print(Colors.GREEN + "Motors enabled" + Colors.RESET)
+                arm_object.add_to_log("Motors enabled")
 
         if not data_table.getBoolean("enable_motors", False):
             if arm_object.motors_enabled:
                 arm_object.disable_motors()
                 print(Colors.YELLOW + "Motors disabled" + Colors.RESET)
+                arm_object.add_to_log("Motors disabled")
 
         if data_table.getBoolean("request_move", False):
             arm_object.move(
@@ -277,8 +315,13 @@ def main():
                 + f"""Moving to position: {data_table.getValue("target_position", (0, 0, 0))}"""
                 + Colors.RESET
             )
+            arm_object.add_to_log(
+                f"""Moving to position: {data_table.getValue("target_position", (0, 0, 0))}"""
+            )
 
             data_table.putBoolean("request_move", False)
+
+        arm_object.update_log(data_table)
 
         data_table.putBoolean("moving", arm_object.check_moving())
         data_table.putValue("current_position", arm_object.get_position())

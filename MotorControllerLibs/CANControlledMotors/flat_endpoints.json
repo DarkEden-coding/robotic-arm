@@ -1,5 +1,5 @@
 {
-    "fw_version": "0.6.9-1",
+    "fw_version": "0.6.9",
     "hw_version": "5.2.0",
     "crc": 64523,
     "endpoints": {

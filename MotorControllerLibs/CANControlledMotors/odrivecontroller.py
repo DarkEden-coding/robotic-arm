@@ -298,15 +298,15 @@ class OdriveController:
         self.max_accel = original_accel
         self.max_decel = original_decel
 
-    def set_percent_traj(self, speed):
+    def set_percent_traj(self, percentage):
         """
         Set the trajectory to a percentage of the max values
-        :param speed: percentage of max values
+        :param percentage: percentage of max values
         :return:
         """
-        self.set_speed(OdriveSpeeds.max_speed * speed)
+        self.set_speed(OdriveSpeeds.max_speed * percentage)
         self.set_accel_decel(
-            OdriveSpeeds.max_accel * speed, OdriveSpeeds.max_decel * speed
+            OdriveSpeeds.max_accel * percentage, OdriveSpeeds.max_decel * percentage
         )
 
     def emergency_stop(self):

@@ -3,8 +3,6 @@ from MathFunctions.inverse_kinematics import (
     get_angles,
     get_trajectory,
     get_pos_from_angles,
-    get_wrist_position,
-    get_wrist_angles,
 )
 from MotorControllerLibs.stepper_motor_controller import StepperMotorController
 from constants import CanIds, StepperConstants, NetworkTablesConstants, Colors
@@ -70,7 +68,7 @@ class Arm:
         """
         wait_for_move = bool(wait_for_move)
 
-        angles = get_angles(pos[0], pos[1], pos[2], self.restricted_areas)
+        angles = get_angles(pos, rotations, self.restricted_areas)
         base_offset, shoulder_offset, elbow_offset = get_trajectory(
             *angles,
             self.base_controller,
@@ -80,18 +78,10 @@ class Arm:
 
         self.add_to_log(f"Target Angles: {angles}")
 
-        target_wrist_pos = get_wrist_position(pos, rotations)
-
-        self.add_to_log(f"Target Wrist Position: {target_wrist_pos}")
-
-        wrist_angles = get_wrist_angles(angles, pos, target_wrist_pos)
-
-        self.add_to_log(f"Target Wrist Angles: {wrist_angles}")
-
         self.moving = True
 
-        self.yaw_motor.move_to_angle(wrist_angles[0])
-        self.pitch_motor.move_to_angle(wrist_angles[1])
+        self.yaw_motor.move_to_angle(rotations[3])
+        self.pitch_motor.move_to_angle(rotations[4])
 
         self.base_controller.move_to_angle(angles[0], base_offset)
         self.shoulder_controller.move_to_angle(angles[1], shoulder_offset)
@@ -225,15 +215,11 @@ class Arm:
         :return: tuple
         """
         return get_pos_from_angles(
-            (
-                self.base_controller.get_angle(),
-                self.shoulder_controller.get_angle(),
-                self.elbow_controller.get_angle(),
-            ),
-            (
-                self.yaw_motor.get_angle(),
-                self.pitch_motor.get_angle(),
-            ),
+            self.base_controller.get_angle(),
+            self.shoulder_controller.get_angle(),
+            self.elbow_controller.get_angle(),
+            self.yaw_motor.get_angle(),
+            self.pitch_motor.get_angle(),
         )
 
 

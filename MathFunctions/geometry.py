@@ -142,7 +142,7 @@ class Vector3:
     def __sub__(self, other):
         return Vector3(self.start, self.component - other.component)
 
-    def __copy__(self):
+    def copy(self):
         return Vector3(self.start, self.component)
 
 

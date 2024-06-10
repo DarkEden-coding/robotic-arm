@@ -38,8 +38,8 @@ def get_angles(target_position, target_rotation, restricted_ares):
             - Vectors.m_base_vector.get_end_point(),
         )
         / (
-            len(Vectors.m_projected_upper_arm_vector)
-            * len(Vectors.m_upper_arm_vector_one)
+            Vectors.m_projected_upper_arm_vector.length()
+            * Vectors.m_upper_arm_vector_one.length()
         )
     ) * (180 / np.pi)
 
@@ -56,11 +56,11 @@ def get_angles(target_position, target_rotation, restricted_ares):
     # use some triangle rules to find the shoulder angles given all side lengths
     shoulder_angle = np.arccos(
         (
-            len(Vectors.m_projected_upper_arm_vector) ** 2
+            Vectors.m_projected_upper_arm_vector.length() ** 2
             + target_base_distance**2
-            - len(Vectors.m_fore_arm_vector) ** 2
+            - Vectors.m_fore_arm_vector.length() ** 2
         )
-        / (2 * len(Vectors.m_projected_upper_arm_vector) * target_base_distance)
+        / (2 * Vectors.m_projected_upper_arm_vector.length() * target_base_distance)
     ) * (180 / np.pi)
 
     # use some triangle rules to find the elbow angle given all side lengths
@@ -68,14 +68,14 @@ def get_angles(target_position, target_rotation, restricted_ares):
         -90
         + np.arccos(
             (
-                len(Vectors.m_fore_arm_vector) ** 2
-                + len(Vectors.m_projected_upper_arm_vector) ** 2
+                Vectors.m_fore_arm_vector.length() ** 2
+                + Vectors.m_projected_upper_arm_vector.length() ** 2
                 - target_base_distance**2
             )
             / (
                 2
-                * len(Vectors.m_fore_arm_vector)
-                * len(Vectors.m_projected_upper_arm_vector)
+                * Vectors.m_fore_arm_vector.length()
+                * Vectors.m_projected_upper_arm_vector.length()
             )
         )
         * (180 / np.pi)

@@ -133,7 +133,7 @@ class Vector3:
         # Update the end point
         self.end = self.start + self.component
 
-    def __len__(self):
+    def length(self):
         return np.linalg.norm(self.component)
 
     def __add__(self, other):

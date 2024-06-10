@@ -75,7 +75,7 @@ class Arm:
             return
 
         base_offset, shoulder_offset, elbow_offset = get_trajectory(
-            *angles,
+            *angles[:3],
             self.base_controller,
             self.shoulder_controller,
             self.elbow_controller,

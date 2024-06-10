@@ -9,6 +9,8 @@ from constants import CanIds, StepperConstants, NetworkTablesConstants, Colors
 from networktables import NetworkTables
 from time import sleep, time
 from MathFunctions.geometry import decode_string_to_cube
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Arm:

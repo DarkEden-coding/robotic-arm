@@ -246,7 +246,7 @@ def main():
     for area in restricted_areas:
         restricted_areas_decoded.append(decode_string_to_cube(area))
 
-    print(type(restricted_areas_decoded))
+    print(type(restricted_areas_decoded[0]))
 
     arm_object = Arm(restricted_areas_decoded)
 

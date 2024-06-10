@@ -231,4 +231,4 @@ def get_pos_from_angles(
         0, 0, base_angle, m_base_vector.get_end_point()
     )
 
-    return np.around(m_end_effector_vector.get_end_point(), 4)
+    return np.around(m_end_effector_vector.get_end_point(), 4).tolist()

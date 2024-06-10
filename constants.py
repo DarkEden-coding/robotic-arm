@@ -31,13 +31,6 @@ class OdriveSpeeds:
     max_decel = 0.6 * 2  # rps/s
 
 
-class SocketConstants:
-    host = "arm.local"
-    port = 50135
-    password = "ScytheIndustries"
-    function_check = True
-
-
 class StepperConstants:
     degrees_per_step = 1.8  # direct degrees per step
     trapezoidal_step = (

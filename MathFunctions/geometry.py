@@ -6,7 +6,7 @@ def decode_string_to_cube(string):
     """
     Decode a string into a Cube object.
     :param string: the string to decode
-    :return:
+    :return: a Cube object
     """
     corner1 = tuple(map(float, string.split(" ")[:3]))
     corner2 = tuple(map(float, string.split(" ")[3:]))

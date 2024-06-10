@@ -246,6 +246,8 @@ def main():
     for area in restricted_areas:
         restricted_areas_decoded.append(decode_string_to_cube(area))
 
+    print(type(restricted_areas_decoded))
+
     arm_object = Arm(restricted_areas_decoded)
 
     print(Colors.GREEN + "Setup complete" + Colors.RESET)

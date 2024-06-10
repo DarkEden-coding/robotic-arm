@@ -16,7 +16,7 @@ def get_angles(target_position, target_rotation, restricted_ares):
     :param restricted_ares: list of restricted areas for the robot arm, each area is a Cube object
     :return: angles in degrees (base angle, shoulder angle, elbow angle)
     """
-    if is_point_in_any_cube(target_position, restricted_ares):
+    if is_point_in_any_cube(restricted_ares, target_position):
         raise ValueError("Target position is in a restricted area")
 
     m_end_effector_vector = Vector3(

@@ -68,7 +68,12 @@ class Arm:
         """
         wait_for_move = bool(wait_for_move)
 
-        angles = get_angles(pos, rotations, self.restricted_areas)
+        try:
+            angles = get_angles(pos, rotations, self.restricted_areas)
+        except ValueError:
+            self.add_to_log("Target position is in a restricted area")
+            return
+
         base_offset, shoulder_offset, elbow_offset = get_trajectory(
             *angles,
             self.base_controller,
@@ -245,8 +250,6 @@ def main():
     restricted_areas_decoded = []
     for area in restricted_areas:
         restricted_areas_decoded.append(decode_string_to_cube(area))
-
-    print(type(restricted_areas_decoded[0]))
 
     arm_object = Arm(restricted_areas_decoded)
 

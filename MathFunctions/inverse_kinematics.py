@@ -1,73 +1,129 @@
 from constants import (
-    Lengths,
-    Offsets,
+    Vectors,
 )
-import math
 import numpy as np
 from MathFunctions.geometry import (
     Vector3,
-    rotate_point,
-    rotate_point_around_axis,
     is_point_in_any_cube,
 )
 
 
-def get_angles(x_pos, y_pos, z_pos, restricted_ares):
+def get_angles(target_position, target_rotation, restricted_ares):
     """
     Get the angles of the robot arm
-    :param x_pos: x position of the end effector
-    :param y_pos: y position of the end effector
-    :param z_pos: z position of the end effector
+    :param target_position: target position of the robot arm end effector
+    :param target_rotation: target rotation of the robot arm end effector
     :param restricted_ares: list of restricted areas for the robot arm, each area is a Cube object
-    :return: angles in radians (base angle, shoulder angle, elbow angle)
+    :return: angles in degrees (base angle, shoulder angle, elbow angle)
     """
-    # soh cah toa
-    z_pos -= Offsets.height_to_shoulder
-
-    x_pos += Offsets.position_error_offsets[0]
-    y_pos += Offsets.position_error_offsets[1]
-    z_pos += Offsets.position_error_offsets[2]
-
-    if is_point_in_any_cube(restricted_ares, (x_pos, y_pos, z_pos)):
+    if is_point_in_any_cube(restricted_ares, target_position):
         raise ValueError("Target position is in a restricted area")
 
-    target_distance = math.sqrt(x_pos**2 + y_pos**2 + z_pos**2)
-    if target_distance > Lengths.arm_1_length + Lengths.arm_2_length:
-        raise ValueError("Target position is out of reach")
-
-    base_angle = math.atan2(y_pos, x_pos)
-
-    y_flat_distance = math.sqrt((0 - x_pos) ** 2 + (0 - y_pos) ** 2)
-
-    rotated_point = (y_flat_distance, z_pos)
-
-    x_flat_distance = math.sqrt(
-        (0 - rotated_point[0]) ** 2 + (0 - rotated_point[1]) ** 2
+    m_end_effector_vector = Vector3(
+        Vectors.m_fore_arm_vector.get_end_point(), [0, 0, 130]
+    )
+    m_end_effector_vector.move_absolute(target_position)
+    m_end_effector_vector.rotate_around_point(
+        target_rotation[0], target_rotation[1], 0, target_position
     )
 
-    shoulder_offset = math.atan2(rotated_point[1], rotated_point[0])
+    wrist_target_position = m_end_effector_vector.get_end_point()
 
-    shoulder_angle = math.acos(
-        (Lengths.arm_1_length**2 + x_flat_distance**2 - Lengths.arm_2_length**2)
-        / (2 * Lengths.arm_1_length * x_flat_distance)
+    # angle between projected_upper_arm_vector and upper_arm_vector_one to correct for the error
+    upper_arm_error_angle = np.arccos(
+        np.dot(
+            Vectors.m_projected_upper_arm_vector.get_end_point()
+            - Vectors.m_base_vector.get_end_point(),
+            Vectors.m_upper_arm_vector_one.get_end_point()
+            - Vectors.m_base_vector.get_end_point(),
+        )
+        / (
+            Vectors.m_projected_upper_arm_vector.length()
+            * Vectors.m_upper_arm_vector_one.length()
+        )
+    ) * (180 / np.pi)
+
+    # calculate the base angle to the target
+    base_angle = np.arctan2(wrist_target_position[1], wrist_target_position[0]) * (
+        180 / np.pi
     )
 
-    shoulder_angle += shoulder_offset
-
-    elbow_angle = math.acos(
-        (Lengths.arm_2_length**2 + Lengths.arm_1_length**2 - x_flat_distance**2)
-        / (2 * Lengths.arm_2_length * Lengths.arm_1_length)
+    # the distance between the end of the base vector and the target pos
+    target_base_distance = np.linalg.norm(
+        wrist_target_position - Vectors.m_base_vector.get_end_point()
     )
 
-    # convert to degrees
-    base_angle = math.degrees(base_angle)
-    shoulder_angle = 90 - math.degrees(shoulder_angle)
-    elbow_angle = 180 - math.degrees(elbow_angle)
+    # use some triangle rules to find the shoulder angles given all side lengths
+    shoulder_angle = np.arccos(
+        (
+            Vectors.m_projected_upper_arm_vector.length() ** 2
+            + target_base_distance**2
+            - Vectors.m_fore_arm_vector.length() ** 2
+        )
+        / (2 * Vectors.m_projected_upper_arm_vector.length() * target_base_distance)
+    ) * (180 / np.pi)
 
-    # correct for offset
-    base_angle -= math.degrees(math.tan(Offsets.shoulder_y_offset / y_flat_distance))
+    # use some triangle rules to find the elbow angle given all side lengths
+    elbow_angle = (
+        -90
+        + np.arccos(
+            (
+                Vectors.m_fore_arm_vector.length() ** 2
+                + Vectors.m_projected_upper_arm_vector.length() ** 2
+                - target_base_distance**2
+            )
+            / (
+                2
+                * Vectors.m_fore_arm_vector.length()
+                * Vectors.m_projected_upper_arm_vector.length()
+            )
+        )
+        * (180 / np.pi)
+        - upper_arm_error_angle
+    )
 
-    return -base_angle, -shoulder_angle, -elbow_angle
+    target_flat_distance = np.linalg.norm(wrist_target_position[:2])
+
+    # calculate the vertical angle to the target for angle correction
+    vert_angle_to_target = np.arctan2(
+        wrist_target_position[2] - Vectors.m_base_vector.get_end_point()[2],
+        target_flat_distance,
+    ) * (180 / np.pi)
+
+    vert_angle_to_target += upper_arm_error_angle
+
+    shoulder_angle = -(90 - (shoulder_angle + vert_angle_to_target))
+    elbow_angle = -(90 - elbow_angle)
+
+    # reverse the angles to get the target position in wrist local space
+    m_end_effector_vector.rotate_around_point(
+        0, 0, -base_angle, Vectors.m_base_vector.get_end_point()
+    )
+    m_end_effector_vector.rotate_around_point(
+        0, shoulder_angle, 0, Vectors.m_base_vector.get_end_point()
+    )
+    m_end_effector_vector.rotate_around_point(
+        0, elbow_angle, 0, Vectors.m_upper_arm_vector_two.get_end_point()
+    )
+    m_end_effector_vector.move_absolute(np.array([0, 0, 0], dtype=float))
+
+    wrist_flat_distance = np.linalg.norm(m_end_effector_vector.get_end_point()[:2])
+    wrist_pitch_angle = 90 + np.arctan2(
+        m_end_effector_vector.get_end_point()[2], wrist_flat_distance
+    ) * (180 / np.pi)
+
+    wrist_yaw_angle = (
+        np.arctan2(
+            m_end_effector_vector.get_end_point()[1],
+            m_end_effector_vector.get_end_point()[0],
+        )
+        * (180 / np.pi)
+        + 180
+    )
+    if wrist_yaw_angle > 180:
+        wrist_yaw_angle -= 360
+
+    return base_angle, shoulder_angle, elbow_angle, wrist_yaw_angle, wrist_pitch_angle
 
 
 def get_trajectory(
@@ -105,101 +161,74 @@ def get_trajectory(
     return base_speed, shoulder_speed, elbow_speed
 
 
-def get_wrist_position(position, wrist_angles):
+def get_pos_from_angles(
+    base_angle, shoulder_angle, elbow_angle, wrist_pitch_angle, wrist_yaw_angle
+):
     """
-    Get the wrist position
-    :param position: position of the end target point (x, y, z)
-    :param wrist_angles: wrist angles in degrees (x_axis, y_axis, z_axis)
-    :return: wrist position (x, y, z)
+    Get the position of the robot arm end effector from the angles
+    :param base_angle: the base angle in degrees
+    :param shoulder_angle: the shoulder angle in degrees
+    :param elbow_angle: the elbow angle in degrees
+    :param wrist_pitch_angle: the wrist pitch angle in degrees
+    :param wrist_yaw_angle: the wrist yaw angle in degrees
+    :return: the position of the robot arm end effector
     """
-    end_effector_vector = Vector3(position, wrist_angles, Lengths.end_effector_length)
 
-    return end_effector_vector.end_point
+    shoulder_angle = -shoulder_angle
+    elbow_angle = -elbow_angle
 
+    # reset vectors
+    m_base_vector = Vectors.m_base_vector.copy()
+    m_upper_arm_vector_one = Vectors.m_upper_arm_vector_one.copy()
+    m_upper_arm_vector_two = Vectors.m_upper_arm_vector_two.copy()
+    m_projected_upper_arm_vector = Vectors.m_projected_upper_arm_vector.copy()
+    m_fore_arm_vector = Vectors.m_fore_arm_vector.copy()
+    m_end_effector_vector = Vectors.m_end_effector_vector.copy()
 
-def get_wrist_angles(arm_angles, target_position, wrist_position):
-    """
-    Get the wrist angles
-    :param arm_angles: arm angles in degrees (base, shoulder, elbow)
-    :param target_position: target position of the end effector (x, y, z)
-    :param wrist_position: wrist position (x, y, z)
-    :return: wrist angles in degrees (x_axis, y_axis, z_axis)
-    """
-    total_arm_angle = abs(arm_angles[1] + arm_angles[2])
-
-    target_position = np.array(target_position)
-    wrist_position = np.array(wrist_position)
-
-    yaw_rotation = math.degrees(math.atan2(wrist_position[1], wrist_position[0]))
-
-    target_position = rotate_point(target_position, (0, 0, 0), (0, 0, -yaw_rotation))
-    wrist_position = rotate_point(wrist_position, (0, 0, 0), (0, 0, -yaw_rotation))
-
-    target_position -= wrist_position
-
-    target_position = rotate_point(target_position, (0, 0, 0), (0, total_arm_angle, 0))
-
-    needed_wrist_z_angle = math.degrees(
-        math.atan2(target_position[0], target_position[1])
+    m_end_effector_vector.rotate_around_point(
+        0, wrist_pitch_angle, wrist_yaw_angle, m_fore_arm_vector.get_end_point()
     )
 
-    flat_distance = math.sqrt(target_position[0] ** 2 + target_position[1] ** 2)
-
-    needed_wrist_y_angle = math.degrees(math.atan2(target_position[2], flat_distance))
-
-    return 90 + needed_wrist_z_angle, 90 - needed_wrist_y_angle
-
-
-def get_pos_from_angles(arm_angles, wrist_angles):
-    """
-    Get the position (x, y, z) of the robot arm end effector
-    :param wrist_angles: the wrist angles in degrees (x_axis, y_axis, z_axis)
-    :param arm_angles (base angle, shoulder angle, elbow angle) in degrees
-    :return: x, y, z coordinates of the end effector
-    """
-    base_angle, shoulder_angle, elbow_angle = arm_angles
-
-    base_vector = Vector3((0, 0, 0), (0, 0, 0), Offsets.height_to_shoulder)
-
-    transfer_vector = Vector3(
-        base_vector.end_point,
-        (90, 0, 0),
-        Offsets.shoulder_y_offset,
-        angle_order="xyz",
+    # preform the rotations to the vectors
+    m_base_vector.rotate_locally(0, 0, base_angle)
+    m_upper_arm_vector_one.rotate_around_point(
+        0, shoulder_angle, 0, m_base_vector.get_end_point()
     )
-    transfer_vector.rotate_global((0, 0, base_angle))
-
-    shoulder_vector = Vector3(
-        transfer_vector.end_point,
-        (0, shoulder_angle, 0),
-        Lengths.arm_1_length,
-        angle_order="yxz",
+    m_upper_arm_vector_two.rotate_around_point(
+        0, shoulder_angle, 0, m_base_vector.get_end_point()
     )
-    shoulder_vector.rotate_global((0, 0, base_angle))
-
-    elbow_vector = Vector3(
-        shoulder_vector.end_point,
-        (0, elbow_angle + shoulder_angle, 0),
-        Lengths.arm_2_length,
-        angle_order="yxz",
+    m_fore_arm_vector.rotate_around_point(
+        0, shoulder_angle, 0, m_base_vector.get_end_point()
     )
-    elbow_vector.rotate_global((0, 0, base_angle))
-
-    wrist_vector = Vector3(
-        elbow_vector.end_point,
-        (0, shoulder_angle + elbow_angle + wrist_angles[1], 0),
-        Lengths.end_effector_length,
-        angle_order="xyz",
+    m_projected_upper_arm_vector.rotate_around_point(
+        0, shoulder_angle, 0, m_base_vector.get_end_point()
     )
-    wrist_vector.rotate_global((0, 0, base_angle))
-
-    end_position = tuple(
-        rotate_point_around_axis(
-            wrist_vector.end_point,
-            elbow_vector.end_point,
-            elbow_vector.starting_point,
-            wrist_angles[0],
-        )
+    m_end_effector_vector.rotate_around_point(
+        0, shoulder_angle, 0, m_base_vector.get_end_point()
     )
 
-    return end_position
+    m_fore_arm_vector.rotate_around_point(
+        0, elbow_angle, 0, m_upper_arm_vector_two.get_end_point()
+    )
+    m_end_effector_vector.rotate_around_point(
+        0, elbow_angle, 0, m_upper_arm_vector_two.get_end_point()
+    )
+
+    m_upper_arm_vector_one.rotate_around_point(
+        0, 0, base_angle, m_base_vector.get_end_point()
+    )
+    m_upper_arm_vector_two.rotate_around_point(
+        0, 0, base_angle, m_base_vector.get_end_point()
+    )
+    m_fore_arm_vector.rotate_around_point(
+        0, 0, base_angle, m_base_vector.get_end_point()
+    )
+    m_projected_upper_arm_vector.rotate_around_point(
+        0, 0, base_angle, m_base_vector.get_end_point()
+    )
+
+    m_end_effector_vector.rotate_around_point(
+        0, 0, base_angle, m_base_vector.get_end_point()
+    )
+
+    return np.around(m_end_effector_vector.get_end_point(), 4).tolist()

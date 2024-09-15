@@ -116,6 +116,7 @@ class StepperMotorController:
         max_speed: float,
         starting_speed: float,
         gear_ratio: float,
+        reverse: bool = False,
     ):
         """
         Stepper motor controller class
@@ -136,6 +137,7 @@ class StepperMotorController:
         self.max_speed = max_speed
         self.gear_ratio = gear_ratio
         self.starting_speed = starting_speed
+        self.reverse = reverse
 
         self.position_data = []
         self.speed_data = []
@@ -276,6 +278,8 @@ class StepperMotorController:
         :param relative: whether the movement is relative to the current position instead of absolute
         :return:
         """
+        if self.reverse:
+            target_angle = -target_angle
         self.movement_thread = Thread(
             target=self._move_to_angle, args=(target_angle, relative)
         )

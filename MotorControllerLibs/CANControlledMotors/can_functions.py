@@ -16,7 +16,13 @@ try:
     subprocess.run(command, shell=True, check=True)
     print("CAN Connection command executed successfully.")
 except subprocess.CalledProcessError as e:
-    print(f"Error: {e}")
+    if (
+        e
+        == "Command 'sudo ip link set can0 up type can bitrate 250000' returned non-zero exit status 2."
+    ):
+        print("CAN Connection command already executed.")
+    else:
+        print(f"Error: {e}")
 
 OPCODE_READ = 0x00
 OPCODE_WRITE = 0x01
@@ -137,7 +143,7 @@ def get_property_value(obj_path, node_id):
 
         # Flush CAN RX buffer so there are no more old pending messages
         while bus.recv(timeout=0) is not None:
-            sleep(0.01)
+            sleep(0.001)
 
         # Send read command
         bus.send(

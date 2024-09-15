@@ -29,7 +29,7 @@ def setup(node_id, gear_ratio):
 
     # Flush CAN RX buffer so there are no more old pending messages
     while bus.recv(timeout=0) is not None:
-        sleep(0.01)
+        sleep(0.001)
 
     # Send read command
     bus.send(
@@ -104,7 +104,7 @@ def setup(node_id, gear_ratio):
 
     # Flush CAN RX buffer so there are no more old pending messages
     while bus.recv(timeout=0) is not None:
-        sleep(0.01)
+        sleep(0.001)
 
     # Send read command
     bus.send(
@@ -298,15 +298,15 @@ class OdriveController:
         self.max_accel = original_accel
         self.max_decel = original_decel
 
-    def set_percent_traj(self, speed):
+    def set_percent_traj(self, percentage):
         """
         Set the trajectory to a percentage of the max values
-        :param speed: percentage of max values
+        :param percentage: percentage of max values
         :return:
         """
-        self.set_speed(OdriveSpeeds.max_speed * speed)
+        self.set_speed(OdriveSpeeds.max_speed * percentage)
         self.set_accel_decel(
-            OdriveSpeeds.max_accel * speed, OdriveSpeeds.max_decel * speed
+            OdriveSpeeds.max_accel * percentage, OdriveSpeeds.max_decel * percentage
         )
 
     def emergency_stop(self):

@@ -1,139 +1,87 @@
-import socket
-from constants import (
-    SocketConstants,
-    restricted_areas,
-    return_map,
-    CanIds,
-)
-import pickle
+from constants import NetworkTablesConstants, restricted_areas_encoded
+from networktables import NetworkTables
+from time import sleep, time
+from threading import Thread
 
-HOST = SocketConstants.host
-PORT = SocketConstants.port
-PASSWORD = SocketConstants.password
+NetworkTables.initialize(server=NetworkTablesConstants.ip)
 
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-print("Connecting to server")
-
-server_socket.connect((HOST, PORT))
-
-print("Connection to server established.")
+data_table = NetworkTables.getTable("RoboticArmData")
 
 
-def send_command(command):
-    print(f"Sending command: {command['function_name']}")
-    command["password"] = PASSWORD
-    return_from_function = return_map[command["function_name"]]
+def heartbeat():
+    while True:
+        data_table.putNumber("client_heartbeat", time())
+        sleep(0.001)
 
-    # send the message to the server
-    # Serialize and send the object
-    serialized_data = pickle.dumps(command)
-    server_socket.sendall(serialized_data)
 
-    if SocketConstants.function_check:
-        print("Waiting for server to receive the message")
-
-        # Receive data
-        received_data = b""
-        while True:
-            chunk = server_socket.recv(4096)
-            if not chunk:
-                break
-            received_data += chunk
-            # if data is a complete object, break
-            try:
-                pickle.loads(received_data)
-                break
-            except Exception as e:
-                print(e)
-                continue
-
-        if received_data == serialized_data:
-            print("Server received the message")
-        else:
-            print("Server did not receive the message")
-            print(f"Sent: {command}")
-            print(f"Received: {pickle.loads(received_data)}")
-
-    if return_from_function:
-        # Receive data
-        received_data = b""
-        while True:
-            chunk = server_socket.recv(4096)
-            if not chunk:
-                break
-            received_data += chunk
-            # if data is a complete object, break
-            try:
-                pickle.loads(received_data)
-                break
-            except Exception as e:
-                print(e)
-                continue
-
-        # Deserialize the received data
-        received_object = pickle.loads(received_data)
-
-        if received_object:
-            if "Error" in received_object:
-                print(f"{received_object}")
-            else:
-                print(f"Server response: {received_object}")
-                return received_object
+def check_connection():
+    """
+    Check if the client is connected to the server by comparing client heartbeat to server heartbeat
+    :return: if the client is connected to the server
+    """
+    return (
+        abs(
+            data_table.getNumber("server_heartbeat", 0)
+            - data_table.getNumber("client_heartbeat", 0)
+        )
+        < NetworkTablesConstants.heart_beat_timeout
+    )
 
 
 def setup():
-    send_command(
-        {
-            "function_name": "setup",
-            "args": [
-                CanIds.base_nodeid,
-                CanIds.shoulder_nodeid,
-                CanIds.elbow_nodeid,
-                restricted_areas,
-            ],
-            "password": PASSWORD,
-        }
-    )
+    data_table.putStringArray("restricted_areas", restricted_areas_encoded)
+
+    data_table.putBoolean("enable_motors", False)
+    data_table.putBoolean("shutdown", False)
+    data_table.putBoolean("emergency_stop", False)
+    data_table.putNumber("percentage_speed", 1)
+    data_table.putValue("target_position", (0, 0, 0))
+    data_table.putBoolean("moving", False)
+    data_table.putValue("current_position", (0, 0, 0))
+
+    data_table.putBoolean("setup", True)
+
+    # wait for the server to be ready
+    while data_table.getBoolean("setup", False):
+        sleep(0.1)
+
+    Thread(target=heartbeat).start()
 
 
 def enable_motors():
-    send_command({"function_name": "enable_motors", "args": [], "password": PASSWORD})
+    data_table.putBoolean("enable_motors", True)
 
 
 def disable_motors():
-    send_command({"function_name": "disable_motors", "args": [], "password": PASSWORD})
+    data_table.putBoolean("enable_motors", False)
 
 
 def shutdown():
-    send_command({"function_name": "shutdown", "args": [], "password": PASSWORD})
+    data_table.putBoolean("shutdown", True)
 
 
-def set_percent_speed(percent_speed):
-    send_command(
-        {
-            "function_name": "set_percent_speed",
-            "args": [percent_speed],
-            "password": PASSWORD,
-        }
-    )
+def set_percentage_speed(percentage_speed):
+    data_table.putNumber("percentage_speed", percentage_speed)
 
 
-def move(pos, wait_for_finish=False):
-    send_command(
-        {"function_name": "move", "args": [pos, wait_for_finish], "password": PASSWORD}
-    )
+def move(pos, rotations, wait_for_finish=False):
+    if not data_table.getBoolean("moving", False):
+        data_table.putValue("target_position", pos)
+        data_table.putValue("target_rotations", rotations)
+        data_table.putBoolean("request_move", True)
+
+        if wait_for_finish:
+            while data_table.getBoolean("moving", True):
+                sleep(0.1)
 
 
 def emergency_stop():
-    send_command({"function_name": "emergency_stop", "args": [], "password": PASSWORD})
-
-
-def close_connection():
-    server_socket.close()
+    data_table.putBoolean("emergency_stop", True)
 
 
 def get_position():
-    return send_command(
-        {"function_name": "get_position", "args": [], "password": PASSWORD}
-    )
+    return data_table.getValue("current_position", (0, 0, 0))
+
+
+def get_server_log():
+    return data_table.getString("server_log", "")

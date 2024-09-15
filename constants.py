@@ -1,4 +1,4 @@
-from MathFunctions.geometry import Cube
+from MathFunctions.geometry import Cube, Vector3
 
 
 class CanIds:
@@ -7,31 +7,28 @@ class CanIds:
     elbow_nodeid = 2
 
 
-class Lengths:
-    arm_1_length = 378
-    arm_2_length = 546.77
-    end_effector_length = (
-        134 - 4.37968
-    )  # this is to the very center of the rotating bar
+class Vectors:
+    m_base_vector = Vector3([0, 0, 0], [0, 0, 225.76])
 
+    m_upper_arm_vector_one = Vector3(m_base_vector.get_end_point(), [0, 0, 379.64695])
 
-class Offsets:
-    shoulder_y_offset = -30.06119
-    height_to_shoulder = 216.41039
-    position_error_offsets = (0, 0, 0)
+    m_upper_arm_vector_two = Vector3(
+        m_upper_arm_vector_one.get_end_point(), [29.42254, 0, 59.39554]
+    )
+
+    m_projected_upper_arm_vector = m_upper_arm_vector_one + m_upper_arm_vector_two
+
+    m_fore_arm_vector = Vector3(
+        m_upper_arm_vector_two.get_end_point(), [0, 0, 389.09462]
+    )
+
+    m_end_effector_vector = Vector3(m_fore_arm_vector.get_end_point(), [0, 0, 130])
 
 
 class OdriveSpeeds:
     max_speed = 5 * 2  # rps
     max_accel = 0.6 * 2  # rps/s
     max_decel = 0.6 * 2  # rps/s
-
-
-class SocketConstants:
-    host = "arm.local"
-    port = 50135
-    password = "ScytheIndustries"
-    function_check = True
 
 
 class StepperConstants:
@@ -52,8 +49,8 @@ class StepperConstants:
 
 class NetworkTablesConstants:
     ip = "arm.local"
-    port = 5810
     refresh_rate = 60  # hz
+    heart_beat_timeout = 10  # seconds
 
 
 restricted_areas = [

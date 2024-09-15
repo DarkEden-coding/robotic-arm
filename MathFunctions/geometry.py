@@ -6,10 +6,10 @@ def decode_string_to_cube(string):
     """
     Decode a string into a Cube object.
     :param string: the string to decode
-    :return:
+    :return: a Cube object
     """
-    corner1 = tuple(string.split(" ")[:3])
-    corner2 = tuple(string.split(" ")[3:])
+    corner1 = tuple(map(float, string.split(" ")[:3]))
+    corner2 = tuple(map(float, string.split(" ")[3:]))
     return Cube(corner1, corner2)
 
 
@@ -46,53 +46,104 @@ class Cube:
         return f"{self.corner1[0]} {self.corner1[1]} {self.corner1[2]} {self.corner2[0]} {self.corner2[1]} {self.corner2[2]}"
 
 
-class Vector3:
-    def __init__(self, starting_point, angles, length, angle_order="zyx"):
-        """
-        Initialize the vector
-        :param starting_point: Tuple (x, y, z) representing the starting point of the vector
-        :param angles: Tuple (x, y, z) representing the angles of the vector on the x, y, and z global axes
-        :param length: Length of the vector
-        """
-        self.starting_point = starting_point
-        if len(angles) == 3:
-            self.x_angle, self.y_angle, self.z_angle = -angles[0], angles[1], angles[2]
-        else:
-            self.x_angle, self.y_angle = -angles[0], angles[1]
-            self.z_angle = 0
-        self.length = length
-        self.angle_order = angle_order
+def rotate_array_around_point(x, y, z, array, point):
+    # rotate the array around the point
+    array = array - point
 
-        self.end_point = np.array(
+    # convert angles to radians
+    x = np.radians(x)
+    y = np.radians(y)
+    z = np.radians(z)
+
+    # rotation matrix
+    rotation_matrix = np.array(
+        [
             [
-                self.starting_point[0],
-                self.starting_point[1],
-                self.length + self.starting_point[2],
-            ]
+                np.cos(y) * np.cos(z),
+                np.cos(z) * np.sin(x) * np.sin(y) - np.cos(x) * np.sin(z),
+                np.sin(x) * np.sin(z) + np.cos(x) * np.cos(z) * np.sin(y),
+            ],
+            [
+                np.cos(y) * np.sin(z),
+                np.cos(x) * np.cos(z) + np.sin(x) * np.sin(y) * np.sin(z),
+                np.cos(x) * np.sin(y) * np.sin(z) - np.cos(z) * np.sin(x),
+            ],
+            [-np.sin(y), np.cos(y) * np.sin(x), np.cos(x) * np.cos(y)],
+        ]
+    )
+
+    array = np.dot(rotation_matrix, array)
+
+    return array + point
+
+
+class Vector3:
+    def __init__(self, start, component):
+        self.start = np.array(start)
+        self.component = np.array(component)
+        self.end = self.start + self.component
+        self.orientation = np.eye(3)  # Initial orientation is the identity matrix
+
+    def get_end_point(self):
+        return self.end
+
+    def get_start_point(self):
+        return self.start
+
+    def get_component(self):
+        return self.component
+
+    def move_absolute(self, point):
+        self.start = np.array(point)
+        self.end = self.start + self.component
+
+    def rotate_around_point(self, x, y, z, point):
+        point = np.array(point)
+
+        # Rotate the start point around the given point
+        self.start = rotate_array_around_point(x, y, z, self.start, point)
+
+        # Rotate the end point around the given point
+        self.end = rotate_array_around_point(x, y, z, self.end, point)
+
+        # Update the component based on the new start and end points
+        self.component = self.end - self.start
+
+    def rotate_locally(self, x, y, z):
+        # Local rotation matrices
+        rx = np.array(
+            [[1, 0, 0], [0, np.cos(x), -np.sin(x)], [0, np.sin(x), np.cos(x)]]
+        )
+        ry = np.array(
+            [[np.cos(y), 0, np.sin(y)], [0, 1, 0], [-np.sin(y), 0, np.cos(y)]]
+        )
+        rz = np.array(
+            [[np.cos(z), -np.sin(z), 0], [np.sin(z), np.cos(z), 0], [0, 0, 1]]
         )
 
-        self.end_point = rotate_point(
-            self.end_point,
-            self.starting_point,
-            (self.x_angle, self.y_angle, self.z_angle),
-            self.angle_order,
-        )
+        # Combine the local rotations
+        local_rotation = np.dot(np.dot(rz, ry), rx)
 
-    def rotate_global(self, angles):
-        """
-        Rotate the vector
-        :param angles: Tuple (x, y, z) representing the angles of the vector on the x, y, and z axes
-        :return: None
-        """
-        self.end_point = rotate_point(
-            self.end_point,
-            self.starting_point,
-            angles,
-            self.angle_order,
-        )
+        # Update the orientation matrix with the new local rotation
+        self.orientation = np.dot(self.orientation, local_rotation)
 
-    def __str__(self):
-        return f"Vector3(starting_point={tuple(self.starting_point)}, end_point={tuple(self.end_point)}, length={self.length}"
+        # Rotate the component using the updated orientation matrix
+        self.component = np.dot(self.orientation, self.component)
+
+        # Update the end point
+        self.end = self.start + self.component
+
+    def length(self):
+        return np.linalg.norm(self.component)
+
+    def __add__(self, other):
+        return Vector3(self.start, self.component + other.component)
+
+    def __sub__(self, other):
+        return Vector3(self.start, self.component - other.component)
+
+    def copy(self):
+        return Vector3(self.start, self.component)
 
 
 def rotate_point(point, origin, angles, order="zyx"):
@@ -153,54 +204,6 @@ def rotate_point(point, origin, angles, order="zyx"):
     point += origin
 
     return point
-
-
-def rotate_point_around_axis(point, axis_start, axis_end, angle_degrees):
-    # Convert angle to radians
-    angle_radians = np.radians(angle_degrees)
-
-    # Create a unit vector representing the axis of rotation
-    axis_vector = np.array(axis_end) - np.array(axis_start)
-    axis_unit_vector = axis_vector / np.linalg.norm(axis_vector)
-
-    # Create the rotation matrix
-    rotation_matrix = np.array(
-        [
-            [
-                np.cos(angle_radians)
-                + axis_unit_vector[0] ** 2 * (1 - np.cos(angle_radians)),
-                axis_unit_vector[0] * axis_unit_vector[1] * (1 - np.cos(angle_radians))
-                - axis_unit_vector[2] * np.sin(angle_radians),
-                axis_unit_vector[0] * axis_unit_vector[2] * (1 - np.cos(angle_radians))
-                + axis_unit_vector[1] * np.sin(angle_radians),
-            ],
-            [
-                axis_unit_vector[1] * axis_unit_vector[0] * (1 - np.cos(angle_radians))
-                + axis_unit_vector[2] * np.sin(angle_radians),
-                np.cos(angle_radians)
-                + axis_unit_vector[1] ** 2 * (1 - np.cos(angle_radians)),
-                axis_unit_vector[1] * axis_unit_vector[2] * (1 - np.cos(angle_radians))
-                - axis_unit_vector[0] * np.sin(angle_radians),
-            ],
-            [
-                axis_unit_vector[2] * axis_unit_vector[0] * (1 - np.cos(angle_radians))
-                - axis_unit_vector[1] * np.sin(angle_radians),
-                axis_unit_vector[2] * axis_unit_vector[1] * (1 - np.cos(angle_radians))
-                + axis_unit_vector[0] * np.sin(angle_radians),
-                np.cos(angle_radians)
-                + axis_unit_vector[2] ** 2 * (1 - np.cos(angle_radians)),
-            ],
-        ]
-    )
-
-    # Convert point and axis to NumPy arrays for easier manipulation
-    point = np.array(point)
-    axis_start = np.array(axis_start)
-
-    # Translate the point to the origin, rotate, and translate back
-    rotated_point = np.dot(rotation_matrix, point - axis_start) + axis_start
-
-    return rotated_point.tolist()
 
 
 def is_point_in_any_cube(cubes, point):

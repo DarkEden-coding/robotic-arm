@@ -1,4 +1,4 @@
-from MotorControllerLibs.CANControlledMotors.can_functions import (
+from Server.MotorControllerLibs.CANControlledMotors.can_functions import (
     bus,
     send_bus_message,
     get_property_value,

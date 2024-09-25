@@ -1,9 +1,10 @@
-import socket
-import pickle
-import threading
-import os
 import json
-import rsa
+import os
+import pickle
+import socket
+import threading
+import traceback
+from datetime import datetime
 
 
 def start_thread(target):
@@ -25,10 +26,11 @@ class Server:
         self.name = name
         self.password = None
         self.client_public_key = None
-        self.data = {}
+        self.data = {"server_logs": ""}
+        self.file_path = os.path.dirname(os.path.realpath(__file__))
+        self.log_thread_lock = threading.Lock()
 
         self._load_settings()
-        self.public_key, self.private_key = rsa.newkeys(2048)
 
         self.command_socket = self._setup_socket(self.port)
         self.data_socket = self._setup_socket(self.port + 1)
@@ -40,23 +42,30 @@ class Server:
         start_thread(self._listen_for_data)
         start_thread(self._listen_for_get_request)
 
-        print("Server started successfully.")
+        self._print_log("Server started successfully.")
+
+    def _print_log(self, message):
+        with self.log_thread_lock:
+            # print message with timestamp and add message to server logs
+            time_stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            print(f"{time_stamp} - {message}")
+            self.data["server_logs"] += f"{time_stamp} - {message}\n"
 
     def _load_settings(self):
-        if os.path.exists("settings.json"):
-            with open("settings.json", "r") as f:
+        if os.path.exists(f"{self.file_path}/network-settings.json"):
+            with open(f"{self.file_path}/network-settings.json", "r") as f:
                 settings = json.load(f)
             self.host = settings.get("host", self.host)
             self.port = settings.get("port", self.port)
             self.password = settings.get("password", self.password)
-        print(f"Server settings: {self.host}:{self.port}")
+        self._print_log(f"Server settings: {self.host}:{self.port}")
 
     def _setup_socket(self, port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind((self.host, port))
         sock.settimeout(5)
         sock.listen()
-        print(f"Socket set up on {self.host}:{port}")
+        self._print_log(f"Socket set up on {self.host}:{port}")
         return sock
 
     def register_command_handler(self, handler):
@@ -65,7 +74,7 @@ class Server:
         :param handler: the function to be called apon command request
         """
         self.command_handler = handler
-        print("Command handler registered.")
+        self._print_log("Command handler registered.")
 
     def _listen_for_commands(self):
         self._listen(self.command_socket, self._process_command)
@@ -85,48 +94,47 @@ class Server:
                     self._handle_client_connection(conn, addr, process_func)
             except socket.timeout:
                 continue
-            except Exception as e:
-                print(f"Error: {e}")
+            except Exception as _:
+                self._print_log(f"Error in listen function: {traceback.format_exc()}")
 
     def _authenticate_client(self, conn, addr):
         while True:
-            print(f"Connected by {addr}, waiting for authentication...")
+            self._print_log(f"Connected by {addr}, waiting for authentication...")
             data = pickle.loads(conn.recv(2048))
             if data == self.password:
-                print("Password accepted. Sending public key...")
-                conn.sendall(
-                    pickle.dumps(
-                        {
-                            "status": "success",
-                            "public_key": self.public_key.save_pkcs1(),
-                        }
-                    )
-                )
-                self.client_public_key = rsa.PublicKey.load_pkcs1(
-                    pickle.loads(conn.recv(1024))
-                )
-                print("Client authenticated successfully.")
+                self._print_log("Password accepted.")
+                conn.sendall(pickle.dumps({"status": "success"}))
                 break
             else:
                 conn.sendall(
                     pickle.dumps({"status": "error", "message": "Invalid password."})
                 )
-                print(f"Invalid password from {addr}.")
+                self._print_log(f"Invalid password from {addr}.")
+                conn.close()
 
     def _handle_client_connection(self, conn, addr, process_func):
         while True:
             try:
-                data = self.decrypt_data(conn.recv(1024))
+                data = conn.recv(1024)
                 if not data:
-                    print(f"Connection closed by {addr}.")
+                    self._print_log(f"Connection closed by {addr}.")
                     break
                 data = pickle.loads(data)
                 response = process_func(data)
-                conn.sendall(self.encrypt_data(pickle.dumps(response)))
+
+                if not data.get("periodic", False):
+                    self._print_log(f"Processed data: {data} Response: {response}")
+
+                conn.sendall(pickle.dumps(response))
             except socket.timeout:
                 continue
-            except Exception as e:
-                print(f"Error: {e}")
+            except ConnectionResetError:
+                self._print_log(f"Connection reset by {addr}.")
+                break
+            except Exception as _:
+                self._print_log(
+                    f"Error in client connection function: {traceback.format_exc()}"
+                )
 
     def _process_command(self, data):
         command, args = data.get("command"), data.get("args")
@@ -134,7 +142,9 @@ class Server:
             try:
                 return self.command_handler(command, args)
             except Exception as e:
-                print(f"Error occurred while executing command: {command} Error: {e}")
+                self._print_log(
+                    f"Error occurred while executing command: {command} Error: {e}"
+                )
                 return {
                     "status": "error",
                     "message": f"An error occurred in the command: {e}",
@@ -158,18 +168,7 @@ class Server:
             return {"status": "success", "data": self.data}
         return {"status": "success", "data": self.data.get(key, "Key not found.")}
 
-    def encrypt_data(self, data):
-        """
-        Encrypts data that will be sent to the client
-        :param data: The data to be encrypted
-        :return: The encrypted data
-        """
-        return rsa.encrypt(data, self.client_public_key)
 
-    def decrypt_data(self, data):
-        """
-        Decrypts data that was sent from the client
-        :param data: The data to be decrypted
-        :return: The decrypted data
-        """
-        return rsa.decrypt(data, self.private_key)
+if __name__ == "__main__":
+    server = Server()
+    input("Press Enter to close the server.")

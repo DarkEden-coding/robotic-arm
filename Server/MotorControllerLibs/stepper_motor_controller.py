@@ -1,303 +1,216 @@
-import RPi.GPIO as GPIO
-import time
-import math
-from constants import StepperConstants
+from math import sqrt
 from threading import Thread
+from time import sleep, time
 
+from stepper_constants import StepperConstants, import_gpio
+
+GPIO = import_gpio()
 GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbering
 
 
-def cleanup():
-    """
-    Cleanup the GPIO pins
-    :return:
-    """
-    GPIO.cleanup()
-
-
-def get_movement_lengths(max_speed, accel, initial_speed, target_distance):
-    """
-    Get the length of the acceleration and linear movement
-    :param max_speed: the maximum speed of the motor in rotations per second
-    :param accel: the acceleration of the motor in rotations per second per second
-    :param initial_speed: the initial speed of the motor in rotations per second
-    :param target_distance: the target distance in degrees
-    :return:
-    """
-    accel_time = max_speed / accel
-    dist_over_accel = (initial_speed * accel_time) + (1 / 2 * accel * (accel_time**2))
-    linear_movement_length = target_distance - (2 * dist_over_accel)
-
-    return dist_over_accel, linear_movement_length
-
-
-def total_movement_time(acceleration, max_speed, linear_movement_length, target):
-    """
-    Get the total movement time
-    :param acceleration: the acceleration of the motor in rotations per second per second
-    :param max_speed: the maximum speed of the motor in rotations per second
-    :param linear_movement_length: the length of the linear movement
-    :param target: the target distance
-    :return:
-    """
-    if linear_movement_length > 0:
-        acceleration_time = max_speed / acceleration
-        linear_movement_time = linear_movement_length / max_speed
-
-        accel_and_linear_movement_time = (acceleration_time * 2) + linear_movement_time
-        return accel_and_linear_movement_time
-    else:
-        final_velocity = math.sqrt(2 * acceleration * (target / 2))
-        acceleration_time = final_velocity / acceleration
-        return 2 * acceleration_time
-
-
-def get_speed(
-    current_speed,
-    max_speed,
-    acceleration,
-    dist_over_accel,
-    linear_movement_length,
-    position,
-    target_distance,
-    stage=0,
-):
-    """
-    Get the speed of the motor
-    :param current_speed: the current speed of the object in units per second
-    :param max_speed: the maximum speed of the object in units per second
-    :param acceleration: the acceleration of the object in units per second per second
-    :param dist_over_accel: the distance over the acceleration
-    :param linear_movement_length: the length of the linear movement
-    :param position: the current position of the object
-    :param target_distance: the target distance of the object
-    :param stage: the stage of the movement
-    :return:
-    """
-    if linear_movement_length <= 0:
-        if position < (target_distance / 2):
-            current_speed += acceleration * StepperConstants.trapezoidal_step
-        else:
-            current_speed -= acceleration * StepperConstants.trapezoidal_step
-        return current_speed, 0
-    else:
-        if current_speed < max_speed and stage == 0:
-            current_speed = float(current_speed) + float(
-                acceleration * StepperConstants.trapezoidal_step
-            )
-        elif position < target_distance - dist_over_accel and (
-            stage == 0 or stage == 1
-        ):
-            stage = 1
-            current_speed = max_speed
-        elif stage == 1 or stage == 2:
-            current_speed -= acceleration * StepperConstants.trapezoidal_step
-            stage = 2
-
-        return current_speed, stage
-
-
-microstep_map = {
-    8: (GPIO.LOW, GPIO.LOW),
-    16: (GPIO.HIGH, GPIO.HIGH),
-    32: (GPIO.HIGH, GPIO.LOW),
-    64: (GPIO.LOW, GPIO.HIGH),
-}
-
-
-class StepperMotorController:
-    def __init__(
-        self,
-        enable_pin: int,
-        dir_pin: int,
-        step_pin: int,
-        micro_step_pins: tuple,
-        acceleration: float,
-        max_speed: float,
-        starting_speed: float,
-        gear_ratio: float,
-        reverse: bool = False,
-    ):
+class StepperMotor:
+    def __init__(self, motor_pins):
         """
-        Stepper motor controller class
-        :param enable_pin: the enable pin of the stepper motor
-        :param dir_pin: the direction pin of the stepper motor
-        :param step_pin: the step pin of the stepper motor
-        :param micro_step_pins: the micro step pins of the stepper motor (tuple)
-        :param acceleration: the acceleration of the stepper motor in rotations per second per second
-        :param max_speed: the maximum speed of the stepper motor in rotations per second
-        :param starting_speed: the starting speed of the stepper motor in rotations per second
-        :param gear_ratio: the gear ratio of the stepper motor in a decimal form
+        Stepper Motor class to control a stepper motor using the RPi.GPIO library.
+        :param motor_pins: the pins to control the stepper motor in the following order:
+        [step_pin, direction_pin, enable_pin, [micro_stepping_pins]]
         """
-        self.enable_pin = enable_pin
-        self.dir_pin = dir_pin
-        self.step_pin = step_pin
-        self.micro_step_pins = micro_step_pins
-        self.acceleration = acceleration
-        self.max_speed = max_speed
-        self.gear_ratio = gear_ratio
-        self.starting_speed = starting_speed
-        self.reverse = reverse
+        self.step_pin = motor_pins[0]
+        self.direction_pin = motor_pins[1]
+        self.enable_pin = motor_pins[2]
+        self.micro_stepping_pins = motor_pins[3]
 
-        self.position_data = []
-        self.speed_data = []
-
-        self.enabled = False
-        self.micro_steps = 8
-        self.speed = 0
-        self.step_position = 0
-        self.current_angle = 0
-
-        self.movement_thread = None
-
-        self.emergency_stop = False
-
-        self.moving = False
-
-        GPIO.setup(self.enable_pin, GPIO.OUT)
-        GPIO.setup(self.dir_pin, GPIO.OUT)
         GPIO.setup(self.step_pin, GPIO.OUT)
-        GPIO.setup(self.micro_step_pins, GPIO.OUT)
+        GPIO.setup(self.direction_pin, GPIO.OUT)
+        GPIO.setup(self.enable_pin, GPIO.OUT)
+        GPIO.setup(self.micro_stepping_pins, GPIO.OUT)
 
-    def emergency_stop(self):
-        self.emergency_stop = True
-
-    def enable_motor(self):
-        """
-        Enable the stepper motor
-        :return:
-        """
-        GPIO.output(self.enable_pin, GPIO.LOW)
-        self.enabled = True
-
-    def disable_motor(self):
-        """
-        Disable the stepper motor
-        :return:
-        """
         GPIO.output(self.enable_pin, GPIO.HIGH)
-        self.enabled = False
 
-    def set_micro_steps(self, micro_steps):
-        """
-        Set the micro steps of the stepper motor
-        :param micro_steps: the micro steps of the stepper motor
-        :return:
-        """
-        print(f"setting pins to {microstep_map[micro_steps]}")
-        GPIO.output(self.micro_step_pins, microstep_map[micro_steps])
-        self.micro_steps = micro_steps
+        self.micro_stepping = StepperConstants.microstepping
+        self.set_micro_stepping(StepperConstants.microstepping)
 
-    def _move_to_angle(self, target_angle, relative):
-        GPIO.setmode(GPIO.BCM)
-
-        self.enable_motor()
-
-        if not relative:
-            target_angle = target_angle - self.current_angle
-
-        fixed_degrees_per_step = StepperConstants.degrees_per_step / self.micro_steps
-        steps = target_angle / fixed_degrees_per_step
-
-        steps = steps * self.gear_ratio
-
-        direction = GPIO.HIGH if steps > 0 else GPIO.LOW
-        GPIO.output(self.dir_pin, direction)
-
-        steps = abs(steps)
-
-        max_speed_steps = self.max_speed / fixed_degrees_per_step
-        acceleration_steps = self.acceleration / fixed_degrees_per_step
-        starting_speed_steps = self.starting_speed / fixed_degrees_per_step
-
-        dist_over_accel, linear_movement_length = get_movement_lengths(
-            max_speed_steps, acceleration_steps, starting_speed_steps, steps
-        )
-
-        stage = 0
-        self.speed = starting_speed_steps
-        self.step_position = 0
-        self.moving = True
-        while True:
-            if self.emergency_stop:
-                break
-
-            self.speed, stage = get_speed(
-                self.speed,
-                max_speed_steps,
-                acceleration_steps,
-                dist_over_accel,
-                linear_movement_length,
-                self.step_position,
-                steps,
-                stage,
-            )
-
-            if self.speed * StepperConstants.trapezoidal_step <= 0:
-                break
-            else:
-                delay = (
-                    StepperConstants.trapezoidal_step
-                    / (self.speed * StepperConstants.trapezoidal_step)
-                ) / 2
-
-            for _ in range(int(self.speed * StepperConstants.trapezoidal_step)):
-                GPIO.output(self.step_pin, GPIO.HIGH)
-                time.sleep(delay)
-                GPIO.setmode(GPIO.BCM)
-                GPIO.output(self.step_pin, GPIO.LOW)
-                time.sleep(delay)
-                self.step_position += 1
-
-            if self.step_position >= steps:
-                break
-
-            # set the current angle
-            if direction == GPIO.HIGH:
-                self.current_angle += self.step_position * fixed_degrees_per_step
-            else:
-                self.current_angle -= self.step_position * fixed_degrees_per_step
-        self.current_angle = target_angle
+        self.current_position = 0
+        self.current_velocity = 0
         self.moving = False
 
-    def get_angle(self):
-        return self.current_angle
+        self.max_speed = StepperConstants.max_speed
+        self.acceleration = StepperConstants.acceleration
 
-    def wait_for_move(self):
-        """
-        Wait until the stepper motor is stopped
-        :return:
-        """
-        self.movement_thread.join()
+        self.running_thread = Thread(target=self.running_thread)
+        self.running_thread.start()
 
-    def move_to_angle(self, target_angle, relative=False):
-        """
-        Move the stepper motor to a specific angle
-        :param target_angle: the target angle in degrees
-        :param wait_for_move: whether to wait for the movement to finish
-        :param relative: whether the movement is relative to the current position instead of absolute
-        :return:
-        """
-        if self.reverse:
-            target_angle = -target_angle
-        self.movement_thread = Thread(
-            target=self._move_to_angle, args=(target_angle, relative)
+    def set_micro_stepping(self, micro_stepping):
+        GPIO.output(
+            self.micro_stepping_pins[0],
+            StepperConstants.microstep_map[micro_stepping][0],
         )
-        self.movement_thread.start()
+        GPIO.output(
+            self.micro_stepping_pins[1],
+            StepperConstants.microstep_map[micro_stepping][1],
+        )
+        self.micro_stepping = micro_stepping
 
-    def force_move_steps(self, steps):
-        """
-        Force the stepper motor to move a specific number of steps, not recommended for use
-        :param steps: the number of steps to move
-        :return:
-        """
-        direction = GPIO.HIGH if steps > 0 else GPIO.LOW
-        GPIO.output(self.dir_pin, direction)
+    def running_thread(self):
+        while True:
+            start_time = time()
+            if self.current_velocity > 0:
+                GPIO.output(self.direction_pin, GPIO.HIGH)
+            elif self.current_velocity < 0:
+                GPIO.output(self.direction_pin, GPIO.LOW)
 
-        steps = abs(steps)
+            step_velocity = abs(self.current_velocity) / (
+                StepperConstants.degrees_per_step / self.micro_stepping
+            )
+            if step_velocity != 0:
+                GPIO.output(self.step_pin, GPIO.HIGH)
+                sleep(1 / (2 * step_velocity))
+                GPIO.output(self.step_pin, GPIO.LOW)
+                sleep(1 / (2 * step_velocity))
+            else:
+                sleep(0.01)
+            self.current_position += self.current_velocity * (time() - start_time)
 
-        for _ in range(int(steps)):
-            GPIO.output(self.step_pin, GPIO.HIGH)
-            time.sleep(0.001)
-            GPIO.output(self.step_pin, GPIO.LOW)
-            time.sleep(0.001)
+    def set_position(self, position, blocking=False):
+        if blocking:
+            self._set_position(position)
+        else:
+            Thread(target=self._set_position, args=(position,)).start()
+            sleep(0.05)
+
+    def _set_position(self, position):
+        print(f"Moving to position: {position}")
+        self.moving = True
+        change_in_position = position - self.current_position
+        start_position = self.current_position
+        print(f"Change in position: {change_in_position}")
+
+        if self._get_acceleration_distance() * 2 > abs(change_in_position):
+            print("Move too short to get to max speed...")
+            accelerate_position = position - change_in_position / 2
+            decelerate_position = position - change_in_position / 2
+        else:
+            accelerate_position = (
+                self.current_position
+                + self._get_acceleration_distance()
+                * (1 if change_in_position > 0 else -1)
+            )
+            decelerate_position = position - self._get_acceleration_distance() * (
+                1 if change_in_position > 0 else -1
+            )
+
+        self.current_position = (
+            0.01 if self.current_position == 0 else self.current_position
+        )
+
+        print(f"Accelerate Position: {accelerate_position}")
+        print(f"Decelerate Position: {decelerate_position}")
+
+        def get_acceleration_velocity():
+            return sqrt(
+                2
+                * self.acceleration
+                * abs(self.current_position - (start_position - 0.1))
+            )
+
+        def get_deceleration_velocity():
+            return sqrt(
+                2
+                * self.acceleration
+                * abs(
+                    (self.current_position - start_position)
+                    - (position - start_position)
+                )
+            )
+
+        if change_in_position > 0:
+            while self.current_position < accelerate_position:
+                self.current_velocity = get_acceleration_velocity()
+                sleep(0.0001)
+
+            while self.current_position < decelerate_position:
+                self.current_velocity = self.max_speed
+                sleep(0.0001)
+
+            while self.current_position < position:
+                self.current_velocity = get_deceleration_velocity()
+                sleep(0.0001)
+        else:
+            while self.current_position > accelerate_position:
+                self.current_velocity = -get_acceleration_velocity()
+                sleep(0.0001)
+
+            while self.current_position > decelerate_position:
+                self.current_velocity = -self.max_speed
+                sleep(0.0001)
+
+            while self.current_position > position:
+                self.current_velocity = -get_deceleration_velocity()
+                sleep(0.0001)
+
+        self.current_velocity = 0
+        self.moving = False
+        print(f"Stopped at: {self.current_position}\n")
+
+    def _get_acceleration_time(self):
+        return self.max_speed / self.acceleration
+
+    def _get_acceleration_distance(self):
+        return 0.5 * self.acceleration * self._get_acceleration_time() ** 2
+
+
+if __name__ == "__main__":
+    graph_enabled = False  # Toggle graphing here
+
+    if graph_enabled:
+        import matplotlib.pyplot as plt  # Only import if graphing is enabled
+
+    motor = StepperMotor([1, 12, 0, [5, 6]])
+
+    moves = [180, -180]
+
+    positions = []
+    velocities = []
+    time_steps = []
+    start_time = time()
+
+    if graph_enabled:
+        plt.figure(figsize=(10, 5))
+        plt.subplot(2, 1, 1)
+        (pos_plot,) = plt.plot([], [], label="Position")
+        plt.title("Stepper Motor Position Over Time")
+        plt.ylabel("Position")
+        plt.legend()
+
+        plt.subplot(2, 1, 2)
+        (vel_plot,) = plt.plot([], [], label="Velocity", color="orange")
+        plt.title("Stepper Motor Velocity Over Time")
+        plt.ylabel("Velocity")
+        plt.xlabel("Time (s)")
+        plt.legend()
+
+    for move in moves:
+        motor.set_position(move, blocking=False)
+
+        while motor.moving:
+            positions.append(motor.current_position)
+            velocities.append(motor.current_velocity)
+            time_steps.append(time() - start_time)
+
+            if graph_enabled:
+                pos_plot.set_data(time_steps, positions)
+                vel_plot.set_data(time_steps, velocities)
+
+                plt.subplot(2, 1, 1)
+                plt.xlim(0, max(time_steps))
+                plt.ylim(min(positions), max(positions))
+
+                plt.subplot(2, 1, 2)
+                plt.xlim(0, max(time_steps))
+                plt.ylim(min(velocities), max(velocities))
+
+                plt.pause(0.01)  # Pause to update the plot
+            sleep(0.01)
+
+    if graph_enabled:
+        plt.show()
